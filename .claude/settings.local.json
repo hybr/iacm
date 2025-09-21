@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(curl:*)",
+      "Bash(cmd:*)",
+      "Bash(javac:*)",
+      "Bash(java:*)",
+      "Bash(timeout 5 java:*)",
+      "Bash(javap:*)",
+      "Bash(timeout 3 java:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
