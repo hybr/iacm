@@ -149,18 +149,24 @@ public class UserDAO {
     }
 
     public boolean insertUser(User user) throws SQLException {
-        String query = "INSERT INTO users (username, password, email, full_name, security_question, security_answer, role) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO users (username, password, password_salt, email, full_name, security_question, security_answer, role, assigned_club_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getEmail());
-            pstmt.setString(4, user.getFullName());
-            pstmt.setString(5, user.getSecurityQuestion());
-            pstmt.setString(6, user.getSecurityAnswer());
-            pstmt.setString(7, user.getRole().name());
+            pstmt.setString(3, user.getPasswordSalt());
+            pstmt.setString(4, user.getEmail());
+            pstmt.setString(5, user.getFullName());
+            pstmt.setString(6, user.getSecurityQuestion());
+            pstmt.setString(7, user.getSecurityAnswer());
+            pstmt.setString(8, user.getRole().name());
+            if (user.getAssignedClubId() != null) {
+                pstmt.setInt(9, user.getAssignedClubId());
+            } else {
+                pstmt.setNull(9, java.sql.Types.INTEGER);
+            }
 
             return pstmt.executeUpdate() > 0;
         }
