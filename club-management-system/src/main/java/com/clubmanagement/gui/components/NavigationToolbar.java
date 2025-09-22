@@ -87,6 +87,11 @@ public class NavigationToolbar extends JPanel {
         dashboardBtn.addActionListener(e -> notifyAction("dashboard"));
         add(dashboardBtn);
 
+        // Club Allocation button
+        JButton allocationBtn = createToolbarButton("🎯 Allocation", "View club allocations");
+        allocationBtn.addActionListener(e -> notifyAction("allocation"));
+        add(allocationBtn);
+
         // Self Attendance button
         JButton attendanceBtn = createToolbarButton("✔️ Mark Attendance", "Mark your attendance");
         attendanceBtn.addActionListener(e -> notifyAction("selfAttendance"));
