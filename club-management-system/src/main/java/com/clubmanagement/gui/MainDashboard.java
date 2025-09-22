@@ -1,6 +1,6 @@
 package com.clubmanagement.gui;
 
-import com.clubmanagement.gui.components.RibbonComponent;
+import com.clubmanagement.gui.components.NavigationToolbar;
 import com.clubmanagement.gui.theme.ModernTheme;
 import com.clubmanagement.models.User;
 import com.clubmanagement.services.AuthenticationService;
@@ -14,7 +14,7 @@ public class MainDashboard extends JFrame {
     private AuthenticationService authService;
     private JPanel contentPanel;
     private CardLayout cardLayout;
-    private RibbonComponent ribbon;
+    private NavigationToolbar toolbar;
     private JLabel statusLabel;
 
     public MainDashboard(AuthenticationService authService) {
@@ -30,7 +30,7 @@ public class MainDashboard extends JFrame {
         contentPanel = ModernTheme.createContentPanel();
         contentPanel.setLayout(cardLayout);
 
-        ribbon = new RibbonComponent(authService);
+        toolbar = new NavigationToolbar(authService);
         statusLabel = ModernTheme.createBodyLabel("Ready");
     }
 
@@ -40,38 +40,25 @@ public class MainDashboard extends JFrame {
         // Set modern look and feel
         getContentPane().setBackground(ModernTheme.LIGHT_GRAY);
 
-        if (authService.isGrade9()) {
-            // Grade 9 students get a simple layout without ribbon
-            JPanel titlePanel = createSimpleTitlePanel();
-            add(titlePanel, BorderLayout.NORTH);
+        // Header with title
+        JPanel titlePanel = createTitlePanel();
+        add(titlePanel, BorderLayout.NORTH);
 
-            // Direct content area for Grade 9
-            JPanel mainPanel = new JPanel(new BorderLayout());
-            mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
-            mainPanel.add(contentPanel, BorderLayout.CENTER);
+        // Navigation toolbar for all users
+        add(toolbar, BorderLayout.CENTER);
 
-            add(mainPanel, BorderLayout.CENTER);
-        } else {
-            // Other roles get the full ribbon interface
-            JPanel titlePanel = createTitlePanel();
-            add(titlePanel, BorderLayout.NORTH);
+        // Main content area
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            // Ribbon
-            add(ribbon, BorderLayout.CENTER);
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-            // Main content area
-            JPanel mainPanel = new JPanel(new BorderLayout());
-            mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
-            mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Status bar
+        JPanel statusPanel = createStatusPanel();
+        mainPanel.add(statusPanel, BorderLayout.SOUTH);
 
-            mainPanel.add(contentPanel, BorderLayout.CENTER);
-
-            // Status bar
-            JPanel statusPanel = createStatusPanel();
-            mainPanel.add(statusPanel, BorderLayout.SOUTH);
-
-            add(mainPanel, BorderLayout.SOUTH);
-        }
+        add(mainPanel, BorderLayout.SOUTH);
 
         loadInitialContent();
     }
@@ -389,19 +376,23 @@ public class MainDashboard extends JFrame {
     }
 
     private void setupEventHandlers() {
-        ribbon.addActionListener(e -> handleRibbonAction(e.getActionCommand()));
+        toolbar.addActionListener(e -> handleToolbarAction(e.getActionCommand()));
     }
 
-    private void handleRibbonAction(String command) {
+    private void handleToolbarAction(String command) {
         statusLabel.setText("Processing " + command + "...");
 
         SwingUtilities.invokeLater(() -> {
             switch (command.toLowerCase()) {
+                case "dashboard":
+                    loadInitialContent();
+                    statusLabel.setText("Dashboard loaded");
+                    break;
                 case "proposals":
                     showProposalManagement();
                     statusLabel.setText("Proposal Management loaded");
                     break;
-                case "allocations":
+                case "allocation":
                     showClubAllocation();
                     statusLabel.setText("Club Allocation loaded");
                     break;
@@ -428,6 +419,23 @@ public class MainDashboard extends JFrame {
                 case "attendance":
                     showAttendanceMarking();
                     statusLabel.setText("Attendance Marking loaded");
+                    break;
+                case "selfattendance":
+                    if (authService.isGrade11()) {
+                        showGrade11SelfAttendance();
+                        statusLabel.setText("Self-Attendance Marking loaded");
+                    } else {
+                        showAttendanceMarking();
+                        statusLabel.setText("Attendance loaded");
+                    }
+                    break;
+                case "attendancehistory":
+                    showAttendanceReport();
+                    statusLabel.setText("Attendance History loaded");
+                    break;
+                case "clubassignment":
+                    showGrade9ClubAssignments();
+                    statusLabel.setText("Club Assignment loaded");
                     break;
                 case "clubinfo":
                     showClubInfo();

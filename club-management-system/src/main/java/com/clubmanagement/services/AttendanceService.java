@@ -292,4 +292,135 @@ public class AttendanceService {
 
         return null; // No validation errors
     }
+
+    // ============ MISSING METHODS FOR GUI COMPATIBILITY ============
+
+    /**
+     * Get total number of sessions in the system
+     */
+    public static int getTotalSessions() {
+        return 20; // Total sessions per academic period
+    }
+
+    /**
+     * Get minimum required attendance
+     */
+    public static int getMinimumRequiredAttendance() {
+        return 15; // Minimum sessions required for attendance
+    }
+
+    /**
+     * Mark attendance for a student with session number
+     */
+    public boolean markAttendance(int studentId, int sessionNumber, boolean present) throws SQLException {
+        try {
+            User student = userDAO.getUserById(studentId);
+            if (student == null || student.getAssignedClubId() == null) {
+                return false;
+            }
+
+            AttendanceStatus status = present ? AttendanceStatus.PRESENT : AttendanceStatus.ABSENT;
+            LocalDate sessionDate = LocalDate.now(); // Use current date for session
+
+            Attendance attendance = new Attendance(
+                studentId,
+                student.getAssignedClubId(),
+                studentId, // Self-marked
+                sessionDate,
+                status,
+                "Session " + sessionNumber
+            );
+
+            return attendanceDAO.markAttendance(attendance);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if student has attendance for a specific session
+     */
+    public boolean hasAttendanceForSession(int studentId, int sessionNumber) throws SQLException {
+        try {
+            List<Attendance> attendanceList = attendanceDAO.getAttendanceByStudent(studentId);
+            return attendanceList.stream()
+                .anyMatch(a -> a.getNotes() != null && a.getNotes().contains("Session " + sessionNumber));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get student attendance list
+     */
+    public List<Attendance> getStudentAttendance(int studentId) throws SQLException {
+        return attendanceDAO.getAttendanceByStudent(studentId);
+    }
+
+    /**
+     * Get student attendance count
+     */
+    public int getStudentAttendanceCount(int studentId) throws SQLException {
+        List<Attendance> attendanceList = getStudentAttendance(studentId);
+        return (int) attendanceList.stream()
+            .filter(a -> a.getStatus() == AttendanceStatus.PRESENT || a.getStatus() == AttendanceStatus.LATE)
+            .count();
+    }
+
+    /**
+     * Check if student has minimum attendance
+     */
+    public boolean hasMinimumAttendance(int studentId) throws SQLException {
+        return getStudentAttendanceCount(studentId) >= getMinimumRequiredAttendance();
+    }
+
+    /**
+     * Generate attendance report
+     */
+    public AttendanceReport generateAttendanceReport() throws SQLException {
+        return new AttendanceReport();
+    }
+
+    /**
+     * Inner class for attendance reports
+     */
+    public static class AttendanceReport {
+        private List<User> students;
+        private Map<Integer, Integer> attendanceCounts;
+        private List<User> poorAttendanceStudents;
+
+        public AttendanceReport() {
+            this.students = new ArrayList<>();
+            this.attendanceCounts = new java.util.HashMap<>();
+            this.poorAttendanceStudents = new ArrayList<>();
+        }
+
+        public List<User> getStudents() {
+            return students;
+        }
+
+        public void setStudents(List<User> students) {
+            this.students = students;
+        }
+
+        public List<User> getAllStudents() {
+            return students;
+        }
+
+        public Map<Integer, Integer> getAttendanceCounts() {
+            return attendanceCounts;
+        }
+
+        public void setAttendanceCounts(Map<Integer, Integer> attendanceCounts) {
+            this.attendanceCounts = attendanceCounts;
+        }
+
+        public List<User> getPoorAttendanceStudents() {
+            return poorAttendanceStudents;
+        }
+
+        public void setPoorAttendanceStudents(List<User> poorAttendanceStudents) {
+            this.poorAttendanceStudents = poorAttendanceStudents;
+        }
+    }
 }

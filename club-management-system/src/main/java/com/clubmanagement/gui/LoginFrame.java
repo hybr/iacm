@@ -29,7 +29,9 @@ public class LoginFrame extends JFrame {
         usernameField = ModernTheme.createStyledTextField();
         passwordField = ModernTheme.createStyledPasswordField();
         loginButton = ModernTheme.createPrimaryButton("Login");
-        signUpButton = ModernTheme.createSecondaryButton("Sign Up");
+        signUpButton = ModernTheme.createPrimaryButton("Sign Up");
+        signUpButton.setBackground(ModernTheme.PRIMARY_BLUE.brighter());
+        signUpButton.setPreferredSize(new Dimension(100, 35));
 
         // Create forgot password as a styled link/text button
         forgotPasswordButton = new JButton("Forgot Password?");
@@ -63,17 +65,17 @@ public class LoginFrame extends JFrame {
         // Main container with modern styling
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
 
         // Login card
         JPanel loginCard = ModernTheme.createCardPanel();
         loginCard.setLayout(new BorderLayout());
-        loginCard.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        loginCard.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
 
         // Header section
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ModernTheme.WHITE);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
         JLabel titleLabel = ModernTheme.createTitleLabel("Club Management System");
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -120,13 +122,17 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(20, 0, 15, 0);
         formPanel.add(loginButton, gbc);
 
-        // Sign Up button (separate from Forgot Password)
-        JPanel signUpPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        // Sign Up section with text and button
+        JPanel signUpPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         signUpPanel.setBackground(ModernTheme.WHITE);
+
+        JLabel newUserLabel = ModernTheme.createBodyLabel("New user?");
+        newUserLabel.setForeground(ModernTheme.TEXT_LIGHT);
+        signUpPanel.add(newUserLabel);
         signUpPanel.add(signUpButton);
 
         gbc.gridy = 6;
-        gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.insets = new Insets(15, 0, 0, 0);
         formPanel.add(signUpPanel, gbc);
 
         loginCard.add(headerPanel, BorderLayout.NORTH);
@@ -134,21 +140,34 @@ public class LoginFrame extends JFrame {
 
         mainPanel.add(loginCard, BorderLayout.CENTER);
 
-        // Info panel with modern styling
+        // Compact info panel
         JPanel infoPanel = ModernTheme.createCardPanel();
         infoPanel.setLayout(new BorderLayout());
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        JLabel infoTitle = ModernTheme.createHeadingLabel("Default Login Credentials");
-        infoTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel infoTitle = new JLabel("Demo Credentials", SwingConstants.CENTER);
+        infoTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        infoTitle.setForeground(ModernTheme.TEXT_DARK);
 
-        JPanel credentialsPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+        JPanel credentialsPanel = new JPanel(new GridLayout(3, 1, 2, 2));
         credentialsPanel.setBackground(ModernTheme.WHITE);
-        credentialsPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        credentialsPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
-        credentialsPanel.add(ModernTheme.createBodyLabel("Club Manager: manager / manager123"));
-        credentialsPanel.add(ModernTheme.createBodyLabel("11th Grader: grade11_1 / pass123"));
-        credentialsPanel.add(ModernTheme.createBodyLabel("9th Grader: grade9_1 / pass123"));
+        JLabel mgr = new JLabel("Manager: manager/manager123", SwingConstants.CENTER);
+        mgr.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        mgr.setForeground(ModernTheme.TEXT_LIGHT);
+
+        JLabel g11 = new JLabel("Grade 11: grade11_1/pass123", SwingConstants.CENTER);
+        g11.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        g11.setForeground(ModernTheme.TEXT_LIGHT);
+
+        JLabel g9 = new JLabel("Grade 9: grade9_1/pass123", SwingConstants.CENTER);
+        g9.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        g9.setForeground(ModernTheme.TEXT_LIGHT);
+
+        credentialsPanel.add(mgr);
+        credentialsPanel.add(g11);
+        credentialsPanel.add(g9);
 
         infoPanel.add(infoTitle, BorderLayout.NORTH);
         infoPanel.add(credentialsPanel, BorderLayout.CENTER);
@@ -285,7 +304,7 @@ public class LoginFrame extends JFrame {
     private void setupFrame() {
         setTitle("Club Management System - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(new Dimension(500, 650));
+        setSize(new Dimension(500, 700));
         setLocationRelativeTo(null);
         setResizable(false);
 

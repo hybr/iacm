@@ -159,6 +159,22 @@ public class Attendance {
     public String getClubName() { return clubName; }
     public void setClubName(String clubName) { this.clubName = clubName; }
 
+    // Additional methods for GUI compatibility
+    public int getSessionNumber() {
+        if (notes != null && notes.startsWith("Session ")) {
+            try {
+                return Integer.parseInt(notes.substring(8));
+            } catch (NumberFormatException e) {
+                return 1;
+            }
+        }
+        return 1;
+    }
+
+    public boolean isPresent() {
+        return status == AttendanceStatus.PRESENT || status == AttendanceStatus.LATE;
+    }
+
     @Override
     public String toString() {
         return String.format("%s - %s (%s) - %s",
