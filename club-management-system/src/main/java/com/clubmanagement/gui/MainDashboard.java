@@ -19,6 +19,11 @@ public class MainDashboard extends JFrame {
 
     public MainDashboard(AuthenticationService authService) {
         this.authService = authService;
+
+        // Set macOS specific settings for better compatibility
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Club Management");
+
         initializeComponents();
         setupLayout();
         setupEventHandlers();

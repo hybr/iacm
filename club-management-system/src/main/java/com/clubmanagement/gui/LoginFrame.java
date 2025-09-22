@@ -257,93 +257,75 @@ public class LoginFrame extends JFrame {
         signUpButton.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        try {
-            if (authService.login(username, password)) {
-                JOptionPane.showMessageDialog(this, "Login successful!",
-                                            "Success", JOptionPane.INFORMATION_MESSAGE);
+        // Perform login in background thread to avoid blocking UI
+        SwingWorker<Boolean, Void> loginWorker = new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                return authService.login(username, password);
+            }
 
-                this.dispose();
-
+            @Override
+            protected void done() {
                 try {
-                    // Check if 9th grader needs to complete first login
-                    if (authService.needsFirstLoginCompletion()) {
-                        // Grade 9 students need club selection
+                    boolean loginSuccess = get();
+
+                    if (loginSuccess) {
+                        // Close login window first
+                        LoginFrame.this.dispose();
+
+                        // Open appropriate window based on user status
                         SwingUtilities.invokeLater(() -> {
                             try {
-                                new ClubSelectionFrame(authService).setVisible(true);
+                                // Check if 9th grader needs to complete first login
+                                if (authService.needsFirstLoginCompletion()) {
+                                    // Grade 9 students need club selection
+                                    new ClubSelectionFrame(authService).setVisible(true);
+                                } else if (authService.needsClubSelection()) {
+                                    // Grade 11 students need club selection (multiple clubs)
+                                    new Grade11ClubSelectionFrame(authService).setVisible(true);
+                                } else {
+                                    // Create and show main dashboard
+                                    MainDashboard dashboard = new MainDashboard(authService);
+                                    dashboard.setVisible(true);
+                                }
                             } catch (Exception e) {
-                                System.err.println("Error opening ClubSelectionFrame: " + e.getMessage());
+                                System.err.println("Error opening post-login window: " + e.getMessage());
                                 e.printStackTrace();
                                 JOptionPane.showMessageDialog(null,
-                                    "Error opening club selection: " + e.getMessage(),
+                                    "Error opening application: " + e.getMessage(),
                                     "Error", JOptionPane.ERROR_MESSAGE);
-                            }
-                        });
-                    } else if (authService.needsClubSelection()) {
-                        // Grade 11 students need club selection (multiple clubs)
-                        SwingUtilities.invokeLater(() -> {
-                            try {
-                                new Grade11ClubSelectionFrame(authService).setVisible(true);
-                            } catch (Exception e) {
-                                System.err.println("Error opening Grade11ClubSelectionFrame: " + e.getMessage());
-                                e.printStackTrace();
-                                JOptionPane.showMessageDialog(null,
-                                    "Error opening Grade 11 club selection: " + e.getMessage(),
-                                    "Error", JOptionPane.ERROR_MESSAGE);
+                                // Reopen login on error
+                                new LoginFrame().setVisible(true);
                             }
                         });
                     } else {
-                        SwingUtilities.invokeLater(() -> {
-                            try {
-                                new MainDashboard(authService).setVisible(true);
-                            } catch (Exception e) {
-                                System.err.println("Error opening MainDashboard: " + e.getMessage());
-                                e.printStackTrace();
-                                JOptionPane.showMessageDialog(null,
-                                    "Error opening main dashboard: " + e.getMessage(),
-                                    "Error", JOptionPane.ERROR_MESSAGE);
-                            }
-                        });
+                        // Reset loading state
+                        loginButton.setText("Login");
+                        loginButton.setEnabled(true);
+                        signUpButton.setEnabled(true);
+                        setCursor(Cursor.getDefaultCursor());
+
+                        JOptionPane.showMessageDialog(LoginFrame.this, "Invalid username or password.",
+                                                    "Login Error", JOptionPane.ERROR_MESSAGE);
+                        passwordField.setText("");
                     }
                 } catch (Exception e) {
-                    System.err.println("Error during post-login processing: " + e.getMessage());
+                    // Reset loading state
+                    loginButton.setText("Login");
+                    loginButton.setEnabled(true);
+                    signUpButton.setEnabled(true);
+                    setCursor(Cursor.getDefaultCursor());
+
+                    System.err.println("Error during login: " + e.getMessage());
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog(this,
-                        "Error during login processing: " + e.getMessage(),
+                    JOptionPane.showMessageDialog(LoginFrame.this,
+                        "Login error: " + e.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } else {
-                // Reset loading state
-                loginButton.setText("Login");
-                loginButton.setEnabled(true);
-                signUpButton.setEnabled(true);
-                setCursor(Cursor.getDefaultCursor());
-
-                JOptionPane.showMessageDialog(this, "Invalid username or password.",
-                                            "Login Error", JOptionPane.ERROR_MESSAGE);
-                passwordField.setText("");
             }
-        } catch (SQLException ex) {
-            // Reset loading state
-            loginButton.setText("Login");
-            loginButton.setEnabled(true);
-            signUpButton.setEnabled(true);
-            setCursor(Cursor.getDefaultCursor());
+        };
 
-            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
-                                        "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        } catch (Exception ex) {
-            // Reset loading state
-            loginButton.setText("Login");
-            loginButton.setEnabled(true);
-            signUpButton.setEnabled(true);
-            setCursor(Cursor.getDefaultCursor());
-
-            JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(),
-                                        "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
+        loginWorker.execute();
     }
 
     private void openSignUpFrame() {

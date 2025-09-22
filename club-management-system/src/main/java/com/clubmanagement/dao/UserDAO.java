@@ -3,6 +3,7 @@ package com.clubmanagement.dao;
 import com.clubmanagement.database.DatabaseManager;
 import com.clubmanagement.models.User;
 import com.clubmanagement.models.User.UserRole;
+import com.clubmanagement.security.PasswordHasher;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,42 +12,82 @@ import java.util.List;
 public class UserDAO {
 
     public User authenticate(String username, String password) throws SQLException {
-        String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+        String query = "SELECT * FROM users WHERE username = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    try {
-                        return new User(
-                            rs.getInt("id"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            getStringOrNull(rs, "password_salt"),
-                            getStringOrNull(rs, "email"),
-                            getStringOrNull(rs, "full_name"),
-                            getStringOrNull(rs, "security_question"),
-                            getStringOrNull(rs, "security_answer"),
-                            UserRole.valueOf(rs.getString("role")),
-                            getIntegerOrNull(rs, "assigned_club_id"),
-                            getBooleanOrDefault(rs, "first_login_completed", false),
-                            getTimestampOrNull(rs, "created_at"),
-                            getTimestampOrNull(rs, "last_login"),
-                            getBooleanOrDefault(rs, "is_active", true)
-                        );
-                    } catch (SQLException e) {
-                        // Fallback for older database schema
-                        System.err.println("Warning: Using fallback user constructor due to: " + e.getMessage());
-                        return new User(
-                            rs.getInt("id"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            UserRole.valueOf(rs.getString("role"))
-                        );
+                    String storedPasswordHash = rs.getString("password");
+                    String storedSalt = getStringOrNull(rs, "password_salt");
+
+                    // Check if this is an encrypted password (has salt)
+                    if (storedSalt != null && !storedSalt.isEmpty()) {
+                        // Verify password using encrypted comparison
+                        if (PasswordHasher.verifyPassword(password, storedPasswordHash, storedSalt)) {
+                            try {
+                                return new User(
+                                    rs.getInt("id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    storedSalt,
+                                    getStringOrNull(rs, "email"),
+                                    getStringOrNull(rs, "full_name"),
+                                    getStringOrNull(rs, "security_question"),
+                                    getStringOrNull(rs, "security_answer"),
+                                    UserRole.valueOf(rs.getString("role")),
+                                    getIntegerOrNull(rs, "assigned_club_id"),
+                                    getBooleanOrDefault(rs, "first_login_completed", false),
+                                    getTimestampOrNull(rs, "created_at"),
+                                    getTimestampOrNull(rs, "last_login"),
+                                    getBooleanOrDefault(rs, "is_active", true)
+                                );
+                            } catch (SQLException e) {
+                                // Fallback for older database schema
+                                System.err.println("Warning: Using fallback user constructor due to: " + e.getMessage());
+                                return new User(
+                                    rs.getInt("id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    UserRole.valueOf(rs.getString("role"))
+                                );
+                            }
+                        }
+                    } else {
+                        // Fallback for legacy plain text passwords (temporary compatibility)
+                        if (storedPasswordHash.equals(password)) {
+                            System.err.println("Warning: User '" + username + "' is using legacy plain text password. Please update to encrypted password.");
+                            try {
+                                return new User(
+                                    rs.getInt("id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    storedSalt,
+                                    getStringOrNull(rs, "email"),
+                                    getStringOrNull(rs, "full_name"),
+                                    getStringOrNull(rs, "security_question"),
+                                    getStringOrNull(rs, "security_answer"),
+                                    UserRole.valueOf(rs.getString("role")),
+                                    getIntegerOrNull(rs, "assigned_club_id"),
+                                    getBooleanOrDefault(rs, "first_login_completed", false),
+                                    getTimestampOrNull(rs, "created_at"),
+                                    getTimestampOrNull(rs, "last_login"),
+                                    getBooleanOrDefault(rs, "is_active", true)
+                                );
+                            } catch (SQLException e) {
+                                // Fallback for older database schema
+                                System.err.println("Warning: Using fallback user constructor due to: " + e.getMessage());
+                                return new User(
+                                    rs.getInt("id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    UserRole.valueOf(rs.getString("role"))
+                                );
+                            }
+                        }
                     }
                 }
             }

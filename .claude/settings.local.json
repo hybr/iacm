@@ -19,7 +19,8 @@
       "Bash(./run.bat)",
       "Bash(.compile.bat)",
       "Bash(compile.bat)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(sqlite3:*)"
     ],
     "deny": [],
     "ask": []

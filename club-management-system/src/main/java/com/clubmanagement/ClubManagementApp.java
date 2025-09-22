@@ -11,11 +11,27 @@ public class ClubManagementApp {
         // Set uncaught exception handler for EDT
         System.setProperty("sun.awt.exception.handler", "com.clubmanagement.ClubManagementApp$EdtExceptionHandler");
 
+        // Set macOS specific properties
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("apple.awt.application.name", "Club Management System");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Club Management System");
+
+        // Set system Look and Feel for better macOS integration
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // Fall back to default if system LAF fails
+            try {
+                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            } catch (Exception ex) {
+                // Continue with default
+            }
+        }
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
-                    // Set look and feel (skip for now to avoid compilation issues)
 
                     DatabaseManager.getConnection();
                     System.out.println("Database initialized successfully!");
