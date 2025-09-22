@@ -329,12 +329,9 @@ public class ForgotPasswordFrame extends JFrame {
         }
 
         try {
-            // Verify the security answer (using password hashing for security)
-            boolean isCorrect = PasswordHasher.verifyPassword(
-                answer.toLowerCase(), // Case insensitive
-                currentUser.getSecurityAnswer(),
-                currentUser.getPasswordSalt() // Use same salt as password
-            );
+            // Verify the security answer using simple case-insensitive comparison
+            // Security answers are stored as plain text, not hashed
+            boolean isCorrect = userDAO.validateSecurityAnswer(currentUser.getUsername(), answer);
 
             if (isCorrect) {
                 // Correct answer, proceed to password reset
@@ -348,9 +345,9 @@ public class ForgotPasswordFrame extends JFrame {
                 securityAnswerField.requestFocus();
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                "Error verifying answer: " + e.getMessage(),
+                "Database error: " + e.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

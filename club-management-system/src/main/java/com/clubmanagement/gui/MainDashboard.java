@@ -279,6 +279,53 @@ public class MainDashboard extends JFrame {
         contentPanel.repaint();
     }
 
+    private void showGrade9StudentsView() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(new Grade9StudentsViewPanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade9StudentsView");
+        cardLayout.show(contentPanel, "grade9StudentsView");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private void showManagerAttendanceReports() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+
+        ManagerAttendanceReportPanel attendancePanel = new ManagerAttendanceReportPanel(authService);
+        attendancePanel.setBackToDashboardCallback(() -> {
+            showProposalManagement(); // Return to default manager view
+        });
+
+        cardPanel.add(attendancePanel, BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "managerAttendanceReports");
+        cardLayout.show(contentPanel, "managerAttendanceReports");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private void showManagerClubAssignments() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+
+        ManagerClubAssignmentsViewPanel assignmentsPanel = new ManagerClubAssignmentsViewPanel(authService);
+        // Set callback to return to dashboard
+        assignmentsPanel.setBackToDashboardCallback(() -> {
+            loadInitialContent(); // This will show the proposal management (manager's default dashboard)
+            statusLabel.setText("Returned to Dashboard");
+        });
+
+        cardPanel.add(assignmentsPanel, BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "managerClubAssignments");
+        cardLayout.show(contentPanel, "managerClubAssignments");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
     private void showAttendanceDashboard() {
         contentPanel.removeAll();
         JPanel cardPanel = ModernTheme.createCardPanel();
@@ -294,13 +341,21 @@ public class MainDashboard extends JFrame {
         contentPanel.removeAll();
         JPanel cardPanel = ModernTheme.createCardPanel();
         cardPanel.setLayout(new BorderLayout());
-        cardPanel.add(new Grade11SelfAttendancePanel(authService), BorderLayout.CENTER);
-        contentPanel.add(cardPanel, "grade11SelfAttendance");
-        cardLayout.show(contentPanel, "grade11SelfAttendance");
+
+        Grade11EnhancedDashboard grade11Dashboard = new Grade11EnhancedDashboard(authService);
+        grade11Dashboard.setLogoutCallback(() -> {
+            logout(); // Use the existing logout method
+        });
+
+        cardPanel.add(grade11Dashboard, BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade11EnhancedDashboard");
+        cardLayout.show(contentPanel, "grade11EnhancedDashboard");
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
+    // Grade 9 club assignments feature disabled per user request
+    /*
     private void showGrade9ClubAssignments() {
         contentPanel.removeAll();
         JPanel cardPanel = ModernTheme.createCardPanel();
@@ -311,6 +366,7 @@ public class MainDashboard extends JFrame {
         contentPanel.revalidate();
         contentPanel.repaint();
     }
+    */
 
     private void showAttendanceMarking() {
         if (authService.isGrade11()) {
@@ -401,14 +457,7 @@ public class MainDashboard extends JFrame {
                     showClubAllocation();
                     statusLabel.setText("Club Allocation loaded");
                     break;
-                case "grade9clubs":
-                    showGrade9ClubAssignments();
-                    statusLabel.setText("Grade 9 Club Assignments loaded");
-                    break;
-                case "reports":
-                    showAttendanceReport();
-                    statusLabel.setText("Attendance Report loaded");
-                    break;
+                // "grade9clubs" case removed per user request
                 case "submit":
                     showProposalSubmission();
                     statusLabel.setText("Proposal Submission loaded");
@@ -425,6 +474,18 @@ public class MainDashboard extends JFrame {
                     showAttendanceMarking();
                     statusLabel.setText("Attendance Marking loaded");
                     break;
+                case "attendancereports":
+                    if (authService.isClubManager()) {
+                        showManagerAttendanceReports();
+                        statusLabel.setText("Attendance Reports loaded");
+                    }
+                    break;
+                case "clubassignments":
+                    if (authService.isClubManager()) {
+                        showManagerClubAssignments();
+                        statusLabel.setText("Club Assignments loaded");
+                    }
+                    break;
                 case "selfattendance":
                     if (authService.isGrade11()) {
                         showGrade11SelfAttendance();
@@ -434,14 +495,29 @@ public class MainDashboard extends JFrame {
                         statusLabel.setText("Attendance loaded");
                     }
                     break;
+                case "uploadproposal":
+                    if (authService.isGrade11()) {
+                        showProposalSubmission();
+                        statusLabel.setText("Upload Proposal loaded");
+                    }
+                    break;
+                case "proposalstatus":
+                    if (authService.isGrade11()) {
+                        showProposalStatus();
+                        statusLabel.setText("Proposal Status loaded");
+                    }
+                    break;
+                case "viewgrade9":
+                    if (authService.isGrade11()) {
+                        showGrade9StudentsView();
+                        statusLabel.setText("Grade 9 Students View loaded");
+                    }
+                    break;
                 case "attendancehistory":
                     showAttendanceReport();
                     statusLabel.setText("Attendance History loaded");
                     break;
-                case "clubassignment":
-                    showGrade9ClubAssignments();
-                    statusLabel.setText("Club Assignment loaded");
-                    break;
+                // "clubassignment" case removed per user request
                 case "clubinfo":
                     showClubInfo();
                     statusLabel.setText("Club Info loaded");

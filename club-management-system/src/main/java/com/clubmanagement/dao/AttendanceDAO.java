@@ -406,6 +406,36 @@ public class AttendanceDAO {
         return sessions;
     }
 
+    /**
+     * Get all attendance records for reporting purposes
+     */
+    public List<Attendance> getAllAttendance() throws SQLException {
+        String query = """
+            SELECT a.*,
+                   u1.full_name as student_name,
+                   u2.full_name as marker_name,
+                   c.name as club_name
+            FROM attendance a
+            LEFT JOIN users u1 ON a.student_id = u1.id
+            LEFT JOIN users u2 ON a.marked_by_id = u2.id
+            LEFT JOIN clubs c ON a.club_id = c.id
+            ORDER BY a.session_date DESC, c.name, u1.full_name
+        """;
+
+        List<Attendance> attendanceList = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                attendanceList.add(mapResultSetToAttendance(rs));
+            }
+        }
+
+        return attendanceList;
+    }
+
     // ============ HELPER METHODS ============
 
     private Attendance mapResultSetToAttendance(ResultSet rs) throws SQLException {

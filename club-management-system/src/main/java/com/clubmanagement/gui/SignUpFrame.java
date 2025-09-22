@@ -295,9 +295,8 @@ public class SignUpFrame extends JFrame {
                 return;
             }
 
-            // Hash password and security answer
+            // Hash password only (security answer should be stored as plain text)
             PasswordHasher.HashedPassword hashedPassword = PasswordHasher.hashPassword(password);
-            PasswordHasher.HashedPassword hashedAnswer = PasswordHasher.hashPassword(securityAnswer.toLowerCase());
 
             // Create user object
             User newUser = new User();
@@ -308,7 +307,7 @@ public class SignUpFrame extends JFrame {
             newUser.setPasswordHash(hashedPassword.getHash());
             newUser.setPasswordSalt(hashedPassword.getSalt());
             newUser.setSecurityQuestion(securityQuestion);
-            newUser.setSecurityAnswer(hashedAnswer.getHash());
+            newUser.setSecurityAnswer(securityAnswer.trim()); // Store as plain text for forgot password functionality
             newUser.setFirstLoginCompleted(true); // Set to true since club is selected during signup
 
             // Assign club for Grade 9 and Grade 11

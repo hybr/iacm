@@ -58,24 +58,19 @@ public class NavigationToolbar extends JPanel {
         add(dashboardBtn);
 
         // Proposals button
-        JButton proposalsBtn = createToolbarButton("📋 Proposals", "Manage club proposals");
+        JButton proposalsBtn = createToolbarButton("📋 Proposals", "Review and manage club proposals");
         proposalsBtn.addActionListener(e -> notifyAction("proposals"));
         add(proposalsBtn);
 
-        // Attendance button
-        JButton attendanceBtn = createToolbarButton("📊 Attendance", "View attendance reports");
-        attendanceBtn.addActionListener(e -> notifyAction("attendance"));
+        // Attendance Reports button (read-only)
+        JButton attendanceBtn = createToolbarButton("📊 Attendance Reports", "View and export attendance data");
+        attendanceBtn.addActionListener(e -> notifyAction("attendanceReports"));
         add(attendanceBtn);
 
-        // Club Allocation button
-        JButton allocationBtn = createToolbarButton("🎯 Allocation", "Manage club allocations");
-        allocationBtn.addActionListener(e -> notifyAction("allocation"));
-        add(allocationBtn);
-
-        // Reports button
-        JButton reportsBtn = createToolbarButton("📈 Reports", "View reports and analytics");
-        reportsBtn.addActionListener(e -> notifyAction("reports"));
-        add(reportsBtn);
+        // Club Assignments View button (read-only)
+        JButton assignmentsBtn = createToolbarButton("👥 Club Assignments", "View student club assignments");
+        assignmentsBtn.addActionListener(e -> notifyAction("clubAssignments"));
+        add(assignmentsBtn);
 
         // Separator
         add(createSeparator());
@@ -97,6 +92,21 @@ public class NavigationToolbar extends JPanel {
         attendanceBtn.addActionListener(e -> notifyAction("selfAttendance"));
         add(attendanceBtn);
 
+        // Upload Proposal button
+        JButton uploadProposalBtn = createToolbarButton("📤 Upload Proposal", "Submit a new proposal");
+        uploadProposalBtn.addActionListener(e -> notifyAction("uploadProposal"));
+        add(uploadProposalBtn);
+
+        // Check Proposal Status button
+        JButton proposalStatusBtn = createToolbarButton("📊 Proposal Status", "Check proposal status");
+        proposalStatusBtn.addActionListener(e -> notifyAction("proposalStatus"));
+        add(proposalStatusBtn);
+
+        // View Grade 9 Students button
+        JButton viewGrade9Btn = createToolbarButton("👥 View Grade 9", "View Grade 9 students and their clubs");
+        viewGrade9Btn.addActionListener(e -> notifyAction("viewGrade9"));
+        add(viewGrade9Btn);
+
         // Attendance History button
         JButton historyBtn = createToolbarButton("📈 History", "View attendance history");
         historyBtn.addActionListener(e -> notifyAction("attendanceHistory"));
@@ -112,10 +122,7 @@ public class NavigationToolbar extends JPanel {
         dashboardBtn.addActionListener(e -> notifyAction("dashboard"));
         add(dashboardBtn);
 
-        // Club Assignment button
-        JButton clubBtn = createToolbarButton("🎯 My Club", "View club assignment");
-        clubBtn.addActionListener(e -> notifyAction("clubAssignment"));
-        add(clubBtn);
+        // Club Assignment button removed per user request
 
         // Self Attendance button
         JButton attendanceBtn = createToolbarButton("✔️ Attendance", "Mark attendance");
