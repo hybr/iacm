@@ -18,6 +18,18 @@ public class LoginFrame extends JFrame {
     private AuthenticationService authService;
 
     public LoginFrame() {
+        // Set cross-platform Look and Feel for better macOS compatibility
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            // Force opaque buttons on macOS
+            if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                UIManager.put("Button.opaque", true);
+                UIManager.put("Button.background", Color.WHITE);
+            }
+        } catch (Exception e) {
+            // Continue with default if setting fails
+        }
+
         this.authService = new AuthenticationService();
         initializeComponents();
         setupLayout();
@@ -29,9 +41,32 @@ public class LoginFrame extends JFrame {
         usernameField = ModernTheme.createStyledTextField();
         passwordField = ModernTheme.createStyledPasswordField();
         loginButton = ModernTheme.createPrimaryButton("Login");
-        signUpButton = ModernTheme.createPrimaryButton("Sign Up");
-        signUpButton.setBackground(ModernTheme.PRIMARY_BLUE.brighter());
+        // Ensure login button is visible on macOS
+        loginButton.setOpaque(true);
+        loginButton.setBorderPainted(true);
+        loginButton.setContentAreaFilled(true);
+
+        // Create Sign Up button with enhanced macOS compatibility
+        signUpButton = ModernTheme.createSecondaryButton("Sign Up");
+        signUpButton.setOpaque(true);
+        signUpButton.setBorderPainted(true);
+        signUpButton.setContentAreaFilled(true);
+        signUpButton.setBackground(new Color(70, 130, 180)); // Steel blue for better visibility
+        signUpButton.setForeground(Color.WHITE);
+        signUpButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         signUpButton.setPreferredSize(new Dimension(100, 35));
+
+        // Enhanced hover effect for macOS
+        signUpButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                signUpButton.setBackground(new Color(100, 149, 237)); // Cornflower blue
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                signUpButton.setBackground(new Color(70, 130, 180)); // Steel blue
+            }
+        });
 
         // Create forgot password as a styled link/text button
         forgotPasswordButton = new JButton("Forgot Password?");
@@ -216,6 +251,12 @@ public class LoginFrame extends JFrame {
             return;
         }
 
+        // Show loading state
+        loginButton.setText("Logging in...");
+        loginButton.setEnabled(false);
+        signUpButton.setEnabled(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
         try {
             if (authService.login(username, password)) {
                 JOptionPane.showMessageDialog(this, "Login successful!",
@@ -272,15 +313,33 @@ public class LoginFrame extends JFrame {
                         "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
+                // Reset loading state
+                loginButton.setText("Login");
+                loginButton.setEnabled(true);
+                signUpButton.setEnabled(true);
+                setCursor(Cursor.getDefaultCursor());
+
                 JOptionPane.showMessageDialog(this, "Invalid username or password.",
                                             "Login Error", JOptionPane.ERROR_MESSAGE);
                 passwordField.setText("");
             }
         } catch (SQLException ex) {
+            // Reset loading state
+            loginButton.setText("Login");
+            loginButton.setEnabled(true);
+            signUpButton.setEnabled(true);
+            setCursor(Cursor.getDefaultCursor());
+
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                                         "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         } catch (Exception ex) {
+            // Reset loading state
+            loginButton.setText("Login");
+            loginButton.setEnabled(true);
+            signUpButton.setEnabled(true);
+            setCursor(Cursor.getDefaultCursor());
+
             JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(),
                                         "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();

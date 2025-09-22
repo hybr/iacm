@@ -53,22 +53,22 @@ public class NavigationToolbar extends JPanel {
 
     private void createClubManagerButtons() {
         // Dashboard button
-        JButton dashboardBtn = createToolbarButton("📊 Dashboard", "View main dashboard");
+        JButton dashboardBtn = createToolbarButton("🏠 Dashboard", "View main dashboard");
         dashboardBtn.addActionListener(e -> notifyAction("dashboard"));
         add(dashboardBtn);
 
         // Proposals button
-        JButton proposalsBtn = createToolbarButton("📝 Proposals", "Manage club proposals");
+        JButton proposalsBtn = createToolbarButton("📋 Proposals", "Manage club proposals");
         proposalsBtn.addActionListener(e -> notifyAction("proposals"));
         add(proposalsBtn);
 
         // Attendance button
-        JButton attendanceBtn = createToolbarButton("📅 Attendance", "View attendance reports");
+        JButton attendanceBtn = createToolbarButton("📊 Attendance", "View attendance reports");
         attendanceBtn.addActionListener(e -> notifyAction("attendance"));
         add(attendanceBtn);
 
         // Club Allocation button
-        JButton allocationBtn = createToolbarButton("🏢 Allocation", "Manage club allocations");
+        JButton allocationBtn = createToolbarButton("🎯 Allocation", "Manage club allocations");
         allocationBtn.addActionListener(e -> notifyAction("allocation"));
         add(allocationBtn);
 
@@ -88,12 +88,12 @@ public class NavigationToolbar extends JPanel {
         add(dashboardBtn);
 
         // Self Attendance button
-        JButton attendanceBtn = createToolbarButton("✅ Mark Attendance", "Mark your attendance");
+        JButton attendanceBtn = createToolbarButton("✔️ Mark Attendance", "Mark your attendance");
         attendanceBtn.addActionListener(e -> notifyAction("selfAttendance"));
         add(attendanceBtn);
 
         // Attendance History button
-        JButton historyBtn = createToolbarButton("📊 History", "View attendance history");
+        JButton historyBtn = createToolbarButton("📈 History", "View attendance history");
         historyBtn.addActionListener(e -> notifyAction("attendanceHistory"));
         add(historyBtn);
 
@@ -113,7 +113,7 @@ public class NavigationToolbar extends JPanel {
         add(clubBtn);
 
         // Self Attendance button
-        JButton attendanceBtn = createToolbarButton("✅ Attendance", "Mark attendance");
+        JButton attendanceBtn = createToolbarButton("✔️ Attendance", "Mark attendance");
         attendanceBtn.addActionListener(e -> notifyAction("selfAttendance"));
         add(attendanceBtn);
 
@@ -128,12 +128,12 @@ public class NavigationToolbar extends JPanel {
         add(profileBtn);
 
         // Change Password button
-        JButton passwordBtn = createToolbarButton("🔐 Password", "Change password");
+        JButton passwordBtn = createToolbarButton("🔑 Password", "Change password");
         passwordBtn.addActionListener(e -> notifyAction("changepassword"));
         add(passwordBtn);
 
         // Help button
-        JButton helpBtn = createToolbarButton("❓ Help", "Get help");
+        JButton helpBtn = createToolbarButton("ℹ️ Help", "Get help");
         helpBtn.addActionListener(e -> notifyAction("userguide"));
         add(helpBtn);
 
@@ -147,16 +147,19 @@ public class NavigationToolbar extends JPanel {
 
     private JButton createToolbarButton(String text, String tooltip) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(70, 130, 180)); // Steel blue
         button.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createRaisedBevelBorder(),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+            BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         button.setFocusPainted(false);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setToolTipText(tooltip);
+        button.setOpaque(true);
+        button.setBorderPainted(true);
+        button.setContentAreaFilled(true);
 
         // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {

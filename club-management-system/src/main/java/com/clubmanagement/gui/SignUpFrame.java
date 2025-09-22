@@ -1,8 +1,10 @@
 package com.clubmanagement.gui;
 
 import com.clubmanagement.dao.UserDAO;
+import com.clubmanagement.dao.ClubDAO;
 import com.clubmanagement.gui.theme.ModernTheme;
 import com.clubmanagement.models.User;
+import com.clubmanagement.models.Club;
 import com.clubmanagement.security.PasswordHasher;
 
 import javax.swing.*;
@@ -10,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.List;
 
 public class SignUpFrame extends JFrame {
     private JTextField usernameField;
@@ -20,9 +23,12 @@ public class SignUpFrame extends JFrame {
     private JComboBox<String> securityQuestionCombo;
     private JTextField securityAnswerField;
     private JComboBox<User.UserRole> roleCombo;
+    private JComboBox<Club> clubCombo;
+    private JLabel clubLabel;
     private JButton signUpButton;
     private JButton backToLoginButton;
     private UserDAO userDAO;
+    private ClubDAO clubDAO;
 
     private String[] securityQuestions = {
         "What was the name of your first pet?",
@@ -37,6 +43,7 @@ public class SignUpFrame extends JFrame {
 
     public SignUpFrame() {
         this.userDAO = new UserDAO();
+        this.clubDAO = new ClubDAO();
         initializeComponents();
         setupLayout();
         setupEventHandlers();
@@ -66,6 +73,23 @@ public class SignUpFrame extends JFrame {
             BorderFactory.createLineBorder(ModernTheme.LIGHT_GRAY, 1),
             BorderFactory.createEmptyBorder(10, 12, 10, 12)
         ));
+
+        // Initialize club components (initially hidden)
+        clubLabel = ModernTheme.createBodyLabel("Select Club");
+        clubCombo = new JComboBox<>();
+        clubCombo.setFont(ModernTheme.BODY_FONT);
+        clubCombo.setBackground(Color.WHITE);
+        clubCombo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(ModernTheme.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(10, 12, 10, 12)
+        ));
+
+        // Initially hide club selection
+        clubLabel.setVisible(false);
+        clubCombo.setVisible(false);
+
+        // Load clubs into combo box
+        loadClubs();
 
         signUpButton = ModernTheme.createPrimaryButton("Create Account");
         backToLoginButton = ModernTheme.createSecondaryButton("Back to Login");
@@ -155,8 +179,14 @@ public class SignUpFrame extends JFrame {
         gbc.gridy = 15;
         formPanel.add(roleCombo, gbc);
 
-        // Buttons
+        // Club Selection (initially hidden)
         gbc.gridy = 16;
+        formPanel.add(clubLabel, gbc);
+        gbc.gridy = 17;
+        formPanel.add(clubCombo, gbc);
+
+        // Buttons
+        gbc.gridy = 18;
         gbc.insets = new Insets(25, 0, 10, 0);
         formPanel.add(signUpButton, gbc);
 
@@ -164,7 +194,7 @@ public class SignUpFrame extends JFrame {
         linkPanel.setBackground(ModernTheme.WHITE);
         linkPanel.add(backToLoginButton);
 
-        gbc.gridy = 17;
+        gbc.gridy = 19;
         gbc.insets = new Insets(5, 0, 0, 0);
         formPanel.add(linkPanel, gbc);
 
@@ -195,6 +225,14 @@ public class SignUpFrame extends JFrame {
                 goBackToLogin();
             }
         });
+
+        // Add role change listener to show/hide club selection
+        roleCombo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateClubVisibility();
+            }
+        });
     }
 
     private void performSignUp() {
@@ -206,6 +244,7 @@ public class SignUpFrame extends JFrame {
         String securityQuestion = (String) securityQuestionCombo.getSelectedItem();
         String securityAnswer = securityAnswerField.getText().trim();
         User.UserRole role = (User.UserRole) roleCombo.getSelectedItem();
+        Club selectedClub = (Club) clubCombo.getSelectedItem();
 
         // Validation
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
@@ -213,6 +252,14 @@ public class SignUpFrame extends JFrame {
             JOptionPane.showMessageDialog(this,
                 "Please fill in all fields.",
                 "Incomplete Information", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Validate club selection for Grade 9 and Grade 11
+        if ((role == User.UserRole.GRADE_9 || role == User.UserRole.GRADE_11) && selectedClub == null) {
+            JOptionPane.showMessageDialog(this,
+                "Please select a club for " + role.toString() + " students.",
+                "Club Selection Required", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -262,15 +309,26 @@ public class SignUpFrame extends JFrame {
             newUser.setPasswordSalt(hashedPassword.getSalt());
             newUser.setSecurityQuestion(securityQuestion);
             newUser.setSecurityAnswer(hashedAnswer.getHash());
-            newUser.setFirstLoginCompleted(false);
+            newUser.setFirstLoginCompleted(true); // Set to true since club is selected during signup
+
+            // Assign club for Grade 9 and Grade 11
+            if (selectedClub != null) {
+                newUser.setAssignedClubId(selectedClub.getId());
+            }
 
             // Save to database
             boolean success = userDAO.insertUser(newUser);
 
             if (success) {
+                String clubInfo = "";
+                if (selectedClub != null) {
+                    clubInfo = "\nAssigned Club: " + selectedClub.getName() + "\n" +
+                              "Note: Your club assignment is permanent and cannot be changed.";
+                }
+
                 JOptionPane.showMessageDialog(this,
                     "✅ Account created successfully!\n\n" +
-                    "Username: " + username + "\n" +
+                    "Username: " + username + clubInfo + "\n\n" +
                     "You can now log in with your credentials.",
                     "Account Created", JOptionPane.INFORMATION_MESSAGE);
 
@@ -319,5 +377,67 @@ public class SignUpFrame extends JFrame {
         setMinimumSize(new Dimension(500, 600));
 
         getContentPane().setBackground(ModernTheme.LIGHT_GRAY);
+    }
+
+    /**
+     * Load available clubs into the club combo box
+     */
+    private void loadClubs() {
+        try {
+            List<Club> clubs = clubDAO.getAllClubs();
+            clubCombo.removeAllItems();
+
+            // Add default option
+            clubCombo.addItem(null);
+
+            // Add all clubs
+            for (Club club : clubs) {
+                clubCombo.addItem(club);
+            }
+
+            // Custom renderer to show club names
+            clubCombo.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value,
+                        int index, boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                    if (value == null) {
+                        setText("-- Select a Club --");
+                        setForeground(ModernTheme.TEXT_LIGHT);
+                    } else if (value instanceof Club) {
+                        setText(((Club) value).getName());
+                        setForeground(ModernTheme.TEXT_DARK);
+                    }
+
+                    return this;
+                }
+            });
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                "Error loading clubs: " + e.getMessage(),
+                "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Update visibility of club selection based on selected role
+     */
+    private void updateClubVisibility() {
+        User.UserRole selectedRole = (User.UserRole) roleCombo.getSelectedItem();
+        boolean showClub = (selectedRole == User.UserRole.GRADE_9 || selectedRole == User.UserRole.GRADE_11);
+
+        clubLabel.setVisible(showClub);
+        clubCombo.setVisible(showClub);
+
+        // Reset club selection when hiding
+        if (!showClub) {
+            clubCombo.setSelectedIndex(0);
+        }
+
+        // Revalidate and repaint to update layout
+        revalidate();
+        repaint();
     }
 }
