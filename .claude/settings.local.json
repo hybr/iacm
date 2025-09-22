@@ -9,7 +9,17 @@
       "Bash(java:*)",
       "Bash(timeout 5 java:*)",
       "Bash(javap:*)",
-      "Bash(timeout 3 java:*)"
+      "Bash(timeout 3 java:*)",
+      "Bash(find:*)",
+      "Bash(./compile.sh)",
+      "Bash(./compile.bat)",
+      "Bash(./compile_core.bat)",
+      "Bash(.compile_core.bat)",
+      "Bash(timeout:*)",
+      "Bash(./run.bat)",
+      "Bash(.compile.bat)",
+      "Bash(compile.bat)",
+      "Bash(bash:*)"
     ],
     "deny": [],
     "ask": []

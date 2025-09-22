@@ -71,6 +71,7 @@ public class RibbonComponent extends JPanel {
         if (authService.isClubManager()) {
             dashboardGroup.addButton("Proposals", "Manage club proposals", e -> notifyAction("proposals"));
             dashboardGroup.addButton("Allocations", "Manage club allocations", e -> notifyAction("allocations"));
+            dashboardGroup.addButton("Grade 9 Clubs", "View Grade 9 club assignments", e -> notifyAction("grade9clubs"));
             dashboardGroup.addButton("Reports", "View attendance reports", e -> notifyAction("reports"));
         } else if (authService.isGrade11()) {
             dashboardGroup.addButton("Submit", "Submit proposal", e -> notifyAction("submit"));
@@ -78,7 +79,7 @@ public class RibbonComponent extends JPanel {
             dashboardGroup.addButton("Attendance", "Track attendance", e -> notifyAction("attendance"));
             dashboardGroup.addButton("Members", "View club members", e -> notifyAction("members"));
         } else if (authService.isGrade9()) {
-            dashboardGroup.addButton("Club Info", "View club information", e -> notifyAction("clubinfo"));
+            dashboardGroup.addButton("My Attendance", "Mark attendance for today", e -> notifyAction("attendance"));
         }
         tab.addGroup(dashboardGroup);
 

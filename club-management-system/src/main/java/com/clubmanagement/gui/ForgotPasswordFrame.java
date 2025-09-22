@@ -1,7 +1,9 @@
 package com.clubmanagement.gui;
 
+import com.clubmanagement.dao.UserDAO;
 import com.clubmanagement.gui.theme.ModernTheme;
 import com.clubmanagement.models.User;
+import com.clubmanagement.security.PasswordHasher;
 import com.clubmanagement.services.AuthenticationService;
 
 import javax.swing.*;
@@ -12,12 +14,29 @@ import java.sql.SQLException;
 
 public class ForgotPasswordFrame extends JFrame {
     private JTextField usernameField;
-    private JButton verifyButton;
+    private JLabel securityQuestionLabel;
+    private JTextField securityAnswerField;
+    private JPasswordField newPasswordField;
+    private JPasswordField confirmPasswordField;
+    private JButton verifyUsernameButton;
+    private JButton verifyAnswerButton;
+    private JButton resetPasswordButton;
     private JButton backToLoginButton;
     private AuthenticationService authService;
+    private UserDAO userDAO;
+
+    // Multi-step flow components
+    private JPanel usernamePanel;
+    private JPanel securityQuestionPanel;
+    private JPanel newPasswordPanel;
+    private CardLayout cardLayout;
+    private JPanel cardPanel;
+
+    private User currentUser;
 
     public ForgotPasswordFrame() {
         this.authService = new AuthenticationService();
+        this.userDAO = new UserDAO();
         initializeComponents();
         setupLayout();
         setupEventHandlers();
@@ -25,10 +44,203 @@ public class ForgotPasswordFrame extends JFrame {
     }
 
     private void initializeComponents() {
-        usernameField = new JTextField(20);
+        // Initialize card layout
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
 
-        verifyButton = new JButton("Send Reset Email");
-        backToLoginButton = new JButton("Back to Login");
+        // Step 1: Username entry
+        usernameField = ModernTheme.createStyledTextField();
+        verifyUsernameButton = ModernTheme.createPrimaryButton("Continue");
+
+        // Step 2: Security question
+        securityQuestionLabel = ModernTheme.createBodyLabel("Loading...");
+        securityAnswerField = ModernTheme.createStyledTextField();
+        verifyAnswerButton = ModernTheme.createPrimaryButton("Verify Answer");
+
+        // Step 3: New password
+        newPasswordField = ModernTheme.createStyledPasswordField();
+        confirmPasswordField = ModernTheme.createStyledPasswordField();
+        resetPasswordButton = ModernTheme.createPrimaryButton("Reset Password");
+
+        // Common components
+        backToLoginButton = ModernTheme.createSecondaryButton("Back to Login");
+
+        // Create the three panels
+        createUsernamePanel();
+        createSecurityQuestionPanel();
+        createNewPasswordPanel();
+    }
+
+    private void createUsernamePanel() {
+        usernamePanel = new JPanel(new BorderLayout());
+        usernamePanel.setBackground(ModernTheme.WHITE);
+        usernamePanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // Header
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBackground(ModernTheme.WHITE);
+
+        JLabel titleLabel = ModernTheme.createTitleLabel("Forgot Password");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel instructionLabel = ModernTheme.createBodyLabel("Enter your username to begin password reset");
+        instructionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        headerPanel.add(titleLabel);
+        headerPanel.add(Box.createVerticalStrut(10));
+        headerPanel.add(instructionLabel);
+
+        // Form
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(ModernTheme.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        formPanel.add(ModernTheme.createBodyLabel("Username:"), gbc);
+
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        formPanel.add(usernameField, gbc);
+
+        // Button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.setBackground(ModernTheme.WHITE);
+        buttonPanel.add(backToLoginButton);
+        buttonPanel.add(verifyUsernameButton);
+
+        usernamePanel.add(headerPanel, BorderLayout.NORTH);
+        usernamePanel.add(formPanel, BorderLayout.CENTER);
+        usernamePanel.add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void createSecurityQuestionPanel() {
+        securityQuestionPanel = new JPanel(new BorderLayout());
+        securityQuestionPanel.setBackground(ModernTheme.WHITE);
+        securityQuestionPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // Header
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBackground(ModernTheme.WHITE);
+
+        JLabel titleLabel = ModernTheme.createTitleLabel("Security Question");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel instructionLabel = ModernTheme.createBodyLabel("Answer your security question to continue");
+        instructionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        headerPanel.add(titleLabel);
+        headerPanel.add(Box.createVerticalStrut(10));
+        headerPanel.add(instructionLabel);
+
+        // Form
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(ModernTheme.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        formPanel.add(ModernTheme.createBodyLabel("Question:"), gbc);
+
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        formPanel.add(securityQuestionLabel, gbc);
+
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(15, 0, 5, 0);
+        formPanel.add(ModernTheme.createBodyLabel("Your Answer:"), gbc);
+
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        formPanel.add(securityAnswerField, gbc);
+
+        // Button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.setBackground(ModernTheme.WHITE);
+        buttonPanel.add(backToLoginButton);
+        buttonPanel.add(verifyAnswerButton);
+
+        securityQuestionPanel.add(headerPanel, BorderLayout.NORTH);
+        securityQuestionPanel.add(formPanel, BorderLayout.CENTER);
+        securityQuestionPanel.add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void createNewPasswordPanel() {
+        newPasswordPanel = new JPanel(new BorderLayout());
+        newPasswordPanel.setBackground(ModernTheme.WHITE);
+        newPasswordPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // Header
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBackground(ModernTheme.WHITE);
+
+        JLabel titleLabel = ModernTheme.createTitleLabel("Set New Password");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel instructionLabel = ModernTheme.createBodyLabel("Enter your new password");
+        instructionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        headerPanel.add(titleLabel);
+        headerPanel.add(Box.createVerticalStrut(10));
+        headerPanel.add(instructionLabel);
+
+        // Form
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(ModernTheme.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        formPanel.add(ModernTheme.createBodyLabel("New Password:"), gbc);
+
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        formPanel.add(newPasswordField, gbc);
+
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(15, 0, 5, 0);
+        formPanel.add(ModernTheme.createBodyLabel("Confirm Password:"), gbc);
+
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        formPanel.add(confirmPasswordField, gbc);
+
+        // Password requirements
+        gbc.gridy = 4;
+        gbc.insets = new Insets(15, 0, 5, 0);
+        JLabel requirementsLabel = ModernTheme.createBodyLabel(
+            "<html><small>" + PasswordHasher.getPasswordRequirements().replace("\n", "<br>") + "</small></html>"
+        );
+        requirementsLabel.setForeground(ModernTheme.DARK_GRAY);
+        formPanel.add(requirementsLabel, gbc);
+
+        // Button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.setBackground(ModernTheme.WHITE);
+        buttonPanel.add(backToLoginButton);
+        buttonPanel.add(resetPasswordButton);
+
+        newPasswordPanel.add(headerPanel, BorderLayout.NORTH);
+        newPasswordPanel.add(formPanel, BorderLayout.CENTER);
+        newPasswordPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void setupLayout() {
@@ -40,111 +252,173 @@ public class ForgotPasswordFrame extends JFrame {
         mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
-        // Reset card
-        JPanel resetCard = ModernTheme.createCardPanel();
-        resetCard.setLayout(new BorderLayout());
-        resetCard.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        // Content card
+        JPanel contentCard = ModernTheme.createCardPanel();
+        contentCard.setLayout(new BorderLayout());
 
-        // Header
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(ModernTheme.WHITE);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
+        // Add panels to card layout
+        cardPanel.add(usernamePanel, "username");
+        cardPanel.add(securityQuestionPanel, "security");
+        cardPanel.add(newPasswordPanel, "password");
 
-        JLabel titleLabel = ModernTheme.createTitleLabel("Forgot Password");
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        JLabel subtitleLabel = ModernTheme.createBodyLabel("Enter your username or email to receive a password reset link");
-        subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        contentCard.add(cardPanel, BorderLayout.CENTER);
+        mainPanel.add(contentCard, BorderLayout.CENTER);
 
-        headerPanel.add(titleLabel, BorderLayout.CENTER);
-        headerPanel.add(subtitleLabel, BorderLayout.SOUTH);
-
-        // Form panel
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(ModernTheme.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 0, 8, 0);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = 2;
-
-        // Username
-        gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(ModernTheme.createBodyLabel("Username or Email"), gbc);
-        gbc.gridy = 1;
-        formPanel.add(usernameField, gbc);
-
-        // Send Reset Email Button
-        gbc.gridy = 2;
-        gbc.insets = new Insets(20, 0, 20, 0);
-        formPanel.add(verifyButton, gbc);
-
-        // Back to Login Button
-        JPanel linkPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        linkPanel.setBackground(ModernTheme.WHITE);
-        linkPanel.add(backToLoginButton);
-
-        gbc.gridy = 3;
-        gbc.insets = new Insets(10, 0, 0, 0);
-        formPanel.add(linkPanel, gbc);
-
-        resetCard.add(headerPanel, BorderLayout.NORTH);
-        resetCard.add(formPanel, BorderLayout.CENTER);
-        mainPanel.add(resetCard, BorderLayout.CENTER);
         add(mainPanel, BorderLayout.CENTER);
+
+        // Start with username panel
+        cardLayout.show(cardPanel, "username");
     }
 
     private void setupEventHandlers() {
-        verifyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendResetEmail();
-            }
-        });
-
-        backToLoginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                goBackToLogin();
-            }
-        });
+        verifyUsernameButton.addActionListener(e -> verifyUsername());
+        verifyAnswerButton.addActionListener(e -> verifySecurityAnswer());
+        resetPasswordButton.addActionListener(e -> resetPassword());
+        backToLoginButton.addActionListener(e -> goBackToLogin());
     }
 
-    private void sendResetEmail() {
-        String usernameOrEmail = usernameField.getText().trim();
+    private void verifyUsername() {
+        String username = usernameField.getText().trim();
 
-        if (usernameOrEmail.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your username or email.",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Please enter your username.",
+                "Username Required", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
-            // Request password reset token
-            boolean success = authService.requestPasswordReset(usernameOrEmail);
+            User user = userDAO.getUserByUsername(username);
 
-            if (success) {
+            if (user == null) {
                 JOptionPane.showMessageDialog(this,
-                    "<html><div style='width: 300px;'>" +
-                    "A password reset link has been sent to your email address.<br><br>" +
-                    "Please check your email and click the link to reset your password.<br><br>" +
-                    "The link will expire in 30 minutes for security reasons." +
-                    "</div></html>",
-                    "Reset Link Sent",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-                // Close this dialog and return to login
-                goBackToLogin();
-            } else {
-                JOptionPane.showMessageDialog(this,
-                    "User not found or no email address on file.\n" +
-                    "Please contact the administrator for assistance.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                    "Username not found. Please check your username and try again.",
+                    "User Not Found", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
-                                        "Error", JOptionPane.ERROR_MESSAGE);
+
+            if (user.getSecurityQuestion() == null || user.getSecurityQuestion().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "No security question is set for this account.\n" +
+                    "Please contact an administrator for password reset assistance.",
+                    "No Security Question", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Store user and show security question
+            currentUser = user;
+            securityQuestionLabel.setText(user.getSecurityQuestion());
+            cardLayout.show(cardPanel, "security");
+            securityAnswerField.requestFocus();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                "Database error: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    private void verifySecurityAnswer() {
+        String answer = securityAnswerField.getText().trim();
+
+        if (answer.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Please enter your security answer.",
+                "Answer Required", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Verify the security answer (using password hashing for security)
+            boolean isCorrect = PasswordHasher.verifyPassword(
+                answer.toLowerCase(), // Case insensitive
+                currentUser.getSecurityAnswer(),
+                currentUser.getPasswordSalt() // Use same salt as password
+            );
+
+            if (isCorrect) {
+                // Correct answer, proceed to password reset
+                cardLayout.show(cardPanel, "password");
+                newPasswordField.requestFocus();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Incorrect security answer. Please try again.",
+                    "Incorrect Answer", JOptionPane.ERROR_MESSAGE);
+                securityAnswerField.setText("");
+                securityAnswerField.requestFocus();
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Error verifying answer: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void resetPassword() {
+        String newPassword = new String(newPasswordField.getPassword());
+        String confirmPassword = new String(confirmPasswordField.getPassword());
+
+        // Validation
+        if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Please fill in both password fields.",
+                "Password Required", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            JOptionPane.showMessageDialog(this,
+                "Passwords do not match. Please try again.",
+                "Password Mismatch", JOptionPane.ERROR_MESSAGE);
+            confirmPasswordField.setText("");
+            return;
+        }
+
+        if (!PasswordHasher.isPasswordStrong(newPassword)) {
+            JOptionPane.showMessageDialog(this,
+                "Password does not meet security requirements:\n\n" +
+                PasswordHasher.getPasswordRequirements(),
+                "Weak Password", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Hash the new password
+            PasswordHasher.HashedPassword hashedPassword = PasswordHasher.hashPassword(newPassword);
+
+            // Update password in database
+            boolean success = userDAO.updatePasswordWithSalt(
+                currentUser.getId(),
+                hashedPassword.getHash(),
+                hashedPassword.getSalt()
+            );
+
+            if (success) {
+                JOptionPane.showMessageDialog(this,
+                    "✅ Password reset successfully!\n\n" +
+                    "You can now log in with your new password.",
+                    "Password Reset Complete", JOptionPane.INFORMATION_MESSAGE);
+
+                // Clear sensitive data
+                newPasswordField.setText("");
+                confirmPasswordField.setText("");
+
+                // Go back to login
+                goBackToLogin();
+
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Failed to update password. Please try again.",
+                    "Update Failed", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                "Database error: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private void goBackToLogin() {
         this.dispose();
@@ -156,8 +430,11 @@ public class ForgotPasswordFrame extends JFrame {
     private void setupFrame() {
         setTitle("Club Management System - Forgot Password");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
-        pack();
+        setSize(new Dimension(500, 600));
         setLocationRelativeTo(null);
+        setResizable(false);
+
+        // Set modern appearance
+        getContentPane().setBackground(ModernTheme.LIGHT_GRAY);
     }
 }

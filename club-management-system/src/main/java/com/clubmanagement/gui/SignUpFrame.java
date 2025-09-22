@@ -1,8 +1,9 @@
 package com.clubmanagement.gui;
 
+import com.clubmanagement.dao.UserDAO;
 import com.clubmanagement.gui.theme.ModernTheme;
 import com.clubmanagement.models.User;
-import com.clubmanagement.services.AuthenticationService;
+import com.clubmanagement.security.PasswordHasher;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,18 +22,21 @@ public class SignUpFrame extends JFrame {
     private JComboBox<User.UserRole> roleCombo;
     private JButton signUpButton;
     private JButton backToLoginButton;
-    private AuthenticationService authService;
+    private UserDAO userDAO;
 
     private String[] securityQuestions = {
         "What was the name of your first pet?",
         "What is your mother's maiden name?",
         "What was the name of your first school?",
         "What is your favorite color?",
-        "What city were you born in?"
+        "What city were you born in?",
+        "What was your childhood nickname?",
+        "What was the make of your first car?",
+        "What is your favorite book?"
     };
 
     public SignUpFrame() {
-        this.authService = new AuthenticationService();
+        this.userDAO = new UserDAO();
         initializeComponents();
         setupLayout();
         setupEventHandlers();
@@ -46,15 +50,22 @@ public class SignUpFrame extends JFrame {
         emailField = ModernTheme.createStyledTextField();
         fullNameField = ModernTheme.createStyledTextField();
 
-        securityQuestionCombo = ModernTheme.createStyledComboBox(securityQuestions);
+        securityQuestionCombo = new JComboBox<>(securityQuestions);
+        securityQuestionCombo.setFont(ModernTheme.BODY_FONT);
+        securityQuestionCombo.setBackground(Color.WHITE);
+        securityQuestionCombo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(ModernTheme.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(10, 12, 10, 12)
+        ));
         securityAnswerField = ModernTheme.createStyledTextField();
 
         roleCombo = new JComboBox<>(User.UserRole.values());
         roleCombo.setFont(ModernTheme.BODY_FONT);
-        roleCombo.setForeground(ModernTheme.TEXT_DARK);
-        roleCombo.setBackground(ModernTheme.WHITE);
-        roleCombo.setBorder(ModernTheme.createRoundedBorder(ModernTheme.MEDIUM_GRAY, 4));
-        roleCombo.setPreferredSize(new Dimension(200, 35));
+        roleCombo.setBackground(Color.WHITE);
+        roleCombo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(ModernTheme.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(10, 12, 10, 12)
+        ));
 
         signUpButton = ModernTheme.createPrimaryButton("Create Account");
         backToLoginButton = ModernTheme.createSecondaryButton("Back to Login");
@@ -196,29 +207,100 @@ public class SignUpFrame extends JFrame {
         String securityAnswer = securityAnswerField.getText().trim();
         User.UserRole role = (User.UserRole) roleCombo.getSelectedItem();
 
-        // Validate input
-        String validationError = authService.validateRegistrationData(username, password, confirmPassword,
-                                                                     email, fullName, securityQuestion, securityAnswer);
-        if (validationError != null) {
-            JOptionPane.showMessageDialog(this, validationError, "Validation Error", JOptionPane.ERROR_MESSAGE);
+        // Validation
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
+            email.isEmpty() || fullName.isEmpty() || securityAnswer.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Please fill in all fields.",
+                "Incomplete Information", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            JOptionPane.showMessageDialog(this,
+                "Passwords do not match. Please try again.",
+                "Password Mismatch", JOptionPane.ERROR_MESSAGE);
+            confirmPasswordField.setText("");
+            return;
+        }
+
+        if (!PasswordHasher.isPasswordStrong(password)) {
+            JOptionPane.showMessageDialog(this,
+                "Password does not meet security requirements:\n\n" +
+                PasswordHasher.getPasswordRequirements(),
+                "Weak Password", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this,
+                "Please enter a valid email address.",
+                "Invalid Email", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
-            boolean success = authService.registerUser(username, password, email, fullName,
-                                                      securityQuestion, securityAnswer, role);
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Account created successfully! You can now log in.",
-                                            "Success", JOptionPane.INFORMATION_MESSAGE);
-                goBackToLogin();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to create account. Please try again.",
-                                            "Error", JOptionPane.ERROR_MESSAGE);
+            // Check if username already exists
+            if (userDAO.getUserByUsername(username) != null) {
+                JOptionPane.showMessageDialog(this,
+                    "Username already exists. Please choose a different username.",
+                    "Username Taken", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(),
-                                        "Database Error", JOptionPane.ERROR_MESSAGE);
+
+            // Hash password and security answer
+            PasswordHasher.HashedPassword hashedPassword = PasswordHasher.hashPassword(password);
+            PasswordHasher.HashedPassword hashedAnswer = PasswordHasher.hashPassword(securityAnswer.toLowerCase());
+
+            // Create user object
+            User newUser = new User();
+            newUser.setFullName(fullName);
+            newUser.setUsername(username);
+            newUser.setEmail(email);
+            newUser.setRole(role);
+            newUser.setPasswordHash(hashedPassword.getHash());
+            newUser.setPasswordSalt(hashedPassword.getSalt());
+            newUser.setSecurityQuestion(securityQuestion);
+            newUser.setSecurityAnswer(hashedAnswer.getHash());
+            newUser.setFirstLoginCompleted(false);
+
+            // Save to database
+            boolean success = userDAO.insertUser(newUser);
+
+            if (success) {
+                JOptionPane.showMessageDialog(this,
+                    "✅ Account created successfully!\n\n" +
+                    "Username: " + username + "\n" +
+                    "You can now log in with your credentials.",
+                    "Account Created", JOptionPane.INFORMATION_MESSAGE);
+
+                // Clear sensitive data
+                passwordField.setText("");
+                confirmPasswordField.setText("");
+                securityAnswerField.setText("");
+
+                // Go back to login
+                goBackToLogin();
+
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Failed to create account. Please try again.",
+                    "Creation Failed", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                "Database error: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Unexpected error: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.contains("@") && email.contains(".") && email.length() > 5;
     }
 
     private void goBackToLogin() {

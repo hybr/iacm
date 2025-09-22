@@ -458,4 +458,152 @@ public class AttendanceDAO {
 
         return session;
     }
+
+    // ============ GRADE 9 SELF-ATTENDANCE METHODS ============
+
+    /**
+     * Insert attendance record for Grade 9 self-attendance
+     */
+    public boolean insertAttendance(Attendance attendance) throws SQLException {
+        String query = """
+            INSERT INTO attendance
+            (student_id, club_id, marked_by_id, session_date, session_time, status, notes, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, attendance.getStudentId());
+            pstmt.setInt(2, attendance.getClubId());
+            pstmt.setInt(3, attendance.getMarkedById());
+            pstmt.setString(4, attendance.getSessionDate().toString());
+            pstmt.setString(5, attendance.getSessionTime() != null ? attendance.getSessionTime().toString() : "14:30:00");
+            pstmt.setString(6, attendance.getStatus() != null ? attendance.getStatus().name() : "ABSENT");
+            pstmt.setString(7, attendance.getNotes());
+            pstmt.setString(8, attendance.getCreatedAt() != null ? attendance.getCreatedAt().toString() : LocalDateTime.now().toString());
+            pstmt.setString(9, LocalDateTime.now().toString());
+
+            return pstmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Get all attendance records for a specific student
+     */
+    public List<Attendance> getAttendanceByStudentId(int studentId) throws SQLException {
+        String query = """
+            SELECT a.*, c.name as club_name, u1.full_name as student_name, u2.full_name as marker_name
+            FROM attendance a
+            LEFT JOIN clubs c ON a.club_id = c.id
+            LEFT JOIN users u1 ON a.student_id = u1.id
+            LEFT JOIN users u2 ON a.marked_by_id = u2.id
+            WHERE a.student_id = ?
+            ORDER BY a.session_date DESC
+        """;
+
+        List<Attendance> attendanceList = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, studentId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    attendanceList.add(mapResultSetToSimpleAttendance(rs));
+                }
+            }
+        }
+
+        return attendanceList;
+    }
+
+    /**
+     * Check if student has attendance record for a specific date
+     */
+    public boolean hasAttendanceForDate(int studentId, LocalDate date) throws SQLException {
+        String query = "SELECT COUNT(*) FROM attendance WHERE student_id = ? AND session_date = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, studentId);
+            pstmt.setString(2, date.toString());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Simplified attendance mapping for Grade 9 interface
+     */
+    private Attendance mapResultSetToSimpleAttendance(ResultSet rs) throws SQLException {
+        Attendance attendance = new Attendance();
+        attendance.setId(rs.getInt("id"));
+        attendance.setStudentId(rs.getInt("student_id"));
+        attendance.setClubId(rs.getInt("club_id"));
+        attendance.setMarkedById(rs.getInt("marked_by_id"));
+        attendance.setSessionDate(LocalDate.parse(rs.getString("session_date")));
+
+        String timeStr = rs.getString("session_time");
+        if (timeStr != null) {
+            attendance.setSessionTime(LocalTime.parse(timeStr));
+        }
+
+        attendance.setStatus(rs.getString("status"));
+        attendance.setNotes(rs.getString("notes"));
+
+        String createdAtStr = rs.getString("created_at");
+        if (createdAtStr != null) {
+            attendance.setCreatedAt(LocalDateTime.parse(createdAtStr));
+        }
+
+        String updatedAtStr = rs.getString("updated_at");
+        if (updatedAtStr != null) {
+            attendance.setUpdatedAt(LocalDateTime.parse(updatedAtStr));
+        }
+
+        // Set display names if available
+        attendance.setStudentName(rs.getString("student_name"));
+        attendance.setMarkerName(rs.getString("marker_name"));
+        attendance.setClubName(rs.getString("club_name"));
+
+        return attendance;
+    }
+
+    /**
+     * Get student attendance for a specific date
+     */
+    public Attendance getStudentAttendanceForDate(int studentId, int clubId, LocalDate sessionDate) throws SQLException {
+        String query = """
+            SELECT a.*, u.full_name as student_name, m.full_name as marker_name, c.name as club_name
+            FROM attendance a
+            LEFT JOIN users u ON a.student_id = u.id
+            LEFT JOIN users m ON a.marked_by_id = m.id
+            LEFT JOIN clubs c ON a.club_id = c.id
+            WHERE a.student_id = ? AND a.club_id = ? AND a.session_date = ?
+        """;
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, clubId);
+            pstmt.setString(3, sessionDate.toString());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToAttendance(rs);
+                }
+            }
+        }
+        return null;
+    }
 }

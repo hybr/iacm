@@ -40,25 +40,38 @@ public class MainDashboard extends JFrame {
         // Set modern look and feel
         getContentPane().setBackground(ModernTheme.LIGHT_GRAY);
 
-        // Title bar
-        JPanel titlePanel = createTitlePanel();
-        add(titlePanel, BorderLayout.NORTH);
+        if (authService.isGrade9()) {
+            // Grade 9 students get a simple layout without ribbon
+            JPanel titlePanel = createSimpleTitlePanel();
+            add(titlePanel, BorderLayout.NORTH);
 
-        // Ribbon
-        add(ribbon, BorderLayout.CENTER);
+            // Direct content area for Grade 9
+            JPanel mainPanel = new JPanel(new BorderLayout());
+            mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
+            mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // Main content area
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            add(mainPanel, BorderLayout.CENTER);
+        } else {
+            // Other roles get the full ribbon interface
+            JPanel titlePanel = createTitlePanel();
+            add(titlePanel, BorderLayout.NORTH);
 
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
+            // Ribbon
+            add(ribbon, BorderLayout.CENTER);
 
-        // Status bar
-        JPanel statusPanel = createStatusPanel();
-        mainPanel.add(statusPanel, BorderLayout.SOUTH);
+            // Main content area
+            JPanel mainPanel = new JPanel(new BorderLayout());
+            mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
+            mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        add(mainPanel, BorderLayout.SOUTH);
+            mainPanel.add(contentPanel, BorderLayout.CENTER);
+
+            // Status bar
+            JPanel statusPanel = createStatusPanel();
+            mainPanel.add(statusPanel, BorderLayout.SOUTH);
+
+            add(mainPanel, BorderLayout.SOUTH);
+        }
 
         loadInitialContent();
     }
@@ -119,6 +132,43 @@ public class MainDashboard extends JFrame {
         return titlePanel;
     }
 
+    private JPanel createSimpleTitlePanel() {
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setBackground(ModernTheme.PRIMARY_BLUE);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+
+        // Left side - App title only for Grade 9
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftPanel.setBackground(ModernTheme.PRIMARY_BLUE);
+
+        JLabel appTitle = new JLabel("Club Management System - My Dashboard");
+        appTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        appTitle.setForeground(ModernTheme.WHITE);
+
+        leftPanel.add(appTitle);
+
+        // Right side - Just close button for Grade 9
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        rightPanel.setBackground(ModernTheme.PRIMARY_BLUE);
+
+        JButton closeBtn = createWindowButton("×");
+        closeBtn.addActionListener(e -> {
+            int result = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to exit?", "Confirm Exit",
+                JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
+
+        rightPanel.add(closeBtn);
+
+        titlePanel.add(leftPanel, BorderLayout.WEST);
+        titlePanel.add(rightPanel, BorderLayout.EAST);
+
+        return titlePanel;
+    }
+
     private JButton createWindowButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -165,7 +215,7 @@ public class MainDashboard extends JFrame {
         if (authService.isClubManager()) {
             showProposalManagement();
         } else if (authService.isGrade11()) {
-            showAttendanceDashboard(); // Show attendance dashboard as default for Grade 11
+            showGrade11SelfAttendance(); // Show self-attendance marking for Grade 11
         } else if (authService.isGrade9()) {
             showAttendanceMarking(); // Grade 9 sees their own attendance history
         }
@@ -248,10 +298,32 @@ public class MainDashboard extends JFrame {
         contentPanel.repaint();
     }
 
+    private void showGrade11SelfAttendance() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(new Grade11SelfAttendancePanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade11SelfAttendance");
+        cardLayout.show(contentPanel, "grade11SelfAttendance");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private void showGrade9ClubAssignments() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(new Grade9ClubAssignmentsPanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade9ClubAssignments");
+        cardLayout.show(contentPanel, "grade9ClubAssignments");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
     private void showAttendanceMarking() {
         if (authService.isGrade11()) {
-            // Grade 11 students see the attendance dashboard (redirect to main view)
-            showAttendanceDashboard();
+            // Grade 11 students see their self-attendance marking panel
+            showGrade11SelfAttendance();
         } else {
             // Other roles use the basic attendance marking panel
             contentPanel.removeAll();
@@ -259,8 +331,8 @@ public class MainDashboard extends JFrame {
             cardPanel.setLayout(new BorderLayout());
 
             if (authService.isGrade9()) {
-                // Grade 9 students see their own attendance history
-                cardPanel.add(new AttendanceHistoryPanel(authService), BorderLayout.CENTER);
+                // Grade 9 students see their simplified dashboard with only attendance and logout
+                cardPanel.add(new Grade9SimpleDashboardPanel(authService), BorderLayout.CENTER);
             } else {
                 // Fallback for other roles
                 JLabel messageLabel = ModernTheme.createBodyLabel("Attendance feature is not available for your role.");
@@ -332,6 +404,10 @@ public class MainDashboard extends JFrame {
                 case "allocations":
                     showClubAllocation();
                     statusLabel.setText("Club Allocation loaded");
+                    break;
+                case "grade9clubs":
+                    showGrade9ClubAssignments();
+                    statusLabel.setText("Grade 9 Club Assignments loaded");
                     break;
                 case "reports":
                     showAttendanceReport();

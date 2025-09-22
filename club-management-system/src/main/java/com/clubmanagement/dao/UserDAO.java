@@ -21,16 +21,33 @@ public class UserDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("email"),
-                        rs.getString("full_name"),
-                        rs.getString("security_question"),
-                        rs.getString("security_answer"),
-                        UserRole.valueOf(rs.getString("role"))
-                    );
+                    try {
+                        return new User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            getStringOrNull(rs, "password_salt"),
+                            getStringOrNull(rs, "email"),
+                            getStringOrNull(rs, "full_name"),
+                            getStringOrNull(rs, "security_question"),
+                            getStringOrNull(rs, "security_answer"),
+                            UserRole.valueOf(rs.getString("role")),
+                            getIntegerOrNull(rs, "assigned_club_id"),
+                            getBooleanOrDefault(rs, "first_login_completed", false),
+                            getTimestampOrNull(rs, "created_at"),
+                            getTimestampOrNull(rs, "last_login"),
+                            getBooleanOrDefault(rs, "is_active", true)
+                        );
+                    } catch (SQLException e) {
+                        // Fallback for older database schema
+                        System.err.println("Warning: Using fallback user constructor due to: " + e.getMessage());
+                        return new User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            UserRole.valueOf(rs.getString("role"))
+                        );
+                    }
                 }
             }
         }
@@ -381,6 +398,96 @@ public class UserDAO {
             pstmt.setString(2, salt);
             pstmt.setInt(3, userId);
 
+            return pstmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Get all Grade 9 students with their club assignments
+     */
+    public List<User> getGrade9StudentsWithClubAssignments() throws SQLException {
+        String query = """
+            SELECT u.*, c.name as club_name FROM users u
+            LEFT JOIN clubs c ON u.assigned_club_id = c.id
+            WHERE u.role = 'GRADE_9'
+            ORDER BY u.full_name, c.name
+        """;
+        List<User> students = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("password_salt"),
+                    rs.getString("email"),
+                    rs.getString("full_name"),
+                    rs.getString("security_question"),
+                    rs.getString("security_answer"),
+                    UserRole.valueOf(rs.getString("role")),
+                    getIntegerOrNull(rs, "assigned_club_id"),
+                    getBooleanOrDefault(rs, "first_login_completed", false),
+                    rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null,
+                    rs.getTimestamp("last_login") != null ? rs.getTimestamp("last_login").toLocalDateTime() : null,
+                    rs.getBoolean("is_active")
+                );
+                students.add(user);
+            }
+        }
+        return students;
+    }
+
+    /**
+     * Helper methods for null-safe database access
+     */
+    private String getStringOrNull(ResultSet rs, String columnName) {
+        try {
+            return rs.getString(columnName);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    private boolean getBooleanOrDefault(ResultSet rs, String columnName, boolean defaultValue) {
+        try {
+            return rs.getBoolean(columnName);
+        } catch (SQLException e) {
+            return defaultValue;
+        }
+    }
+
+    private Integer getIntegerOrNull(ResultSet rs, String columnName) {
+        try {
+            int value = rs.getInt(columnName);
+            return rs.wasNull() ? null : value;
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    private java.time.LocalDateTime getTimestampOrNull(ResultSet rs, String columnName) {
+        try {
+            Timestamp timestamp = rs.getTimestamp(columnName);
+            return timestamp != null ? timestamp.toLocalDateTime() : null;
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Mark first login as completed for a user
+     */
+    public boolean markFirstLoginCompleted(int userId) throws SQLException {
+        String query = "UPDATE users SET first_login_completed = 1 WHERE id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, userId);
             return pstmt.executeUpdate() > 0;
         }
     }

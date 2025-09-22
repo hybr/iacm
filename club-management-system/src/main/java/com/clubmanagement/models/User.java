@@ -109,6 +109,14 @@ public class User {
         this.password = password;
     }
 
+    public String getPasswordHash() {
+        return password;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.password = passwordHash;
+    }
+
     public UserRole getRole() {
         return role;
     }
@@ -126,7 +134,7 @@ public class User {
     }
 
     public String getFullName() {
-        return fullName;
+        return fullName != null ? fullName : username;
     }
 
     public void setFullName(String fullName) {

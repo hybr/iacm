@@ -30,7 +30,30 @@ public class LoginFrame extends JFrame {
         passwordField = ModernTheme.createStyledPasswordField();
         loginButton = ModernTheme.createPrimaryButton("Login");
         signUpButton = ModernTheme.createSecondaryButton("Sign Up");
-        forgotPasswordButton = ModernTheme.createSecondaryButton("Forgot Password");
+
+        // Create forgot password as a styled link/text button
+        forgotPasswordButton = new JButton("Forgot Password?");
+        forgotPasswordButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        forgotPasswordButton.setForeground(ModernTheme.PRIMARY_BLUE);
+        forgotPasswordButton.setBorderPainted(false);
+        forgotPasswordButton.setContentAreaFilled(false);
+        forgotPasswordButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        forgotPasswordButton.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Add hover effect for better UX
+        forgotPasswordButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                forgotPasswordButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                forgotPasswordButton.setText("<html><u>Forgot Password?</u></html>");
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                forgotPasswordButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                forgotPasswordButton.setText("Forgot Password?");
+            }
+        });
     }
 
     private void setupLayout() {
@@ -84,20 +107,27 @@ public class LoginFrame extends JFrame {
         gbc.gridy = 3;
         formPanel.add(passwordField, gbc);
 
-        // Login button
+        // Forgot Password link - positioned right below password field
         gbc.gridy = 4;
+        gbc.insets = new Insets(8, 0, 8, 0);
+        JPanel forgotPasswordPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        forgotPasswordPanel.setBackground(ModernTheme.WHITE);
+        forgotPasswordPanel.add(forgotPasswordButton);
+        formPanel.add(forgotPasswordPanel, gbc);
+
+        // Login button
+        gbc.gridy = 5;
         gbc.insets = new Insets(20, 0, 15, 0);
         formPanel.add(loginButton, gbc);
 
-        // Additional buttons
-        JPanel additionalButtonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        additionalButtonsPanel.setBackground(ModernTheme.WHITE);
-        additionalButtonsPanel.add(signUpButton);
-        additionalButtonsPanel.add(forgotPasswordButton);
+        // Sign Up button (separate from Forgot Password)
+        JPanel signUpPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        signUpPanel.setBackground(ModernTheme.WHITE);
+        signUpPanel.add(signUpButton);
 
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.insets = new Insets(0, 0, 0, 0);
-        formPanel.add(additionalButtonsPanel, gbc);
+        formPanel.add(signUpPanel, gbc);
 
         loginCard.add(headerPanel, BorderLayout.NORTH);
         loginCard.add(formPanel, BorderLayout.CENTER);
@@ -174,15 +204,53 @@ public class LoginFrame extends JFrame {
 
                 this.dispose();
 
-                // Check if 9th grader needs to complete first login
-                if (authService.needsFirstLoginCompletion()) {
-                    SwingUtilities.invokeLater(() -> {
-                        new ClubSelectionFrame(authService).setVisible(true);
-                    });
-                } else {
-                    SwingUtilities.invokeLater(() -> {
-                        new MainDashboard(authService).setVisible(true);
-                    });
+                try {
+                    // Check if 9th grader needs to complete first login
+                    if (authService.needsFirstLoginCompletion()) {
+                        // Grade 9 students need club selection
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                new ClubSelectionFrame(authService).setVisible(true);
+                            } catch (Exception e) {
+                                System.err.println("Error opening ClubSelectionFrame: " + e.getMessage());
+                                e.printStackTrace();
+                                JOptionPane.showMessageDialog(null,
+                                    "Error opening club selection: " + e.getMessage(),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        });
+                    } else if (authService.needsClubSelection()) {
+                        // Grade 11 students need club selection (multiple clubs)
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                new Grade11ClubSelectionFrame(authService).setVisible(true);
+                            } catch (Exception e) {
+                                System.err.println("Error opening Grade11ClubSelectionFrame: " + e.getMessage());
+                                e.printStackTrace();
+                                JOptionPane.showMessageDialog(null,
+                                    "Error opening Grade 11 club selection: " + e.getMessage(),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        });
+                    } else {
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                new MainDashboard(authService).setVisible(true);
+                            } catch (Exception e) {
+                                System.err.println("Error opening MainDashboard: " + e.getMessage());
+                                e.printStackTrace();
+                                JOptionPane.showMessageDialog(null,
+                                    "Error opening main dashboard: " + e.getMessage(),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error during post-login processing: " + e.getMessage());
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this,
+                        "Error during login processing: " + e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid username or password.",
@@ -191,6 +259,10 @@ public class LoginFrame extends JFrame {
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(),
                                         "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }

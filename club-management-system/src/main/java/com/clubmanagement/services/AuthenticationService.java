@@ -250,4 +250,44 @@ public class AuthenticationService {
             System.err.println("Error cleaning up expired tokens: " + e.getMessage());
         }
     }
+
+    /**
+     * Check if Grade 11 student needs club selection (first login with no club assignments)
+     */
+    public boolean needsClubSelection() {
+        if (!isGrade11()) {
+            return false;
+        }
+
+        try {
+            com.clubmanagement.dao.Grade11ClubAssignmentDAO assignmentDAO =
+                new com.clubmanagement.dao.Grade11ClubAssignmentDAO();
+            return !assignmentDAO.hasClubAssignments(currentUser.getId());
+        } catch (SQLException e) {
+            System.err.println("Error checking club assignments: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Mark first login as completed for the current user
+     */
+    public void markFirstLoginCompleted(int userId) {
+        try {
+            userDAO.markFirstLoginCompleted(userId);
+            // Update current user object if it's the same user
+            if (currentUser != null && currentUser.getId() == userId) {
+                currentUser.setFirstLoginCompleted(true);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error marking first login completed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Check if current user has completed first login setup
+     */
+    public boolean hasCompletedFirstLogin() {
+        return currentUser != null && currentUser.isFirstLoginCompleted();
+    }
 }

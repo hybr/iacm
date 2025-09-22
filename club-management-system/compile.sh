@@ -26,7 +26,10 @@ javac -cp "lib/*" -d build \
     src/main/java/com/clubmanagement/database/*.java \
     src/main/java/com/clubmanagement/dao/*.java \
     src/main/java/com/clubmanagement/services/*.java \
-    src/main/java/com/clubmanagement/gui/*.java
+    src/main/java/com/clubmanagement/security/*.java \
+    src/main/java/com/clubmanagement/gui/*.java \
+    src/main/java/com/clubmanagement/gui/theme/*.java \
+    src/main/java/com/clubmanagement/gui/components/*.java
 
 if [ $? -eq 0 ]; then
     echo "Compilation successful!"

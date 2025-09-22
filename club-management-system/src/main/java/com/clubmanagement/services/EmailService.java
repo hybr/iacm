@@ -1,7 +1,8 @@
 package com.clubmanagement.services;
 
 import javax.swing.*;
-import java.awt.Desktop;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -84,7 +85,7 @@ public class EmailService {
             JDialog emailDialog = new JDialog();
             emailDialog.setTitle("Email Sent - Demo Mode");
             emailDialog.setModal(true);
-            emailDialog.setSize(500, 400);
+            emailDialog.setSize(600, 500);
             emailDialog.setLocationRelativeTo(null);
 
             JPanel panel = new JPanel();
@@ -105,6 +106,46 @@ public class EmailService {
             panel.add(scrollPane);
             panel.add(Box.createVerticalStrut(10));
 
+            // For password reset emails, extract and show the token
+            if (subject.contains("Password Reset")) {
+                String token = extractTokenFromBody(body);
+                if (token != null) {
+                    JPanel tokenPanel = new JPanel(new FlowLayout());
+                    tokenPanel.add(new JLabel("Reset Token: "));
+                    JTextField tokenField = new JTextField(token, 30);
+                    tokenField.setEditable(false);
+                    tokenPanel.add(tokenField);
+
+                    JButton copyTokenButton = new JButton("Copy Token");
+                    copyTokenButton.addActionListener(e -> {
+                        Toolkit.getDefaultToolkit().getSystemClipboard()
+                            .setContents(new StringSelection(token), null);
+                        JOptionPane.showMessageDialog(emailDialog, "Token copied to clipboard!");
+                    });
+                    tokenPanel.add(copyTokenButton);
+
+                    JButton openResetButton = new JButton("Open Reset Form");
+                    openResetButton.addActionListener(e -> {
+                        emailDialog.dispose();
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                Class<?> resetFrameClass = Class.forName("com.clubmanagement.gui.ResetPasswordFrame");
+                                Object resetFrame = resetFrameClass.getConstructor(String.class).newInstance(token);
+                                resetFrameClass.getMethod("setVisible", boolean.class).invoke(resetFrame, true);
+                            } catch (Exception ex) {
+                                JOptionPane.showMessageDialog(null,
+                                    "Error opening reset form: " + ex.getMessage(),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        });
+                    });
+                    tokenPanel.add(openResetButton);
+
+                    panel.add(tokenPanel);
+                    panel.add(Box.createVerticalStrut(10));
+                }
+            }
+
             JButton closeButton = new JButton("Close");
             closeButton.addActionListener(e -> emailDialog.dispose());
             panel.add(closeButton);
@@ -112,6 +153,24 @@ public class EmailService {
             emailDialog.add(panel);
             emailDialog.setVisible(true);
         });
+    }
+
+    /**
+     * Extract token from password reset email body
+     */
+    private static String extractTokenFromBody(String body) {
+        try {
+            // Look for the token in the reset URL
+            String pattern = "token=([^&'\"\\s<>]+)";
+            java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+            java.util.regex.Matcher m = p.matcher(body);
+            if (m.find()) {
+                return m.group(1);
+            }
+        } catch (Exception e) {
+            // If extraction fails, return null
+        }
+        return null;
     }
 
     /**

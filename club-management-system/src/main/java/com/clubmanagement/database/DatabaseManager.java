@@ -106,7 +106,7 @@ public class DatabaseManager {
             )
             """,
 
-            // Club allocation table
+            // Club allocation table (for Grade 9 students - single club)
             """
             CREATE TABLE IF NOT EXISTS club_allocation (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,6 +115,19 @@ public class DatabaseManager {
                 FOREIGN KEY (student_id) REFERENCES users(id),
                 FOREIGN KEY (club_id) REFERENCES clubs(id),
                 UNIQUE(student_id)
+            )
+            """,
+
+            // Grade 11 student clubs table (many-to-many mapping)
+            """
+            CREATE TABLE IF NOT EXISTS grade11_student_clubs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id INTEGER NOT NULL,
+                club_id INTEGER NOT NULL,
+                assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (student_id) REFERENCES users(id),
+                FOREIGN KEY (club_id) REFERENCES clubs(id),
+                UNIQUE(student_id, club_id)
             )
             """,
 
@@ -222,12 +235,12 @@ public class DatabaseManager {
 
             if (rs.next() && rs.getInt(1) == 0) {
                 String[] clubs = {
-                    "Science Club",
-                    "Literature Club",
-                    "Sports Club",
-                    "Art Club",
-                    "Music Club",
-                    "Technology Club"
+                    "Science",
+                    "Humanities",
+                    "Social Science",
+                    "Math",
+                    "Art",
+                    "Mind Matters"
                 };
 
                 String insertClubQuery = "INSERT INTO clubs (name) VALUES (?)";

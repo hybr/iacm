@@ -110,6 +110,34 @@ public class Attendance {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // Convenience method for setting status from string
+    public void setStatus(String statusStr) {
+        if (statusStr != null) {
+            try {
+                this.status = AttendanceStatus.valueOf(statusStr);
+            } catch (IllegalArgumentException e) {
+                // Fallback for simple string values
+                switch (statusStr.toUpperCase()) {
+                    case "PRESENT":
+                        this.status = AttendanceStatus.PRESENT;
+                        break;
+                    case "ABSENT":
+                        this.status = AttendanceStatus.ABSENT;
+                        break;
+                    case "LATE":
+                        this.status = AttendanceStatus.LATE;
+                        break;
+                    case "EXCUSED":
+                        this.status = AttendanceStatus.EXCUSED;
+                        break;
+                    default:
+                        this.status = AttendanceStatus.ABSENT;
+                }
+            }
+        }
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public String getNotes() { return notes; }
     public void setNotes(String notes) {
         this.notes = notes;
