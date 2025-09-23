@@ -1,0 +1,504 @@
+@startuml Real Application Diagram 1 - Model Classes from Actual Code
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam classAttributeFontSize 9
+skinparam classOperationFontSize 9
+skinparam linetype ortho
+
+title **REAL APPLICATION DIAGRAM 1: ACTUAL MODEL CLASSES**\n**SHOWS:** Real private/public variables and methods from your Club Management System\n**SOURCE:** Extracted from actual User.java, Club.java, Proposal.java, Attendance.java files
+
+class User {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (ACTUAL)**
+  ====================================
+  **PRIVATE VARIABLES FROM CODE (-)**
+  ====================================
+  - id : int
+  - username : String
+  - password : String
+  - passwordSalt : String
+  - email : String
+  - fullName : String
+  - securityQuestion : String
+  - securityAnswer : String
+  - role : UserRole
+  - assignedClubId : Integer
+  - firstLoginCompleted : boolean
+  - createdAt : LocalDateTime
+  - lastLogin : LocalDateTime
+  - isActive : boolean
+
+  ====================================
+  **SECTION 3: METHODS (FROM YOUR CODE)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + User()
+  + User(username:String, password:String, role:UserRole)
+  + User(id:int, username:String, password:String, role:UserRole)
+  + User(username:String, password:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String, role:UserRole)
+  + User(id:int, username:String, password:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String, role:UserRole)
+  + User(id:int, username:String, password:String, passwordSalt:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String, role:UserRole, assignedClubId:Integer, firstLoginCompleted:boolean, createdAt:LocalDateTime, lastLogin:LocalDateTime, isActive:boolean)
+
+  ====================================
+  **PUBLIC GETTER METHODS (+)**
+  ====================================
+  + getId() : int
+  + getUsername() : String
+  + getPassword() : String
+  + getPasswordHash() : String
+  + getRole() : UserRole
+  + getEmail() : String
+  + getFullName() : String
+  + getSecurityQuestion() : String
+  + getSecurityAnswer() : String
+  + getPasswordSalt() : String
+  + getAssignedClubId() : Integer
+  + isFirstLoginCompleted() : boolean
+  + getCreatedAt() : LocalDateTime
+  + getLastLogin() : LocalDateTime
+  + isActive() : boolean
+
+  ====================================
+  **PUBLIC SETTER METHODS (+)**
+  ====================================
+  + setId(id:int) : void
+  + setUsername(username:String) : void
+  + setPassword(password:String) : void
+  + setPasswordHash(passwordHash:String) : void
+  + setRole(role:UserRole) : void
+  + setEmail(email:String) : void
+  + setFullName(fullName:String) : void
+  + setSecurityQuestion(securityQuestion:String) : void
+  + setSecurityAnswer(securityAnswer:String) : void
+  + setPasswordSalt(passwordSalt:String) : void
+  + setAssignedClubId(assignedClubId:Integer) : void
+  + setFirstLoginCompleted(firstLoginCompleted:boolean) : void
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + setLastLogin(lastLogin:LocalDateTime) : void
+  + setActive(active:boolean) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+enum UserRole {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES (ACTUAL)**
+  ====================================
+  CLUB_MANAGER
+  GRADE_11
+  GRADE_9
+}
+
+class Club {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (ACTUAL)**
+  ====================================
+  **PRIVATE VARIABLES FROM CODE (-)**
+  ====================================
+  - id : int
+  - name : String
+
+  ====================================
+  **SECTION 3: METHODS (FROM YOUR CODE)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Club()
+  + Club(name:String)
+  + Club(id:int, name:String)
+
+  ====================================
+  **PUBLIC ACCESSOR METHODS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getName() : String
+  + setName(name:String) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+class Proposal {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (ACTUAL)**
+  ====================================
+  **PRIVATE VARIABLES FROM CODE (-)**
+  ====================================
+  - id : int
+  - studentId : int
+  - filePath : String
+  - status : ProposalStatus
+
+  ====================================
+  **SECTION 3: METHODS (FROM YOUR CODE)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Proposal()
+  + Proposal(studentId:int, filePath:String)
+  + Proposal(id:int, studentId:int, filePath:String, status:ProposalStatus)
+
+  ====================================
+  **PUBLIC ACCESSOR METHODS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getFilePath() : String
+  + setFilePath(filePath:String) : void
+  + getStatus() : ProposalStatus
+  + setStatus(status:ProposalStatus) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+enum ProposalStatus {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES (ACTUAL)**
+  ====================================
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+class Attendance {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (ACTUAL)**
+  ====================================
+  **PRIVATE CORE DATA FROM CODE (-)**
+  ====================================
+  - id : int
+  - studentId : int
+  - clubId : int
+  - markedById : int
+  - sessionDate : LocalDate
+  - sessionTime : LocalTime
+  - status : AttendanceStatus
+  - notes : String
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+
+  ====================================
+  **PRIVATE DISPLAY DATA FROM CODE (-)**
+  ====================================
+  - studentName : String
+  - markerName : String
+  - clubName : String
+
+  ====================================
+  **SECTION 3: METHODS (FROM YOUR CODE)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Attendance()
+  + Attendance(id:int, studentId:int, clubId:int, markedById:int, sessionDate:LocalDate, sessionTime:LocalTime, status:AttendanceStatus, notes:String, createdAt:LocalDateTime, updatedAt:LocalDateTime)
+  + Attendance(studentId:int, clubId:int, markedById:int, sessionDate:LocalDate, status:AttendanceStatus, notes:String)
+
+  ====================================
+  **PUBLIC CORE ACCESSORS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + getMarkedById() : int
+  + setMarkedById(markedById:int) : void
+  + getSessionDate() : LocalDate
+  + setSessionDate(sessionDate:LocalDate) : void
+  + getSessionTime() : LocalTime
+  + setSessionTime(sessionTime:LocalTime) : void
+  + getStatus() : AttendanceStatus
+  + setStatus(status:AttendanceStatus) : void
+  + setStatus(statusStr:String) : void
+  + getNotes() : String
+  + setNotes(notes:String) : void
+  + getCreatedAt() : LocalDateTime
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + getUpdatedAt() : LocalDateTime
+  + setUpdatedAt(updatedAt:LocalDateTime) : void
+
+  ====================================
+  **PUBLIC DISPLAY ACCESSORS (+)**
+  ====================================
+  + getStudentName() : String
+  + setStudentName(studentName:String) : void
+  + getMarkerName() : String
+  + setMarkerName(markerName:String) : void
+  + getClubName() : String
+  + setClubName(clubName:String) : void
+
+  ====================================
+  **PUBLIC BUSINESS LOGIC (+)**
+  ====================================
+  + getSessionNumber() : int
+  + isPresent() : boolean
+  + toString() : String
+}
+
+enum AttendanceStatus {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES (ACTUAL)**
+  ====================================
+  PRESENT("Present", "✅")
+  ABSENT("Absent", "❌")
+  LATE("Late", "⏱️")
+  EXCUSED("Excused", "📝")
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (ACTUAL)**
+  ====================================
+  **PRIVATE ENUM DATA FROM CODE (-)**
+  ====================================
+  - displayName : String
+  - emoji : String
+
+  ====================================
+  **SECTION 3: METHODS (FROM YOUR CODE)**
+  ====================================
+  **PACKAGE CONSTRUCTOR (~)**
+  ====================================
+  ~ AttendanceStatus(displayName:String, emoji:String)
+
+  ====================================
+  **PUBLIC ACCESSOR METHODS (+)**
+  ====================================
+  + getDisplayName() : String
+  + getEmoji() : String
+  + toString() : String
+}
+
+class ClubAllocation {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (ACTUAL)**
+  ====================================
+  **PRIVATE VARIABLES FROM CODE (-)**
+  ====================================
+  - id : int
+  - studentId : int
+  - clubId : int
+
+  ====================================
+  **SECTION 3: METHODS (FROM YOUR CODE)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + ClubAllocation()
+  + ClubAllocation(studentId:int, clubId:int)
+  + ClubAllocation(id:int, studentId:int, clubId:int)
+
+  ====================================
+  **PUBLIC ACCESSOR METHODS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+class AttendanceSession {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (ACTUAL)**
+  ====================================
+  **PRIVATE CORE DATA FROM CODE (-)**
+  ====================================
+  - id : int
+  - clubId : int
+  - sessionDate : LocalDate
+  - sessionTime : LocalTime
+  - sessionTitle : String
+  - sessionDescription : String
+  - createdById : int
+  - createdAt : LocalDateTime
+  - isActive : boolean
+
+  ====================================
+  **PRIVATE DISPLAY DATA FROM CODE (-)**
+  ====================================
+  - clubName : String
+  - creatorName : String
+
+  ====================================
+  **SECTION 3: METHODS (FROM YOUR CODE)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + AttendanceSession()
+  + AttendanceSession(id:int, clubId:int, sessionDate:LocalDate, sessionTime:LocalTime, sessionTitle:String, sessionDescription:String, createdById:int, createdAt:LocalDateTime, isActive:boolean)
+  + AttendanceSession(clubId:int, sessionDate:LocalDate, sessionTitle:String, sessionDescription:String, createdById:int)
+
+  ====================================
+  **PUBLIC ACCESSOR METHODS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + getSessionDate() : LocalDate
+  + setSessionDate(sessionDate:LocalDate) : void
+  + getSessionTime() : LocalTime
+  + setSessionTime(sessionTime:LocalTime) : void
+  + getSessionTitle() : String
+  + setSessionTitle(sessionTitle:String) : void
+  + getSessionDescription() : String
+  + setSessionDescription(sessionDescription:String) : void
+  + getCreatedById() : int
+  + setCreatedById(createdById:int) : void
+  + getCreatedAt() : LocalDateTime
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + isActive() : boolean
+  + setActive(active:boolean) : void
+  + getClubName() : String
+  + setClubName(clubName:String) : void
+  + getCreatorName() : String
+  + setCreatorName(creatorName:String) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+' ==========================================
+' ACTUAL RELATIONSHIPS FROM YOUR CODE
+' ==========================================
+
+' Aggregation - Enum relationships
+User ||-- UserRole : "has role"
+Proposal ||-- ProposalStatus : "has status"
+Attendance ||-- AttendanceStatus : "has status"
+
+' Association - Foreign key relationships from your database
+User "1" ||--o{ "0..*" Proposal : "submits proposals"
+User "1" ||--o{ "0..*" Attendance : "marks attendance"
+User "1" ||--o{ "0..1" ClubAllocation : "allocated to club"
+
+Club "1" ||--o{ "0..*" ClubAllocation : "contains students"
+Club "1" ||--o{ "0..*" Attendance : "tracks attendance"
+Club "1" ||--o{ "0..*" AttendanceSession : "hosts sessions"
+
+User "1" ||--o{ "0..*" AttendanceSession : "creates sessions"
+
+' Foreign key dependencies from your database schema
+Proposal }o--|| User : "studentId -> User.id"
+Attendance }o--|| User : "studentId -> User.id"
+Attendance }o--|| User : "markedById -> User.id"
+Attendance }o--|| Club : "clubId -> Club.id"
+ClubAllocation }o--|| User : "studentId -> User.id"
+ClubAllocation }o--|| Club : "clubId -> Club.id"
+AttendanceSession }o--|| Club : "clubId -> Club.id"
+AttendanceSession }o--|| User : "createdById -> User.id"
+
+' ==========================================
+' NOTES ABOUT YOUR ACTUAL CODE
+' ==========================================
+
+note top of User
+  **ACTUAL USER CLASS DATA:**
+  From your User.java file:
+  • 14 private attributes
+  • Full constructor with all fields
+  • Complete getter/setter methods
+  • UserRole enum for permissions
+  • LocalDateTime for timestamps
+end note
+
+note top of Attendance
+  **REAL ATTENDANCE FEATURES:**
+  From your Attendance.java:
+  • Core attendance data (who, when, status)
+  • Display data for UI (names)
+  • Business logic (isPresent(), getSessionNumber())
+  • AttendanceStatus enum with emojis
+  • Automatic timestamp updates
+end note
+
+note bottom of AttendanceStatus
+  **ENUM WITH DATA:**
+  Your AttendanceStatus enum contains:
+  • String displayName
+  • String emoji
+  • Constructor with parameters
+  • Getter methods
+  • toString() override
+end note
+
+note as DatabaseSchema
+  **YOUR DATABASE RELATIONSHIPS:**
+
+  **From DatabaseManager.java:**
+  • users table with role, assigned_club_id
+  • clubs table with id, name
+  • proposals table with student_id FK
+  • attendance table with student_id, club_id, marked_by_id FKs
+  • club_allocation table with student_id, club_id FKs
+  • attendance_sessions table with club_id, created_by_id FKs
+
+  **FOREIGN KEYS CREATE ASSOCIATIONS:**
+  • One User can have many Proposals
+  • One Club can have many Attendances
+  • One User can mark many Attendances
+  • One Club contains many ClubAllocations
+end note
+
+DatabaseSchema -up-> ClubAllocation
+
+note bottom
+  **DIAGRAM 1 EXPLANATION:**
+
+  **REPRESENTS:** Your actual domain model classes
+  **DATA SOURCE:** Real variables and methods from your .java files
+  **SHOWS:**
+  • Exact private attributes from your code
+  • Actual public methods with real signatures
+  • Enum values and constructors as implemented
+  • Database foreign key relationships
+
+  **REAL FEATURES:**
+  • User authentication with roles
+  • Proposal submission and status tracking
+  • Attendance marking with status and timestamps
+  • Club allocation system
+  • Session management with creators
+end note
+
+@enduml

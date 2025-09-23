@@ -1,0 +1,209 @@
+@startuml Club Management System - Architecture Diagram
+
+!theme cerulean-outline
+
+title Club Management System - Architecture Overview
+
+!define COMPONENT rectangle
+!define DATABASE cylinder
+!define INTERFACE interface
+
+package "Presentation Layer" <<Layer>> {
+    COMPONENT "Main Application" as MainApp {
+        [ClubManagementApp]
+        [LoginFrame]
+        [Navigation Components]
+    }
+
+    package "Dashboard Components" {
+        COMPONENT "Manager Dashboard" as ManagerDash {
+            [ManagerDashboardFrame]
+            [ProposalManagementPanel]
+            [ClubAllocationPanel]
+            [AttendanceReportPanel]
+        }
+
+        COMPONENT "Grade 11 Dashboard" as Grade11Dash {
+            [Grade11DashboardFrame]
+            [ProposalSubmissionPanel]
+            [ClubMembersPanel]
+            [AttendanceTrackingPanel]
+        }
+
+        COMPONENT "Grade 9 Dashboard" as Grade9Dash {
+            [Grade9DashboardFrame]
+            [ClubInfoPanel]
+            [AttendanceMarkingPanel]
+            [ProposalStatusPanel]
+        }
+    }
+
+    COMPONENT "Common GUI Components" as CommonGUI {
+        [NavigationToolbar]
+        [RibbonComponent]
+        [ChangePasswordFrame]
+        [AttendanceHistoryPanel]
+    }
+}
+
+package "Business Logic Layer" <<Layer>> {
+    COMPONENT "Authentication Services" as AuthServices {
+        [AuthenticationService]
+        [PasswordService]
+        [SecurityService]
+    }
+
+    COMPONENT "Core Services" as CoreServices {
+        [ClubAllocationService]
+        [AttendanceService]
+        [ProposalService]
+        [ReportingService]
+    }
+
+    COMPONENT "Utility Services" as UtilServices {
+        [FileService]
+        [ValidationService]
+        [NotificationService]
+    }
+}
+
+package "Data Access Layer" <<Layer>> {
+    INTERFACE "DAO Interfaces" as DAOInterface {
+        INTERFACE UserDAO
+        INTERFACE ClubDAO
+        INTERFACE ProposalDAO
+        INTERFACE AttendanceDAO
+        INTERFACE ClubAllocationDAO
+        INTERFACE Grade11ClubAssignmentDAO
+    }
+
+    COMPONENT "DAO Implementations" as DAOImpl {
+        [UserDAOImpl]
+        [ClubDAOImpl]
+        [ProposalDAOImpl]
+        [AttendanceDAOImpl]
+        [ClubAllocationDAOImpl]
+        [Grade11ClubAssignmentDAOImpl]
+    }
+}
+
+package "Data Management Layer" <<Layer>> {
+    COMPONENT "Database Manager" as DBManager {
+        [DatabaseManager]
+        [Connection Pool]
+        [Schema Migration]
+        [Transaction Management]
+    }
+
+    DATABASE "SQLite Database" as Database {
+        [users]
+        [clubs]
+        [proposals]
+        [attendance]
+        [club_allocation]
+        [grade11_student_clubs]
+        [attendance_sessions]
+        [password_reset_tokens]
+        [user_sessions]
+    }
+}
+
+package "Domain Models" <<Package>> {
+    COMPONENT "Core Models" as Models {
+        [User]
+        [Club]
+        [Proposal]
+        [Attendance]
+        [ClubAllocation]
+        [AttendanceSession]
+    }
+
+    COMPONENT "Enumerations" as Enums {
+        [UserRole]
+        [ProposalStatus]
+        [AttendanceStatus]
+    }
+}
+
+package "External Dependencies" <<Package>> {
+    COMPONENT "Java Swing" as Swing {
+        [JFrame]
+        [JPanel]
+        [JButton]
+        [JTextField]
+        [JTable]
+    }
+
+    COMPONENT "JDBC Driver" as JDBC {
+        [SQLite JDBC]
+        [Connection Management]
+    }
+
+    COMPONENT "File System" as FileSystem {
+        [PDF Files]
+        [Configuration Files]
+        [Log Files]
+    }
+}
+
+' Layer Dependencies (Top to Bottom)
+MainApp --> AuthServices : "uses"
+ManagerDash --> CoreServices : "uses"
+Grade11Dash --> CoreServices : "uses"
+Grade9Dash --> CoreServices : "uses"
+CommonGUI --> AuthServices : "uses"
+
+AuthServices --> DAOInterface : "uses"
+CoreServices --> DAOInterface : "uses"
+UtilServices --> FileSystem : "accesses"
+
+DAOInterface <|.. DAOImpl : "implements"
+DAOImpl --> DBManager : "uses"
+DAOImpl --> Models : "maps to"
+
+DBManager --> Database : "manages"
+DBManager --> JDBC : "uses"
+
+Models --> Enums : "contains"
+
+' Cross-cutting Dependencies
+MainApp --> Swing : "extends"
+ManagerDash --> Swing : "extends"
+Grade11Dash --> Swing : "extends"
+Grade9Dash --> Swing : "extends"
+CommonGUI --> Swing : "extends"
+
+' Data Flow
+note top of MainApp : Entry point - initializes database\nand launches login interface
+
+note right of AuthServices : Handles user authentication,\npassword management, and security
+
+note right of CoreServices : Implements business rules for\nclub allocation, attendance tracking,\nand proposal management
+
+note bottom of Database : Persistent storage for all\napplication data with referential integrity
+
+note left of Models : Domain objects representing\nbusiness entities and their relationships
+
+' Architectural Patterns
+note as N1
+<b>Architectural Patterns Used:</b>
+• Layered Architecture (4-tier)
+• Model-View-Controller (MVC)
+• Data Access Object (DAO)
+• Singleton (DatabaseManager)
+• Strategy (Club Allocation)
+end note
+
+note as N2
+<b>Key Design Principles:</b>
+• Separation of Concerns
+• Dependency Inversion
+• Single Responsibility
+• Interface Segregation
+• Database Transaction Management
+end note
+
+N1 -right-> MainApp
+N2 -left-> Database
+
+@enduml

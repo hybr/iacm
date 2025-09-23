@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Management System - Complete UML Class Diagrams with Hierarchical Relationships</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0.4in;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: 7px;
+            line-height: 1.1;
+            margin: 0;
+            padding: 8px;
+            background-color: white;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 100vh;
+            page-break-after: always;
+            padding: 8px;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 3px;
+        }
+
+        h2 {
+            font-size: 12px;
+            color: #2c3e50;
+            margin: 12px 0 8px 0;
+            border-bottom: 1px solid #bdc3c7;
+        }
+
+        h3 {
+            font-size: 10px;
+            color: #34495e;
+            margin: 8px 0 4px 0;
+        }
+
+        .uml-box {
+            border: 2px solid #2c3e50;
+            margin: 3px;
+            padding: 0;
+            background-color: #ecf0f1;
+            display: inline-block;
+            vertical-align: top;
+            min-width: 180px;
+            max-width: 250px;
+        }
+
+        .class-name {
+            background-color: #3498db;
+            color: white;
+            padding: 3px 6px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid #2c3e50;
+            font-size: 8px;
+        }
+
+        .attributes {
+            padding: 3px 6px;
+            border-bottom: 1px solid #2c3e50;
+            background-color: #f8f9fa;
+        }
+
+        .methods {
+            padding: 3px 6px;
+            background-color: #ffffff;
+        }
+
+        .attribute-line, .method-line {
+            margin: 1px 0;
+            font-size: 6px;
+        }
+
+        .private { color: #e74c3c; }
+        .public { color: #27ae60; }
+        .protected { color: #f39c12; }
+
+        .relationship-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin: 8px 0;
+        }
+
+        .hierarchy-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+
+        .inheritance-arrow {
+            font-size: 14px;
+            color: #3498db;
+            margin: 2px 5px;
+            font-weight: bold;
+        }
+
+        .aggregation-arrow {
+            font-size: 14px;
+            color: #e67e22;
+            margin: 2px 5px;
+            font-weight: bold;
+        }
+
+        .relationship-line {
+            display: flex;
+            align-items: center;
+            margin: 3px 0;
+        }
+
+        .legend {
+            background-color: #f1f2f6;
+            border: 1px solid #2c3e50;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 8px;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .diagram-section {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .layer-section {
+            width: 100%;
+            border: 1px solid #7f8c8d;
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .layer-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 9px;
+        }
+
+        .connection-line {
+            border-left: 2px solid #3498db;
+            border-bottom: 2px solid #3498db;
+            width: 20px;
+            height: 15px;
+            margin: 0 5px;
+        }
+
+        .vertical-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .horizontal-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media print {
+            .page {
+                page-break-after: always;
+            }
+
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PAGE 1: TITLE AND HIERARCHICAL OVERVIEW -->
+<div class="page">
+    <h1>Club Management System - Complete UML Class Diagrams</h1>
+    <h2>With Hierarchical Relationships</h2>
+
+    <div class="legend">
+        <h3>Relationship Legend:</h3>
+        <div><strong>▲</strong> = Inheritance (extends/implements)</div>
+        <div><strong>◊</strong> = Aggregation (has-a relationship)</div>
+        <div><strong class="private">-</strong> = Private attribute/method</div>
+        <div><strong class="public">+</strong> = Public attribute/method</div>
+        <div><strong class="protected">#</strong> = Protected attribute/method</div>
+    </div>
+
+    <h2>Application Hierarchical Architecture</h2>
+
+    <div class="layer-section">
+        <div class="layer-title">APPLICATION LAYER</div>
+        <div class="relationship-container">
+            <div class="uml-box">
+                <div class="class-name">ClubManagementApp</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- mainFrame: String</div>
+                    <div class="attribute-line private">- isRunning: boolean</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ main(): void</div>
+                    <div class="method-line public">+ initialize(): void</div>
+                    <div class="method-line public">+ shutdown(): void</div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <span class="aggregation-arrow">◊</span>
+        </div>
+    </div>
+
+    <div class="layer-section">
+        <div class="layer-title">GUI LAYER (JFrame & JPanel Hierarchy)</div>
+        <div class="relationship-container">
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">JFrame</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- title: String</div>
+                        <div class="attribute-line private">- visible: boolean</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ setTitle(): void</div>
+                        <div class="method-line public">+ dispose(): void</div>
+                    </div>
+                </div>
+                <span class="inheritance-arrow">▲</span>
+                <div class="horizontal-flow">
+                    <div class="uml-box">
+                        <div class="class-name">LoginFrame</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- username: String</div>
+                            <div class="attribute-line private">- password: String</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ validateLogin(): boolean</div>
+                        </div>
+                    </div>
+                    <div class="uml-box">
+                        <div class="class-name">MainDashboard</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- currentUser: String</div>
+                            <div class="attribute-line private">- userRole: String</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ loadDashboard(): void</div>
+                        </div>
+                    </div>
+                    <div class="uml-box">
+                        <div class="class-name">AttendanceTrackingFrame</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- attendanceTable: String</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ markAttendance(): void</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">JPanel</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- visible: boolean</div>
+                        <div class="attribute-line private">- enabled: boolean</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ setVisible(): void</div>
+                        <div class="method-line public">+ add(): void</div>
+                    </div>
+                </div>
+                <span class="inheritance-arrow">▲</span>
+                <div class="horizontal-flow">
+                    <div class="uml-box">
+                        <div class="class-name">AttendanceDashboard</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- studentCount: int</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ loadData(): void</div>
+                        </div>
+                    </div>
+                    <div class="uml-box">
+                        <div class="class-name">ClubAllocationPanel</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- clubList: String</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ allocateStudent(): void</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <span class="aggregation-arrow">◊</span>
+        </div>
+    </div>
+
+    <div class="layer-section">
+        <div class="layer-title">SERVICE LAYER</div>
+        <div class="relationship-container">
+            <div class="uml-box">
+                <div class="class-name">AuthenticationService</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- currentUser: String</div>
+                    <div class="attribute-line private">- isLoggedIn: boolean</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ login(): boolean</div>
+                    <div class="method-line public">+ logout(): void</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">AttendanceService</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- attendanceRecords: String</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ markStudent(): boolean</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">ClubAllocationService</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- allocations: String</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ allocateStudents(): boolean</div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <span class="aggregation-arrow">◊</span>
+        </div>
+    </div>
+
+    <div class="layer-section">
+        <div class="layer-title">DAO LAYER</div>
+        <div class="relationship-container">
+            <div class="uml-box">
+                <div class="class-name">UserDAO</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- connection: String</div>
+                    <div class="attribute-line private">- tableName: String</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ findById(): String</div>
+                    <div class="method-line public">+ save(): boolean</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">ClubDAO</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- connection: String</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ getAllClubs(): String</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">AttendanceDAO</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- tableName: String</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ markAttendance(): boolean</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">ClubAllocationDAO</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- allocationTable: String</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ allocateStudent(): boolean</div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <span class="aggregation-arrow">◊</span>
+        </div>
+    </div>
+
+    <div class="layer-section">
+        <div class="layer-title">MODEL LAYER</div>
+        <div class="relationship-container">
+            <div class="uml-box">
+                <div class="class-name">User</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- id: int</div>
+                    <div class="attribute-line private">- username: String</div>
+                    <div class="attribute-line private">- role: String</div>
+                    <div class="attribute-line private">- clubId: int</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ getId(): int</div>
+                    <div class="method-line public">+ getUsername(): String</div>
+                    <div class="method-line public">+ getRole(): String</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">Club</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- id: int</div>
+                    <div class="attribute-line private">- name: String</div>
+                    <div class="attribute-line private">- capacity: int</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ getId(): int</div>
+                    <div class="method-line public">+ getName(): String</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">Attendance</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- id: int</div>
+                    <div class="attribute-line private">- studentId: int</div>
+                    <div class="attribute-line private">- clubId: int</div>
+                    <div class="attribute-line private">- isPresent: boolean</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ getId(): int</div>
+                    <div class="method-line public">+ isPresent(): boolean</div>
+                </div>
+            </div>
+            <div class="uml-box">
+                <div class="class-name">ClubAllocation</div>
+                <div class="attributes">
+                    <div class="attribute-line private">- id: int</div>
+                    <div class="attribute-line private">- studentId: int</div>
+                    <div class="attribute-line private">- clubId: int</div>
+                </div>
+                <div class="methods">
+                    <div class="method-line public">+ getId(): int</div>
+                    <div class="method-line public">+ getStudentId(): int</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 2: COMPLETE APPLICATION UML DIAGRAM WITH RELATIONSHIPS -->
+<div class="page">
+    <h1>1. Complete Application Class Relationships</h1>
+
+    <div class="diagram-section">
+        <h2>Core Application Flow with All Relationships</h2>
+        <div class="relationship-container">
+            <!-- GUI Layer -->
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">LoginFrame</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- usernameField: String</div>
+                        <div class="attribute-line private">- passwordField: String</div>
+                        <div class="attribute-line private">- loginButton: String</div>
+                        <div class="attribute-line private">- attemptCount: int</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ validateLogin(): boolean</div>
+                        <div class="method-line public">+ clearFields(): void</div>
+                        <div class="method-line public">+ showMessage(): void</div>
+                        <div class="method-line public">+ dispose(): void</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ has-a</span>
+
+                <!-- Service Layer -->
+                <div class="uml-box">
+                    <div class="class-name">AuthenticationService</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- currentUser: String</div>
+                        <div class="attribute-line private">- isLoggedIn: boolean</div>
+                        <div class="attribute-line private">- sessionToken: String</div>
+                        <div class="attribute-line private">- maxAttempts: int</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ login(): boolean</div>
+                        <div class="method-line public">+ logout(): void</div>
+                        <div class="method-line public">+ getCurrentUser(): String</div>
+                        <div class="method-line public">+ validateSession(): boolean</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ has-a</span>
+
+                <!-- DAO Layer -->
+                <div class="uml-box">
+                    <div class="class-name">UserDAO</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- connection: String</div>
+                        <div class="attribute-line private">- tableName: String</div>
+                        <div class="attribute-line private">- isConnected: boolean</div>
+                        <div class="attribute-line private">- timeout: int</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ findByUsername(): String</div>
+                        <div class="method-line public">+ save(): boolean</div>
+                        <div class="method-line public">+ delete(): boolean</div>
+                        <div class="method-line public">+ authenticate(): boolean</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ creates/uses</span>
+
+                <!-- Model Layer -->
+                <div class="uml-box">
+                    <div class="class-name">User</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- id: int</div>
+                        <div class="attribute-line private">- username: String</div>
+                        <div class="attribute-line private">- password: String</div>
+                        <div class="attribute-line private">- email: String</div>
+                        <div class="attribute-line private">- role: String</div>
+                        <div class="attribute-line private">- isActive: boolean</div>
+                        <div class="attribute-line private">- clubId: int</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ getId(): int</div>
+                        <div class="method-line public">+ setId(): void</div>
+                        <div class="method-line public">+ getUsername(): String</div>
+                        <div class="method-line public">+ setUsername(): void</div>
+                        <div class="method-line public">+ getRole(): String</div>
+                        <div class="method-line public">+ setRole(): void</div>
+                        <div class="method-line public">+ isActive(): boolean</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parallel Attendance Flow -->
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">AttendanceTrackingFrame</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- attendanceTable: String</div>
+                        <div class="attribute-line private">- clubComboBox: String</div>
+                        <div class="attribute-line private">- dateChooser: String</div>
+                        <div class="attribute-line private">- totalStudents: int</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ loadStudentList(): void</div>
+                        <div class="method-line public">+ markAttendance(): void</div>
+                        <div class="method-line public">+ exportToExcel(): void</div>
+                        <div class="method-line public">+ refreshData(): void</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ has-a</span>
+
+                <div class="uml-box">
+                    <div class="class-name">AttendanceService</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- attendanceRecords: String</div>
+                        <div class="attribute-line private">- currentSession: String</div>
+                        <div class="attribute-line private">- sessionDate: String</div>
+                        <div class="attribute-line private">- autoSave: boolean</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ markStudent(): boolean</div>
+                        <div class="method-line public">+ markBulkAttendance(): boolean</div>
+                        <div class="method-line public">+ getAttendanceByClub(): String</div>
+                        <div class="method-line public">+ exportAttendance(): String</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ has-a</span>
+
+                <div class="uml-box">
+                    <div class="class-name">AttendanceDAO</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- tableName: String</div>
+                        <div class="attribute-line private">- primaryKey: String</div>
+                        <div class="attribute-line private">- foreignKeys: String</div>
+                        <div class="attribute-line private">- cacheEnabled: boolean</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ create(): boolean</div>
+                        <div class="method-line public">+ findByStudent(): String</div>
+                        <div class="method-line public">+ findByClub(): String</div>
+                        <div class="method-line public">+ bulkInsert(): boolean</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ creates/uses</span>
+
+                <div class="uml-box">
+                    <div class="class-name">Attendance</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- id: int</div>
+                        <div class="attribute-line private">- studentId: int</div>
+                        <div class="attribute-line private">- clubId: int</div>
+                        <div class="attribute-line private">- isPresent: boolean</div>
+                        <div class="attribute-line private">- dateMarked: String</div>
+                        <div class="attribute-line private">- notes: String</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ getId(): int</div>
+                        <div class="method-line public">+ setId(): void</div>
+                        <div class="method-line public">+ getStudentId(): int</div>
+                        <div class="method-line public">+ setStudentId(): void</div>
+                        <div class="method-line public">+ isPresent(): boolean</div>
+                        <div class="method-line public">+ setPresent(): void</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Club Management Flow -->
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">ClubAllocationPanel</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- studentComboBox: String</div>
+                        <div class="attribute-line private">- clubComboBox: String</div>
+                        <div class="attribute-line private">- allocationTable: String</div>
+                        <div class="attribute-line private">- allocateButton: String</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ loadStudents(): void</div>
+                        <div class="method-line public">+ loadClubs(): void</div>
+                        <div class="method-line public">+ allocateStudent(): void</div>
+                        <div class="method-line public">+ refreshData(): void</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ has-a</span>
+
+                <div class="uml-box">
+                    <div class="class-name">ClubAllocationService</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- allocations: String</div>
+                        <div class="attribute-line private">- maxStudentsPerClub: int</div>
+                        <div class="attribute-line private">- isAutoAllocation: boolean</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ allocateStudents(): boolean</div>
+                        <div class="method-line public">+ getAvailableClubs(): String</div>
+                        <div class="method-line public">+ removeAllocation(): boolean</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ has-a</span>
+
+                <div class="uml-box">
+                    <div class="class-name">ClubAllocationDAO</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- allocationTable: String</div>
+                        <div class="attribute-line private">- studentTable: String</div>
+                        <div class="attribute-line private">- clubTable: String</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ allocateStudent(): boolean</div>
+                        <div class="method-line public">+ removeAllocation(): boolean</div>
+                        <div class="method-line public">+ getAllocations(): String</div>
+                    </div>
+                </div>
+                <span class="aggregation-arrow">◊ creates/uses</span>
+
+                <div class="horizontal-flow">
+                    <div class="uml-box">
+                        <div class="class-name">ClubAllocation</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- id: int</div>
+                            <div class="attribute-line private">- studentId: int</div>
+                            <div class="attribute-line private">- clubId: int</div>
+                            <div class="attribute-line private">- isActive: boolean</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ getId(): int</div>
+                            <div class="method-line public">+ getStudentId(): int</div>
+                            <div class="method-line public">+ getClubId(): int</div>
+                        </div>
+                    </div>
+
+                    <div class="uml-box">
+                        <div class="class-name">Club</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- id: int</div>
+                            <div class="attribute-line private">- name: String</div>
+                            <div class="attribute-line private">- capacity: int</div>
+                            <div class="attribute-line private">- isActive: boolean</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ getId(): int</div>
+                            <div class="method-line public">+ getName(): String</div>
+                            <div class="method-line public">+ getCapacity(): int</div>
+                            <div class="method-line public">+ isActive(): boolean</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 3: MULTIPLE INHERITANCE DIAGRAM -->
+<div class="page">
+    <h1>2. Multiple Inheritance UML Diagram</h1>
+    <h2>(Interface Implementation - Java's Multiple Inheritance Equivalent)</h2>
+
+    <div class="diagram-section">
+        <h2>Table Cell Renderer Hierarchy</h2>
+        <div class="relationship-container">
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">&lt;&lt;interface&gt;&gt;<br>TableCellRenderer</div>
+                    <div class="attributes">
+                        <div class="attribute-line public">+ getTableComponent(): String</div>
+                        <div class="attribute-line public">+ setValue(): void</div>
+                        <div class="attribute-line public">+ isValid(): boolean</div>
+                    </div>
+                </div>
+                <span class="inheritance-arrow">▲ implements</span>
+
+                <div class="uml-box">
+                    <div class="class-name">DefaultTableCellRenderer</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- text: String</div>
+                        <div class="attribute-line private">- alignment: int</div>
+                        <div class="attribute-line private">- foreground: String</div>
+                        <div class="attribute-line private">- background: String</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ setText(): void</div>
+                        <div class="method-line public">+ getText(): String</div>
+                        <div class="method-line public">+ setAlignment(): void</div>
+                        <div class="method-line public">+ getAlignment(): int</div>
+                        <div class="method-line public">+ setForeground(): void</div>
+                        <div class="method-line public">+ setBackground(): void</div>
+                    </div>
+                </div>
+                <span class="inheritance-arrow">▲ extends</span>
+
+                <div class="uml-box">
+                    <div class="class-name">StatusCellRenderer</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- statusText: String</div>
+                        <div class="attribute-line private">- statusColor: String</div>
+                        <div class="attribute-line private">- iconPath: String</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ setStatus(): void</div>
+                        <div class="method-line public">+ getStatus(): String</div>
+                        <div class="method-line public">+ setStatusColor(): void</div>
+                        <div class="method-line public">+ getStatusColor(): String</div>
+                        <div class="method-line public">+ setIcon(): void</div>
+                        <div class="method-line public">+ getIcon(): String</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">&lt;&lt;interface&gt;&gt;<br>TableCellEditor</div>
+                    <div class="attributes">
+                        <div class="attribute-line public">+ getEditorComponent(): String</div>
+                        <div class="attribute-line public">+ getCellValue(): String</div>
+                        <div class="attribute-line public">+ stopEditing(): boolean</div>
+                        <div class="attribute-line public">+ cancelEditing(): void</div>
+                    </div>
+                </div>
+                <span class="inheritance-arrow">▲ implements</span>
+
+                <div class="uml-box">
+                    <div class="class-name">AbstractCellEditor</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- listeners: String</div>
+                        <div class="attribute-line private">- editing: boolean</div>
+                        <div class="attribute-line private">- clickCount: int</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ addListener(): void</div>
+                        <div class="method-line public">+ removeListener(): void</div>
+                        <div class="method-line public">+ fireEditingStopped(): void</div>
+                        <div class="method-line public">+ isCellEditable(): boolean</div>
+                    </div>
+                </div>
+                <span class="inheritance-arrow">▲ extends</span>
+
+                <div class="uml-box">
+                    <div class="class-name">ActionCellEditor</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- editButton: String</div>
+                        <div class="attribute-line private">- viewButton: String</div>
+                        <div class="attribute-line private">- currentRow: int</div>
+                        <div class="attribute-line private">- parentPanel: String</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ getComponent(): String</div>
+                        <div class="method-line public">+ getCellValue(): String</div>
+                        <div class="method-line public">+ stopEditing(): boolean</div>
+                        <div class="method-line public">+ cancelEditing(): void</div>
+                        <div class="method-line public">+ addActionListener(): void</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="diagram-section">
+        <h2>Panel with Multiple Interface Implementation</h2>
+        <div class="relationship-container">
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">JPanel</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- width: int</div>
+                        <div class="attribute-line private">- height: int</div>
+                        <div class="attribute-line private">- visible: boolean</div>
+                        <div class="attribute-line private">- enabled: boolean</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ setSize(): void</div>
+                        <div class="method-line public">+ getSize(): String</div>
+                        <div class="method-line public">+ setVisible(): void</div>
+                        <div class="method-line public">+ isVisible(): boolean</div>
+                        <div class="method-line public">+ add(): void</div>
+                        <div class="method-line public">+ remove(): void</div>
+                    </div>
+                </div>
+                <div class="relationship-line">
+                    <span class="inheritance-arrow">▲ extends</span>
+                    <span style="font-size: 6px;">& implements TableCellRenderer</span>
+                </div>
+
+                <div class="uml-box">
+                    <div class="class-name">ActionButtonRenderer</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- editButton: String</div>
+                        <div class="attribute-line private">- deleteButton: String</div>
+                        <div class="attribute-line private">- buttonPanel: String</div>
+                        <div class="attribute-line private">- isHovered: boolean</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ getComponent(): String</div>
+                        <div class="method-line public">+ setButtonText(): void</div>
+                        <div class="method-line public">+ getButtonText(): String</div>
+                        <div class="method-line public">+ setHover(): void</div>
+                        <div class="method-line public">+ isHovered(): boolean</div>
+                        <div class="method-line public">+ addClickListener(): void</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 4: SINGLE INHERITANCE DIAGRAM -->
+<div class="page">
+    <h1>3. Single Inheritance UML Diagram</h1>
+
+    <div class="diagram-section">
+        <h2>Complete JFrame Inheritance Chain</h2>
+        <div class="relationship-container">
+            <div class="vertical-flow">
+                <div class="uml-box">
+                    <div class="class-name">JFrame</div>
+                    <div class="attributes">
+                        <div class="attribute-line private">- title: String</div>
+                        <div class="attribute-line private">- width: int</div>
+                        <div class="attribute-line private">- height: int</div>
+                        <div class="attribute-line private">- visible: boolean</div>
+                        <div class="attribute-line private">- resizable: boolean</div>
+                        <div class="attribute-line private">- defaultCloseOperation: int</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method-line public">+ setTitle(): void</div>
+                        <div class="method-line public">+ getTitle(): String</div>
+                        <div class="method-line public">+ setSize(): void</div>
+                        <div class="method-line public">+ getSize(): String</div>
+                        <div class="method-line public">+ setVisible(): void</div>
+                        <div class="method-line public">+ isVisible(): boolean</div>
+                        <div class="method-line public">+ setResizable(): void</div>
+                        <div class="method-line public">+ dispose(): void</div>
+                        <div class="method-line public">+ pack(): void</div>
+                    </div>
+                </div>
+                <span class="inheritance-arrow">▲ extends</span>
+
+                <div class="horizontal-flow">
+                    <div class="uml-box">
+                        <div class="class-name">LoginFrame</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- usernameField: String</div>
+                            <div class="attribute-line private">- passwordField: String</div>
+                            <div class="attribute-line private">- loginButton: String</div>
+                            <div class="attribute-line private">- signUpButton: String</div>
+                            <div class="attribute-line private">- forgotPasswordButton: String</div>
+                            <div class="attribute-line private">- isAuthenticated: boolean</div>
+                            <div class="attribute-line private">- attemptCount: int</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ initComponents(): void</div>
+                            <div class="method-line public">+ setupLayout(): void</div>
+                            <div class="method-line public">+ handleLogin(): void</div>
+                            <div class="method-line public">+ handleSignUp(): void</div>
+                            <div class="method-line public">+ handleForgotPassword(): void</div>
+                            <div class="method-line public">+ validateInput(): boolean</div>
+                            <div class="method-line public">+ clearFields(): void</div>
+                            <div class="method-line public">+ showErrorMessage(): void</div>
+                            <div class="method-line public">+ getUsername(): String</div>
+                            <div class="method-line public">+ getPassword(): String</div>
+                        </div>
+                    </div>
+
+                    <div class="uml-box">
+                        <div class="class-name">MainDashboard</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- contentPanel: String</div>
+                            <div class="attribute-line private">- menuBar: String</div>
+                            <div class="attribute-line private">- statusBar: String</div>
+                            <div class="attribute-line private">- currentUser: String</div>
+                            <div class="attribute-line private">- userRole: String</div>
+                            <div class="attribute-line private">- lastActivity: long</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ initComponents(): void</div>
+                            <div class="method-line public">+ setupMenuBar(): void</div>
+                            <div class="method-line public">+ loadUserDashboard(): void</div>
+                            <div class="method-line public">+ showClubManager(): void</div>
+                            <div class="method-line public">+ showGrade11Dashboard(): void</div>
+                            <div class="method-line public">+ showGrade9Dashboard(): void</div>
+                            <div class="method-line public">+ updateStatusBar(): void</div>
+                            <div class="method-line public">+ handleLogout(): void</div>
+                            <div class="method-line public">+ refreshContent(): void</div>
+                        </div>
+                    </div>
+
+                    <div class="uml-box">
+                        <div class="class-name">AttendanceTrackingFrame</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- attendanceTable: String</div>
+                            <div class="attribute-line private">- clubComboBox: String</div>
+                            <div class="attribute-line private">- dateChooser: String</div>
+                            <div class="attribute-line private">- searchField: String</div>
+                            <div class="attribute-line private">- totalStudents: int</div>
+                            <div class="attribute-line private">- presentCount: int</div>
+                            <div class="attribute-line private">- absentCount: int</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ initComponents(): void</div>
+                            <div class="method-line public">+ loadStudentList(): void</div>
+                            <div class="method-line public">+ markAttendance(): void</div>
+                            <div class="method-line public">+ markBulkAttendance(): void</div>
+                            <div class="method-line public">+ exportToExcel(): void</div>
+                            <div class="method-line public">+ generateReport(): void</div>
+                            <div class="method-line public">+ filterByClub(): void</div>
+                            <div class="method-line public">+ filterByDate(): void</div>
+                            <div class="method-line public">+ refreshData(): void</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="diagram-section">
+        <h2>Service to DAO to Model Chain</h2>
+        <div class="relationship-container">
+            <div class="horizontal-flow">
+                <!-- Authentication Chain -->
+                <div class="vertical-flow">
+                    <div class="uml-box">
+                        <div class="class-name">AuthenticationService</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- currentUser: String</div>
+                            <div class="attribute-line private">- isLoggedIn: boolean</div>
+                            <div class="attribute-line private">- sessionTimeout: long</div>
+                            <div class="attribute-line private">- maxAttempts: int</div>
+                            <div class="attribute-line private">- lockoutDuration: long</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ login(): boolean</div>
+                            <div class="method-line public">+ logout(): void</div>
+                            <div class="method-line public">+ isAuthenticated(): boolean</div>
+                            <div class="method-line public">+ getCurrentUser(): String</div>
+                            <div class="method-line public">+ validateCredentials(): boolean</div>
+                            <div class="method-line public">+ resetPassword(): boolean</div>
+                            <div class="method-line public">+ changePassword(): boolean</div>
+                            <div class="method-line public">+ lockAccount(): void</div>
+                            <div class="method-line public">+ unlockAccount(): void</div>
+                        </div>
+                    </div>
+                    <span class="aggregation-arrow">◊ has-a</span>
+
+                    <div class="uml-box">
+                        <div class="class-name">UserDAO</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- databaseUrl: String</div>
+                            <div class="attribute-line private">- username: String</div>
+                            <div class="attribute-line private">- password: String</div>
+                            <div class="attribute-line private">- connectionPool: String</div>
+                            <div class="attribute-line private">- maxConnections: int</div>
+                            <div class="attribute-line private">- timeoutSeconds: int</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ connect(): boolean</div>
+                            <div class="method-line public">+ disconnect(): void</div>
+                            <div class="method-line public">+ findById(): String</div>
+                            <div class="method-line public">+ findByUsername(): String</div>
+                            <div class="method-line public">+ save(): boolean</div>
+                            <div class="method-line public">+ update(): boolean</div>
+                            <div class="method-line public">+ delete(): boolean</div>
+                            <div class="method-line public">+ authenticate(): boolean</div>
+                            <div class="method-line public">+ getAllUsers(): String</div>
+                            <div class="method-line public">+ countUsers(): int</div>
+                        </div>
+                    </div>
+                    <span class="aggregation-arrow">◊ creates/manages</span>
+
+                    <div class="uml-box">
+                        <div class="class-name">User</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- id: int</div>
+                            <div class="attribute-line private">- username: String</div>
+                            <div class="attribute-line private">- password: String</div>
+                            <div class="attribute-line private">- email: String</div>
+                            <div class="attribute-line private">- role: String</div>
+                            <div class="attribute-line private">- isActive: boolean</div>
+                            <div class="attribute-line private">- clubId: int</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ getId(): int</div>
+                            <div class="method-line public">+ setId(): void</div>
+                            <div class="method-line public">+ getUsername(): String</div>
+                            <div class="method-line public">+ setUsername(): void</div>
+                            <div class="method-line public">+ getRole(): String</div>
+                            <div class="method-line public">+ setRole(): void</div>
+                            <div class="method-line public">+ isActive(): boolean</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Chain -->
+                <div class="vertical-flow">
+                    <div class="uml-box">
+                        <div class="class-name">AttendanceService</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- attendanceRecords: String</div>
+                            <div class="attribute-line private">- currentSession: String</div>
+                            <div class="attribute-line private">- sessionDate: String</div>
+                            <div class="attribute-line private">- defaultStatus: String</div>
+                            <div class="attribute-line private">- autoSave: boolean</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ markStudent(): boolean</div>
+                            <div class="method-line public">+ markBulkAttendance(): boolean</div>
+                            <div class="method-line public">+ getAttendanceByClub(): String</div>
+                            <div class="method-line public">+ getAttendanceByDate(): String</div>
+                            <div class="method-line public">+ updateAttendance(): boolean</div>
+                            <div class="method-line public">+ deleteAttendance(): boolean</div>
+                            <div class="method-line public">+ exportAttendance(): String</div>
+                            <div class="method-line public">+ calculateStatistics(): String</div>
+                            <div class="method-line public">+ validateAttendance(): boolean</div>
+                        </div>
+                    </div>
+                    <span class="aggregation-arrow">◊ has-a</span>
+
+                    <div class="uml-box">
+                        <div class="class-name">AttendanceDAO</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- tableName: String</div>
+                            <div class="attribute-line private">- primaryKey: String</div>
+                            <div class="attribute-line private">- foreignKeys: String</div>
+                            <div class="attribute-line private">- indexFields: String</div>
+                            <div class="attribute-line private">- cacheEnabled: boolean</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ create(): boolean</div>
+                            <div class="method-line public">+ findById(): String</div>
+                            <div class="method-line public">+ findByStudent(): String</div>
+                            <div class="method-line public">+ findByClub(): String</div>
+                            <div class="method-line public">+ findByDate(): String</div>
+                            <div class="method-line public">+ update(): boolean</div>
+                            <div class="method-line public">+ delete(): boolean</div>
+                            <div class="method-line public">+ bulkInsert(): boolean</div>
+                            <div class="method-line public">+ countRecords(): int</div>
+                        </div>
+                    </div>
+                    <span class="aggregation-arrow">◊ creates/manages</span>
+
+                    <div class="uml-box">
+                        <div class="class-name">Attendance</div>
+                        <div class="attributes">
+                            <div class="attribute-line private">- id: int</div>
+                            <div class="attribute-line private">- studentId: int</div>
+                            <div class="attribute-line private">- clubId: int</div>
+                            <div class="attribute-line private">- isPresent: boolean</div>
+                            <div class="attribute-line private">- dateMarked: String</div>
+                            <div class="attribute-line private">- notes: String</div>
+                        </div>
+                        <div class="methods">
+                            <div class="method-line public">+ getId(): int</div>
+                            <div class="method-line public">+ setId(): void</div>
+                            <div class="method-line public">+ getStudentId(): int</div>
+                            <div class="method-line public">+ setStudentId(): void</div>
+                            <div class="method-line public">+ isPresent(): boolean</div>
+                            <div class="method-line public">+ setPresent(): void</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

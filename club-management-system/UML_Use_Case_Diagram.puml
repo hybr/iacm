@@ -1,0 +1,150 @@
+@startuml Use Case Diagram - User Interactions
+
+!theme cerulean-outline
+
+title **UML USE CASE DIAGRAM**\n**REPRESENTS:** User interactions and functional requirements\n**PURPOSE:** Shows what different types of users can do in the system
+
+' Define actors
+:Club Manager: as manager
+:Grade 11 Student: as grade11
+:Grade 9 Student: as grade9
+
+' System boundary
+rectangle "Club Management System" {
+
+  ' Authentication use cases
+  package "Authentication" {
+    (Login to System) as login
+    (Change Password) as changePassword
+    (Reset Password) as resetPassword
+    (Logout) as logout
+  }
+
+  ' Club Manager use cases
+  package "Club Management" {
+    (Manage Proposals) as manageProposals
+    (Accept Proposal) as acceptProposal
+    (Reject Proposal) as rejectProposal
+    (View All Proposals) as viewAllProposals
+    (Allocate Students to Clubs) as allocateStudents
+    (View Club Allocations) as viewAllocations
+    (Generate Attendance Reports) as generateReports
+    (View System Statistics) as viewStats
+  }
+
+  ' Grade 11 Student use cases
+  package "Grade 11 Features" {
+    (Submit Club Proposal) as submitProposal
+    (Upload PDF Document) as uploadPDF
+    (Check Proposal Status) as checkProposalStatus
+    (View My Club Members) as viewMyMembers
+    (Mark Student Attendance) as markAttendance
+    (View Grade 9 Students) as viewGrade9Students
+  }
+
+  ' Grade 9 Student use cases
+  package "Grade 9 Features" {
+    (Mark My Attendance) as markMyAttendance
+    (View My Club Info) as viewMyClub
+    (Check Attendance History) as checkAttendanceHistory
+    (View Club Details) as viewClubDetails
+  }
+
+  ' Shared use cases
+  package "Common Features" {
+    (View Profile) as viewProfile
+    (Update Profile) as updateProfile
+  }
+
+  ' Include relationships for complex use cases
+  manageProposals .> acceptProposal : <<include>>
+  manageProposals .> rejectProposal : <<include>>
+  manageProposals .> viewAllProposals : <<include>>
+
+  submitProposal .> uploadPDF : <<include>>
+
+  allocateStudents .> viewAllocations : <<extend>>
+
+  markAttendance .> viewMyMembers : <<include>>
+
+}
+
+' Actor-Use Case relationships
+manager --> login
+manager --> manageProposals
+manager --> allocateStudents
+manager --> generateReports
+manager --> viewStats
+manager --> changePassword
+manager --> logout
+
+grade11 --> login
+grade11 --> submitProposal
+grade11 --> checkProposalStatus
+grade11 --> viewMyMembers
+grade11 --> markAttendance
+grade11 --> viewGrade9Students
+grade11 --> changePassword
+grade11 --> logout
+
+grade9 --> login
+grade9 --> markMyAttendance
+grade9 --> viewMyClub
+grade9 --> checkAttendanceHistory
+grade9 --> viewClubDetails
+grade9 --> changePassword
+grade9 --> logout
+
+' Shared use cases
+manager --> viewProfile
+manager --> updateProfile
+grade11 --> viewProfile
+grade11 --> updateProfile
+grade9 --> viewProfile
+grade9 --> updateProfile
+
+' Password reset (external)
+manager --> resetPassword
+grade11 --> resetPassword
+grade9 --> resetPassword
+
+' Notes explaining the diagram
+note top of manager
+  **CLUB MANAGER**
+  - Highest privilege level
+  - Can manage all aspects
+  - Administrative functions
+end note
+
+note top of grade11
+  **GRADE 11 STUDENT**
+  - Can submit proposals
+  - Can mark attendance for Grade 9
+  - View assigned students
+end note
+
+note top of grade9
+  **GRADE 9 STUDENT**
+  - Basic user privileges
+  - Can only mark own attendance
+  - View club information
+end note
+
+note bottom
+  **DIAGRAM EXPLANATION:**
+
+  **STRUCTURE REPRESENTED:** Use Case Diagram
+  **SHOWS:** Functional requirements and user-system interactions
+  **ELEMENTS:**
+  • Actors (different user types)
+  • Use Cases (system functions)
+  • Associations (who can do what)
+  • Include/Extend relationships
+
+  **RELATIONSHIPS:**
+  • Solid lines: Actor can perform use case
+  • <<include>>: Mandatory sub-functionality
+  • <<extend>>: Optional sub-functionality
+end note
+
+@enduml

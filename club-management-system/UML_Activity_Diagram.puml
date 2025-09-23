@@ -1,0 +1,171 @@
+@startuml Activity Diagram - Process Flows
+
+!theme cerulean-outline
+
+title **UML ACTIVITY DIAGRAM**\n**REPRESENTS:** Business process flows and workflow logic\n**PURPOSE:** Shows step-by-step processes and decision points in the system
+
+|#lightblue|User|
+start
+
+:User enters login credentials;
+
+|#lightgreen|Authentication Service|
+:Validate username and password;
+
+if (Credentials valid?) then (yes)
+  :Create user session;
+  :Set current user;
+
+  |#lightyellow|System|
+  if (User role?) then (Club Manager)
+    |#lightcoral|Manager Dashboard|
+    :Load Manager Dashboard;
+    :Show management options;
+
+    repeat
+      :Wait for user action;
+
+      if (Action type?) then (Manage Proposals)
+        :Fetch all proposals;
+        :Display proposal list;
+        :Wait for manager decision;
+        if (Decision?) then (Accept)
+          :Update proposal status to ACCEPTED;
+          :Log action;
+        else (Reject)
+          :Update proposal status to REJECTED;
+          :Log action;
+        endif
+
+      elseif (Allocate Students) then
+        :Get all Grade 9 students;
+        :Get all available clubs;
+        :Run allocation algorithm;
+        :Save allocations to database;
+        :Display allocation results;
+
+      elseif (Generate Reports) then
+        :Gather attendance data;
+        :Generate statistical reports;
+        :Display attendance summary;
+
+      endif
+
+    repeat while (Continue managing?) is (yes)
+
+  elseif (Grade 11 Student) then
+    |#lightsteelblue|Grade 11 Dashboard|
+    :Load Grade 11 Dashboard;
+    :Show student options;
+
+    repeat
+      :Wait for student action;
+
+      if (Action type?) then (Submit Proposal)
+        :Open file dialog;
+        :Select PDF file;
+        if (Valid PDF?) then (yes)
+          :Upload file to system;
+          :Create proposal record;
+          :Set status to PENDING;
+          :Notify student of success;
+        else (no)
+          :Show error message;
+          :Return to file selection;
+        endif
+
+      elseif (Mark Attendance) then
+        :Get assigned Grade 9 students;
+        :Display attendance form;
+        :Allow marking present/absent;
+        :Save attendance records;
+        :Update attendance database;
+
+      elseif (Check Proposal Status) then
+        :Fetch student's proposals;
+        :Display status list;
+
+      endif
+
+    repeat while (Continue using system?) is (yes)
+
+  else (Grade 9 Student)
+    |#lightpink|Grade 9 Dashboard|
+    :Load Grade 9 Dashboard;
+    :Show basic options;
+
+    repeat
+      :Wait for student action;
+
+      if (Action type?) then (Mark Attendance)
+        :Check if already marked today;
+        if (Already marked?) then (yes)
+          :Show "Already marked" message;
+        else (no)
+          :Get assigned club;
+          :Mark attendance as PRESENT;
+          :Save to database;
+          :Show success message;
+        endif
+
+      elseif (View Club Info) then
+        :Get student's club allocation;
+        :Display club details;
+        :Show other club members;
+
+      elseif (Check Attendance History) then
+        :Fetch student's attendance records;
+        :Calculate attendance percentage;
+        :Display attendance history;
+        if (Attendance < 60%?) then (yes)
+          :Highlight poor attendance;
+          :Show warning message;
+        endif
+
+      endif
+
+    repeat while (Continue using system?) is (yes)
+
+  endif
+
+  |#lightyellow|System|
+  :User clicks logout;
+  :Clear user session;
+  :Return to login screen;
+
+else (no)
+  |#lightcoral|Error Handling|
+  :Show error message;
+  :Clear password field;
+  :Return to login screen;
+endif
+
+stop
+
+note right
+  **DIAGRAM EXPLANATION:**
+
+  **STRUCTURE REPRESENTED:** Activity Diagram
+  **SHOWS:** Sequential workflow and business logic
+  **ELEMENTS:**
+  • Start/End nodes (●/●)
+  • Activities (rounded rectangles)
+  • Decision points (diamonds)
+  • Swim lanes (different user roles)
+  • Flow directions (arrows)
+
+  **SWIM LANES:**
+  • User: User actions and inputs
+  • Authentication Service: Login validation
+  • System: Core system processes
+  • Role-specific Dashboards: Feature workflows
+  • Error Handling: Exception processes
+
+  **DECISION POINTS:**
+  • Credential validation
+  • User role determination
+  • Action type selection
+  • Business rule validation
+end note
+
+@enduml

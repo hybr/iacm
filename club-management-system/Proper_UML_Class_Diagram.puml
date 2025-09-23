@@ -1,0 +1,491 @@
+@startuml Proper UML Class Diagram with Box Structure
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 10
+skinparam classAttributeFontSize 9
+skinparam classOperationFontSize 9
+
+title Club Management System - Proper UML Class Diagram
+
+' ==== MODEL CLASSES ====
+
+class User {
+  ====== ATTRIBUTES ======
+  - id : int
+  - username : String
+  - password : String
+  - passwordSalt : String
+  - email : String
+  - fullName : String
+  - securityQuestion : String
+  - securityAnswer : String
+  - role : UserRole
+  - assignedClubId : Integer
+  - firstLoginCompleted : boolean
+  - createdAt : LocalDateTime
+  - lastLogin : LocalDateTime
+  - isActive : boolean
+
+  ====== METHODS ======
+  + User()
+  + User(username:String, password:String, role:UserRole)
+  + User(id:int, username:String, password:String, role:UserRole)
+  + User(username:String, password:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String, role:UserRole)
+  + User(id:int, username:String, password:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String, role:UserRole)
+  + User(id:int, username:String, password:String, passwordSalt:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String, role:UserRole, assignedClubId:Integer, firstLoginCompleted:boolean, createdAt:LocalDateTime, lastLogin:LocalDateTime, isActive:boolean)
+  + getId() : int
+  + setId(id:int) : void
+  + getUsername() : String
+  + setUsername(username:String) : void
+  + getPassword() : String
+  + setPassword(password:String) : void
+  + getPasswordHash() : String
+  + setPasswordHash(passwordHash:String) : void
+  + getRole() : UserRole
+  + setRole(role:UserRole) : void
+  + getEmail() : String
+  + setEmail(email:String) : void
+  + getFullName() : String
+  + setFullName(fullName:String) : void
+  + getSecurityQuestion() : String
+  + setSecurityQuestion(securityQuestion:String) : void
+  + getSecurityAnswer() : String
+  + setSecurityAnswer(securityAnswer:String) : void
+  + getPasswordSalt() : String
+  + setPasswordSalt(passwordSalt:String) : void
+  + getAssignedClubId() : Integer
+  + setAssignedClubId(assignedClubId:Integer) : void
+  + isFirstLoginCompleted() : boolean
+  + setFirstLoginCompleted(firstLoginCompleted:boolean) : void
+  + getCreatedAt() : LocalDateTime
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + getLastLogin() : LocalDateTime
+  + setLastLogin(lastLogin:LocalDateTime) : void
+  + isActive() : boolean
+  + setActive(active:boolean) : void
+  + toString() : String
+}
+
+enum UserRole {
+  CLUB_MANAGER
+  GRADE_11
+  GRADE_9
+}
+
+class Club {
+  ====== ATTRIBUTES ======
+  - id : int
+  - name : String
+
+  ====== METHODS ======
+  + Club()
+  + Club(name:String)
+  + Club(id:int, name:String)
+  + getId() : int
+  + setId(id:int) : void
+  + getName() : String
+  + setName(name:String) : void
+  + toString() : String
+}
+
+class Proposal {
+  ====== ATTRIBUTES ======
+  - id : int
+  - studentId : int
+  - filePath : String
+  - status : ProposalStatus
+
+  ====== METHODS ======
+  + Proposal()
+  + Proposal(studentId:int, filePath:String)
+  + Proposal(id:int, studentId:int, filePath:String, status:ProposalStatus)
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getFilePath() : String
+  + setFilePath(filePath:String) : void
+  + getStatus() : ProposalStatus
+  + setStatus(status:ProposalStatus) : void
+  + toString() : String
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+class Attendance {
+  ====== ATTRIBUTES ======
+  - id : int
+  - studentId : int
+  - clubId : int
+  - markedById : int
+  - sessionDate : LocalDate
+  - sessionTime : LocalTime
+  - status : AttendanceStatus
+  - notes : String
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+  - studentName : String
+  - markerName : String
+  - clubName : String
+
+  ====== METHODS ======
+  + Attendance()
+  + Attendance(id:int, studentId:int, clubId:int, markedById:int, sessionDate:LocalDate, sessionTime:LocalTime, status:AttendanceStatus, notes:String, createdAt:LocalDateTime, updatedAt:LocalDateTime)
+  + Attendance(studentId:int, clubId:int, markedById:int, sessionDate:LocalDate, status:AttendanceStatus, notes:String)
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + getMarkedById() : int
+  + setMarkedById(markedById:int) : void
+  + getSessionDate() : LocalDate
+  + setSessionDate(sessionDate:LocalDate) : void
+  + getSessionTime() : LocalTime
+  + setSessionTime(sessionTime:LocalTime) : void
+  + getStatus() : AttendanceStatus
+  + setStatus(status:AttendanceStatus) : void
+  + setStatus(statusStr:String) : void
+  + getNotes() : String
+  + setNotes(notes:String) : void
+  + getCreatedAt() : LocalDateTime
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + getUpdatedAt() : LocalDateTime
+  + setUpdatedAt(updatedAt:LocalDateTime) : void
+  + getStudentName() : String
+  + setStudentName(studentName:String) : void
+  + getMarkerName() : String
+  + setMarkerName(markerName:String) : void
+  + getClubName() : String
+  + setClubName(clubName:String) : void
+  + getSessionNumber() : int
+  + isPresent() : boolean
+  + toString() : String
+}
+
+enum AttendanceStatus {
+  PRESENT("Present", "✅")
+  ABSENT("Absent", "❌")
+  LATE("Late", "⏱️")
+  EXCUSED("Excused", "📝")
+
+  ====== ATTRIBUTES ======
+  - displayName : String
+  - emoji : String
+
+  ====== METHODS ======
+  + AttendanceStatus(displayName:String, emoji:String)
+  + getDisplayName() : String
+  + getEmoji() : String
+  + toString() : String
+}
+
+class ClubAllocation {
+  ====== ATTRIBUTES ======
+  - id : int
+  - studentId : int
+  - clubId : int
+
+  ====== METHODS ======
+  + ClubAllocation()
+  + ClubAllocation(studentId:int, clubId:int)
+  + ClubAllocation(id:int, studentId:int, clubId:int)
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + toString() : String
+}
+
+class AttendanceSession {
+  ====== ATTRIBUTES ======
+  - id : int
+  - clubId : int
+  - sessionDate : LocalDate
+  - sessionTime : LocalTime
+  - sessionTitle : String
+  - sessionDescription : String
+  - createdById : int
+  - createdAt : LocalDateTime
+  - isActive : boolean
+  - clubName : String
+  - creatorName : String
+
+  ====== METHODS ======
+  + AttendanceSession()
+  + AttendanceSession(id:int, clubId:int, sessionDate:LocalDate, sessionTime:LocalTime, sessionTitle:String, sessionDescription:String, createdById:int, createdAt:LocalDateTime, isActive:boolean)
+  + AttendanceSession(clubId:int, sessionDate:LocalDate, sessionTitle:String, sessionDescription:String, createdById:int)
+  + getId() : int
+  + setId(id:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + getSessionDate() : LocalDate
+  + setSessionDate(sessionDate:LocalDate) : void
+  + getSessionTime() : LocalTime
+  + setSessionTime(sessionTime:LocalTime) : void
+  + getSessionTitle() : String
+  + setSessionTitle(sessionTitle:String) : void
+  + getSessionDescription() : String
+  + setSessionDescription(sessionDescription:String) : void
+  + getCreatedById() : int
+  + setCreatedById(createdById:int) : void
+  + getCreatedAt() : LocalDateTime
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + isActive() : boolean
+  + setActive(active:boolean) : void
+  + getClubName() : String
+  + setClubName(clubName:String) : void
+  + getCreatorName() : String
+  + setCreatorName(creatorName:String) : void
+  + toString() : String
+}
+
+' ==== GUI CLASSES ====
+
+class JFrame {
+  ====== ATTRIBUTES ======
+  # rootPane : JRootPane
+  # menuBar : JMenuBar
+  # contentPane : Container
+  # layeredPane : JLayeredPane
+  # glassPane : Component
+  # defaultCloseOperation : int
+
+  ====== METHODS ======
+  + JFrame()
+  + JFrame(title:String)
+  + setTitle(title:String) : void
+  + getTitle() : String
+  + setDefaultCloseOperation(operation:int) : void
+  + getDefaultCloseOperation() : int
+  + setVisible(visible:boolean) : void
+  + isVisible() : boolean
+  + pack() : void
+  + setSize(width:int, height:int) : void
+  + getSize() : Dimension
+  + setLocation(x:int, y:int) : void
+  + getLocation() : Point
+  + setResizable(resizable:boolean) : void
+  + isResizable() : boolean
+}
+
+class JPanel {
+  ====== ATTRIBUTES ======
+  - layout : LayoutManager
+  - components : Component[]
+
+  ====== METHODS ======
+  + JPanel()
+  + JPanel(layout:LayoutManager)
+  + add(component:Component) : Component
+  + add(component:Component, constraints:Object) : void
+  + remove(component:Component) : void
+  + removeAll() : void
+  + setLayout(mgr:LayoutManager) : void
+  + getLayout() : LayoutManager
+  + setBackground(bg:Color) : void
+  + getBackground() : Color
+  + setForeground(fg:Color) : void
+  + getForeground() : Color
+  + setBorder(border:Border) : void
+  + getBorder() : Border
+}
+
+class LoginFrame {
+  ====== ATTRIBUTES ======
+  - usernameField : JTextField
+  - passwordField : JPasswordField
+  - loginButton : JButton
+  - signUpButton : JButton
+  - forgotPasswordButton : JButton
+  - authService : AuthenticationService
+
+  ====== METHODS ======
+  + LoginFrame()
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+  - setupFrame() : void
+  - handleLogin() : void
+  - openDashboard(user:User) : void
+  - handleSignUp() : void
+  - handleForgotPassword() : void
+  - validateInput() : boolean
+  - showErrorMessage(message:String) : void
+  - clearFields() : void
+}
+
+class MainDashboard {
+  ====== ATTRIBUTES ======
+  - authService : AuthenticationService
+  - contentPanel : JPanel
+  - cardLayout : CardLayout
+  - toolbar : NavigationToolbar
+  - statusLabel : JLabel
+  - currentUser : User
+
+  ====== METHODS ======
+  + MainDashboard(authService:AuthenticationService)
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+  - setupFrame() : void
+  - createTitlePanel() : JPanel
+  - createStatusPanel() : JPanel
+  - loadInitialContent() : void
+  + setStatusMessage(message:String) : void
+  + showPanel(panelName:String) : void
+  - handleWindowClosing() : void
+  + refreshContent() : void
+}
+
+class Grade11EnhancedDashboard {
+  ====== ATTRIBUTES ======
+  - authService : AuthenticationService
+  - contentPanel : JPanel
+  - cardLayout : CardLayout
+  - currentUser : User
+  - attendancePanel : Grade11SelfAttendancePanel
+  - proposalSubmissionPanel : ProposalSubmissionPanel
+  - proposalStatusPanel : ProposalStatusPanel
+  - grade9StudentsViewPanel : Grade9StudentsViewPanel
+  - attendanceButton : JButton
+  - uploadProposalButton : JButton
+  - checkProposalStatusButton : JButton
+  - viewGrade9StudentsButton : JButton
+  - logoutButton : JButton
+  - logoutCallback : Runnable
+
+  ====== METHODS ======
+  + Grade11EnhancedDashboard(authService:AuthenticationService)
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+  - showAttendancePanel() : void
+  - showProposalSubmissionPanel() : void
+  - showProposalStatusPanel() : void
+  - showGrade9StudentsPanel() : void
+  + setLogoutCallback(callback:Runnable) : void
+  - handleLogout() : void
+  - refreshPanels() : void
+  - updateButtonStates() : void
+}
+
+' ==== SERVICE CLASSES ====
+
+class AuthenticationService {
+  ====== ATTRIBUTES ======
+  - userDAO : UserDAO
+  - currentUser : User
+  - sessionActive : boolean
+
+  ====== METHODS ======
+  + AuthenticationService()
+  + authenticate(username:String, password:String) : User
+  + validatePassword(user:User, password:String) : boolean
+  + hashPassword(password:String) : String
+  + createUser(user:User) : boolean
+  + getCurrentUser() : User
+  + setCurrentUser(user:User) : void
+  + logout() : void
+  + changePassword(userId:int, newPassword:String) : boolean
+  + resetPassword(username:String, securityAnswer:String, newPassword:String) : boolean
+  + isSessionActive() : boolean
+  + validateSecurityAnswer(user:User, answer:String) : boolean
+  - generateSalt() : String
+  - hashPasswordWithSalt(password:String, salt:String) : String
+}
+
+class DatabaseManager {
+  ====== ATTRIBUTES ======
+  - {static} DB_NAME : String = "club_management.db"
+  - {static} DB_URL : String
+  - {static} connection : Connection
+
+  ====== METHODS ======
+  + {static} getConnection() : Connection
+  - {static} initializeDatabase() : void
+  - {static} createTables() : void
+  - {static} migrateDatabase() : void
+  - {static} insertDefaultData() : void
+  - {static} insertDefaultClubs() : void
+  - {static} insertDefaultUsers() : void
+  - {static} updateExistingUsersWithDefaults() : void
+  + {static} closeConnection() : void
+}
+
+' ==== RELATIONSHIPS ====
+
+' Inheritance relationships
+JFrame <|-- LoginFrame : extends
+JFrame <|-- MainDashboard : extends
+JPanel <|-- Grade11EnhancedDashboard : extends
+
+' Enum relationships
+User ||-- UserRole : has
+Proposal ||-- ProposalStatus : has
+Attendance ||-- AttendanceStatus : has
+
+' Aggregation relationships (uses/has-a)
+LoginFrame o-- AuthenticationService : uses
+MainDashboard o-- AuthenticationService : uses
+Grade11EnhancedDashboard o-- AuthenticationService : uses
+Grade11EnhancedDashboard o-- User : current user
+
+AuthenticationService o-- User : current user
+
+' Composition relationships (part-of/owns)
+LoginFrame *-- JTextField : username field
+LoginFrame *-- JPasswordField : password field
+LoginFrame *-- JButton : login button
+LoginFrame *-- JButton : signup button
+LoginFrame *-- JButton : forgot password button
+
+MainDashboard *-- JPanel : content panel
+MainDashboard *-- CardLayout : card layout
+MainDashboard *-- JLabel : status label
+
+Grade11EnhancedDashboard *-- JPanel : content panel
+Grade11EnhancedDashboard *-- CardLayout : card layout
+Grade11EnhancedDashboard *-- JButton : attendance button
+Grade11EnhancedDashboard *-- JButton : upload proposal button
+Grade11EnhancedDashboard *-- JButton : check proposal status button
+Grade11EnhancedDashboard *-- JButton : view grade9 students button
+Grade11EnhancedDashboard *-- JButton : logout button
+
+' Association relationships
+User "1" ||--o{ "many" Proposal : submits
+User "1" ||--o{ "many" Attendance : marks
+User "1" ||--o{ "1" ClubAllocation : allocated to
+Club "1" ||--o{ "many" ClubAllocation : contains
+Club "1" ||--o{ "many" Attendance : tracks
+Club "1" ||--o{ "many" AttendanceSession : hosts
+User "1" ||--o{ "many" AttendanceSession : creates
+
+' Notes explaining relationships
+note top of User : "Main entity representing\nsystem users with roles"
+note top of Club : "Represents different clubs\nstudents can join"
+note bottom of LoginFrame : "Entry point for user\nauthentication"
+note bottom of MainDashboard : "Main application window\nafter login"
+note right of AuthenticationService : "Handles user login,\npassword management\nand session control"
+
+note as RelationshipLegend
+<b>Relationship Types:</b>
+<|-- : Inheritance (is-a)
+o-- : Aggregation (has-a)
+*-- : Composition (part-of)
+||--o{ : One-to-Many Association
+||-- : One-to-One Association
+end note
+
+RelationshipLegend .. User
+
+@enduml

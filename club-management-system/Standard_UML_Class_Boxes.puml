@@ -1,0 +1,462 @@
+@startuml Standard UML Class Boxes with Proper Sections
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classAttributeFontSize 10
+skinparam classOperationFontSize 10
+skinparam linetype ortho
+
+title **STANDARD UML CLASS DIAGRAM BOXES**\n**Showing Proper 3-Compartment Structure with Data Placement**
+
+' ==========================================
+' SECTION 1: MODEL CLASSES
+' ==========================================
+
+class User {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE VARIABLES (-)**
+  ====================================
+  - id : int
+  - username : String
+  - password : String
+  - passwordSalt : String
+  - email : String
+  - fullName : String
+  - securityQuestion : String
+  - securityAnswer : String
+  - role : UserRole
+  - assignedClubId : Integer
+  - firstLoginCompleted : boolean
+  - createdAt : LocalDateTime
+  - lastLogin : LocalDateTime
+  - isActive : boolean
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + User()
+  + User(username:String, password:String, role:UserRole)
+  + User(id:int, username:String, password:String, role:UserRole)
+  + User(username:String, password:String, email:String,
+         fullName:String, securityQuestion:String,
+         securityAnswer:String, role:UserRole)
+
+  ====================================
+  **PUBLIC GETTER METHODS (+)**
+  ====================================
+  + getId() : int
+  + getUsername() : String
+  + getPassword() : String
+  + getPasswordHash() : String
+  + getRole() : UserRole
+  + getEmail() : String
+  + getFullName() : String
+  + getSecurityQuestion() : String
+  + getSecurityAnswer() : String
+  + getPasswordSalt() : String
+  + getAssignedClubId() : Integer
+  + isFirstLoginCompleted() : boolean
+  + getCreatedAt() : LocalDateTime
+  + getLastLogin() : LocalDateTime
+  + isActive() : boolean
+
+  ====================================
+  **PUBLIC SETTER METHODS (+)**
+  ====================================
+  + setId(id:int) : void
+  + setUsername(username:String) : void
+  + setPassword(password:String) : void
+  + setPasswordHash(passwordHash:String) : void
+  + setRole(role:UserRole) : void
+  + setEmail(email:String) : void
+  + setFullName(fullName:String) : void
+  + setSecurityQuestion(securityQuestion:String) : void
+  + setSecurityAnswer(securityAnswer:String) : void
+  + setPasswordSalt(passwordSalt:String) : void
+  + setAssignedClubId(assignedClubId:Integer) : void
+  + setFirstLoginCompleted(firstLoginCompleted:boolean) : void
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + setLastLogin(lastLogin:LocalDateTime) : void
+  + setActive(active:boolean) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+class Club {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE VARIABLES (-)**
+  ====================================
+  - id : int
+  - name : String
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Club()
+  + Club(name:String)
+  + Club(id:int, name:String)
+
+  ====================================
+  **PUBLIC ACCESSOR METHODS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getName() : String
+  + setName(name:String) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+class LoginFrame {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE GUI COMPONENTS (-)**
+  ====================================
+  - usernameField : JTextField
+  - passwordField : JPasswordField
+  - loginButton : JButton
+  - signUpButton : JButton
+  - forgotPasswordButton : JButton
+
+  ====================================
+  **PRIVATE SERVICE OBJECTS (-)**
+  ====================================
+  - authService : AuthenticationService
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + LoginFrame()
+
+  ====================================
+  **PRIVATE INITIALIZATION METHODS (-)**
+  ====================================
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+  - setupFrame() : void
+
+  ====================================
+  **PRIVATE EVENT HANDLERS (-)**
+  ====================================
+  - handleLogin() : void
+  - handleSignUp() : void
+  - handleForgotPassword() : void
+
+  ====================================
+  **PRIVATE UTILITY METHODS (-)**
+  ====================================
+  - openDashboard(user:User) : void
+  - validateInput() : boolean
+  - showErrorMessage(message:String) : void
+  - clearFields() : void
+}
+
+class AuthenticationService {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE DATA ACCESS OBJECTS (-)**
+  ====================================
+  - userDAO : UserDAO
+
+  ====================================
+  **PRIVATE STATE VARIABLES (-)**
+  ====================================
+  - currentUser : User
+  - sessionActive : boolean
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + AuthenticationService()
+
+  ====================================
+  **PUBLIC AUTHENTICATION METHODS (+)**
+  ====================================
+  + authenticate(username:String, password:String) : User
+  + validatePassword(user:User, password:String) : boolean
+  + logout() : void
+  + isSessionActive() : boolean
+
+  ====================================
+  **PUBLIC USER MANAGEMENT (+)**
+  ====================================
+  + createUser(user:User) : boolean
+  + getCurrentUser() : User
+  + setCurrentUser(user:User) : void
+  + changePassword(userId:int, newPassword:String) : boolean
+  + resetPassword(username:String, securityAnswer:String,
+                  newPassword:String) : boolean
+
+  ====================================
+  **PUBLIC SECURITY METHODS (+)**
+  ====================================
+  + hashPassword(password:String) : String
+  + validateSecurityAnswer(user:User, answer:String) : boolean
+
+  ====================================
+  **PRIVATE UTILITY METHODS (-)**
+  ====================================
+  - generateSalt() : String
+  - hashPasswordWithSalt(password:String, salt:String) : String
+}
+
+class Attendance {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE CORE DATA (-)**
+  ====================================
+  - id : int
+  - studentId : int
+  - clubId : int
+  - markedById : int
+  - sessionDate : LocalDate
+  - sessionTime : LocalTime
+  - status : AttendanceStatus
+  - notes : String
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+
+  ====================================
+  **PRIVATE DISPLAY DATA (-)**
+  ====================================
+  - studentName : String
+  - markerName : String
+  - clubName : String
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Attendance()
+  + Attendance(id:int, studentId:int, clubId:int, markedById:int,
+               sessionDate:LocalDate, sessionTime:LocalTime,
+               status:AttendanceStatus, notes:String,
+               createdAt:LocalDateTime, updatedAt:LocalDateTime)
+  + Attendance(studentId:int, clubId:int, markedById:int,
+               sessionDate:LocalDate, status:AttendanceStatus,
+               notes:String)
+
+  ====================================
+  **PUBLIC CORE DATA ACCESSORS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + getMarkedById() : int
+  + setMarkedById(markedById:int) : void
+  + getSessionDate() : LocalDate
+  + setSessionDate(sessionDate:LocalDate) : void
+  + getSessionTime() : LocalTime
+  + setSessionTime(sessionTime:LocalTime) : void
+  + getStatus() : AttendanceStatus
+  + setStatus(status:AttendanceStatus) : void
+  + setStatus(statusStr:String) : void
+  + getNotes() : String
+  + setNotes(notes:String) : void
+  + getCreatedAt() : LocalDateTime
+  + setCreatedAt(createdAt:LocalDateTime) : void
+  + getUpdatedAt() : LocalDateTime
+  + setUpdatedAt(updatedAt:LocalDateTime) : void
+
+  ====================================
+  **PUBLIC DISPLAY DATA ACCESSORS (+)**
+  ====================================
+  + getStudentName() : String
+  + setStudentName(studentName:String) : void
+  + getMarkerName() : String
+  + setMarkerName(markerName:String) : void
+  + getClubName() : String
+  + setClubName(clubName:String) : void
+
+  ====================================
+  **PUBLIC BUSINESS LOGIC METHODS (+)**
+  ====================================
+  + getSessionNumber() : int
+  + isPresent() : boolean
+  + toString() : String
+}
+
+' ==========================================
+' SECTION 2: ENUM CLASSES
+' ==========================================
+
+enum UserRole {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES**
+  ====================================
+  CLUB_MANAGER
+  GRADE_11
+  GRADE_9
+}
+
+enum AttendanceStatus {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES WITH DATA**
+  ====================================
+  PRESENT("Present", "✅")
+  ABSENT("Absent", "❌")
+  LATE("Late", "⏱️")
+  EXCUSED("Excused", "📝")
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE ENUM DATA (-)**
+  ====================================
+  - displayName : String
+  - emoji : String
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PACKAGE CONSTRUCTOR (~)**
+  ====================================
+  ~ AttendanceStatus(displayName:String, emoji:String)
+
+  ====================================
+  **PUBLIC ACCESSOR METHODS (+)**
+  ====================================
+  + getDisplayName() : String
+  + getEmoji() : String
+  + toString() : String
+}
+
+' ==========================================
+' RELATIONSHIPS
+' ==========================================
+
+User ||-- UserRole : contains
+Attendance ||-- AttendanceStatus : contains
+LoginFrame o-- AuthenticationService : uses
+AuthenticationService o-- User : manages
+
+' ==========================================
+' EXPLANATORY NOTES
+' ==========================================
+
+note top of User
+  **UML CLASS BOX STRUCTURE:**
+
+  **COMPARTMENT 1: CLASS NAME**
+  - Always at the top
+  - Bold/centered text
+  - Shows class identity
+
+  **COMPARTMENT 2: ATTRIBUTES**
+  - Private variables with (-)
+  - Protected variables with (#)
+  - Public variables with (+)
+  - Static variables underlined
+
+  **COMPARTMENT 3: METHODS**
+  - Private methods with (-)
+  - Protected methods with (#)
+  - Public methods with (+)
+  - Static methods underlined
+  - Abstract methods in italics
+end note
+
+note bottom of LoginFrame
+  **VISIBILITY SYMBOLS:**
+
+  **(-) PRIVATE:**
+  - Only accessible within the class
+  - Internal implementation details
+  - Data encapsulation
+
+  **(#) PROTECTED:**
+  - Accessible within class and subclasses
+  - Used for inheritance
+
+  **(+) PUBLIC:**
+  - Accessible from anywhere
+  - External interface
+  - API methods
+
+  **(~) PACKAGE:**
+  - Accessible within same package
+  - Default Java visibility
+end note
+
+note bottom of AuthenticationService
+  **DATA PLACEMENT RULES:**
+
+  **ATTRIBUTES SECTION:**
+  • Instance variables
+  • Static variables
+  • Constants
+  • Associations to other objects
+
+  **METHODS SECTION:**
+  • Constructors (first)
+  • Public methods
+  • Protected methods
+  • Private methods (last)
+
+  **ORDERING:**
+  • Most important items first
+  • Group related items together
+  • Follow visibility hierarchy
+end note
+
+note bottom of Attendance
+  **BOX FORMATTING:**
+
+  **SEPARATORS:**
+  • Horizontal lines separate sections
+  • Clear visual boundaries
+  • Consistent spacing
+
+  **GROUPING:**
+  • Related methods grouped together
+  • Logical organization
+  • Easy to read and understand
+
+  **NAMING:**
+  • Descriptive method names
+  • Standard getter/setter patterns
+  • Business logic clearly labeled
+end note
+
+@enduml

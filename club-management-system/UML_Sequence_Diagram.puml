@@ -1,0 +1,161 @@
+@startuml Club Management System - Sequence Diagrams
+
+!theme cerulean-outline
+
+title Club Management System - Key User Interactions
+
+== User Login Flow ==
+
+actor "User" as User
+participant "LoginFrame" as LoginUI
+participant "AuthenticationService" as AuthService
+participant "UserDAO" as UserDAO
+participant "DatabaseManager" as DB
+participant "DashboardFrame" as Dashboard
+
+User -> LoginUI : Enter credentials
+LoginUI -> AuthService : authenticate(username, password)
+AuthService -> UserDAO : getUserByUsername(username)
+UserDAO -> DB : getConnection()
+DB --> UserDAO : Connection
+UserDAO -> DB : SELECT query
+DB --> UserDAO : User data
+UserDAO --> AuthService : User object
+AuthService -> AuthService : validatePassword(user, password)
+alt Valid credentials
+    AuthService --> LoginUI : User object
+    LoginUI -> Dashboard : openDashboard(user)
+    Dashboard --> User : Show appropriate dashboard
+else Invalid credentials
+    AuthService --> LoginUI : null
+    LoginUI --> User : Show error message
+end
+
+== Grade 11 Student Proposal Submission ==
+
+actor "Grade11Student" as Student
+participant "Grade11DashboardFrame" as Dashboard
+participant "ProposalSubmissionPanel" as ProposalPanel
+participant "ProposalDAO" as ProposalDAO
+participant "DatabaseManager" as DB
+
+Student -> Dashboard : Click "Submit Proposal"
+Dashboard -> ProposalPanel : openProposalForm()
+ProposalPanel --> Student : Show file selection dialog
+Student -> ProposalPanel : Select PDF file
+ProposalPanel -> ProposalPanel : validateFile(filePath)
+alt Valid PDF file
+    ProposalPanel -> ProposalDAO : createProposal(proposal)
+    ProposalDAO -> DB : getConnection()
+    DB --> ProposalDAO : Connection
+    ProposalDAO -> DB : INSERT proposal
+    DB --> ProposalDAO : Success
+    ProposalDAO --> ProposalPanel : true
+    ProposalPanel --> Student : "Proposal submitted successfully"
+else Invalid file
+    ProposalPanel --> Student : "Please select a valid PDF file"
+end
+
+== Club Manager Proposal Review ==
+
+actor "ClubManager" as Manager
+participant "ManagerDashboardFrame" as Dashboard
+participant "ProposalManagementPanel" as ProposalPanel
+participant "ProposalDAO" as ProposalDAO
+participant "DatabaseManager" as DB
+
+Manager -> Dashboard : Click "Proposal Management"
+Dashboard -> ProposalPanel : showProposalList()
+ProposalPanel -> ProposalDAO : getAllProposals()
+ProposalDAO -> DB : getConnection()
+DB --> ProposalDAO : Connection
+ProposalDAO -> DB : SELECT all proposals
+DB --> ProposalDAO : Proposal list
+ProposalDAO --> ProposalPanel : List<Proposal>
+ProposalPanel --> Manager : Display proposals with status
+
+Manager -> ProposalPanel : Select proposal and action (Accept/Reject)
+ProposalPanel -> ProposalDAO : updateProposalStatus(proposalId, status)
+ProposalDAO -> DB : UPDATE proposal status
+DB --> ProposalDAO : Success
+ProposalDAO --> ProposalPanel : true
+ProposalPanel --> Manager : "Proposal status updated"
+
+== Grade 9 Student Attendance Marking ==
+
+actor "Grade9Student" as Student
+participant "Grade9DashboardFrame" as Dashboard
+participant "AttendanceMarkingPanel" as AttendancePanel
+participant "AttendanceService" as AttendanceService
+participant "AttendanceDAO" as AttendanceDAO
+participant "ClubAllocationDAO" as AllocationDAO
+participant "DatabaseManager" as DB
+
+Student -> Dashboard : Click "Mark Attendance"
+Dashboard -> AttendancePanel : openAttendanceForm()
+AttendancePanel -> AllocationDAO : getStudentClub(studentId)
+AllocationDAO -> DB : SELECT club for student
+DB --> AllocationDAO : ClubAllocation
+AllocationDAO --> AttendancePanel : ClubAllocation
+AttendancePanel --> Student : Show attendance form for assigned club
+
+Student -> AttendancePanel : Mark attendance as Present
+AttendancePanel -> AttendanceService : markAttendance(studentId, clubId, PRESENT)
+AttendanceService -> AttendanceDAO : markAttendance(attendance)
+AttendanceDAO -> DB : getConnection()
+DB --> AttendanceDAO : Connection
+AttendanceDAO -> DB : INSERT attendance record
+alt Attendance marked successfully
+    DB --> AttendanceDAO : Success
+    AttendanceDAO --> AttendanceService : true
+    AttendanceService --> AttendancePanel : true
+    AttendancePanel --> Student : "Attendance marked successfully"
+else Already marked for today
+    DB --> AttendanceDAO : Unique constraint violation
+    AttendanceDAO --> AttendanceService : false
+    AttendanceService --> AttendancePanel : false
+    AttendancePanel --> Student : "Attendance already marked for today"
+end
+
+== Club Allocation Process ==
+
+actor "ClubManager" as Manager
+participant "ManagerDashboardFrame" as Dashboard
+participant "ClubAllocationPanel" as AllocationPanel
+participant "ClubAllocationService" as AllocationService
+participant "UserDAO" as UserDAO
+participant "ClubDAO" as ClubDAO
+participant "ClubAllocationDAO" as AllocationDAO
+participant "DatabaseManager" as DB
+
+Manager -> Dashboard : Click "Club Allocation"
+Dashboard -> AllocationPanel : openAllocationPanel()
+AllocationPanel -> AllocationService : getAllocationsByClub()
+AllocationService -> AllocationDAO : getAllocations()
+AllocationDAO -> DB : SELECT all allocations
+DB --> AllocationDAO : List<ClubAllocation>
+AllocationDAO --> AllocationService : List<ClubAllocation>
+AllocationService --> AllocationPanel : Display current allocations
+
+Manager -> AllocationPanel : Click "Auto-Allocate Students"
+AllocationPanel -> AllocationService : allocateStudentsToClubs()
+AllocationService -> UserDAO : getUsersByRole(GRADE_9)
+UserDAO -> DB : SELECT Grade 9 students
+DB --> UserDAO : List<User>
+UserDAO --> AllocationService : List<User>
+AllocationService -> ClubDAO : getAllClubs()
+ClubDAO -> DB : SELECT all clubs
+DB --> ClubDAO : List<Club>
+ClubDAO --> AllocationService : List<Club>
+
+loop For each unallocated Grade 9 student
+    AllocationService -> AllocationService : calculateOptimalClub()
+    AllocationService -> AllocationDAO : allocateStudentToClub(allocation)
+    AllocationDAO -> DB : INSERT allocation
+    DB --> AllocationDAO : Success
+end
+
+AllocationService --> AllocationPanel : Allocation complete
+AllocationPanel --> Manager : "Students allocated successfully"
+
+@enduml

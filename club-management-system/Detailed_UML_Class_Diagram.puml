@@ -1,0 +1,395 @@
+@startuml Detailed Class Diagram with Inheritance and Aggregation
+
+!theme cerulean-outline
+
+title Club Management System - Detailed Class Diagram with Relationships
+
+' Model Classes
+class User {
+    - id: int
+    - username: String
+    - password: String
+    - passwordSalt: String
+    - email: String
+    - fullName: String
+    - securityQuestion: String
+    - securityAnswer: String
+    - role: UserRole
+    - assignedClubId: Integer
+    - firstLoginCompleted: boolean
+    - createdAt: LocalDateTime
+    - lastLogin: LocalDateTime
+    - isActive: boolean
+
+    + User()
+    + User(username: String, password: String, role: UserRole)
+    + User(id: int, username: String, password: String, role: UserRole)
+    + User(username: String, password: String, email: String, fullName: String, securityQuestion: String, securityAnswer: String, role: UserRole)
+    + getId(): int
+    + setId(id: int): void
+    + getUsername(): String
+    + setUsername(username: String): void
+    + getPassword(): String
+    + setPassword(password: String): void
+    + getPasswordHash(): String
+    + setPasswordHash(passwordHash: String): void
+    + getRole(): UserRole
+    + setRole(role: UserRole): void
+    + getEmail(): String
+    + setEmail(email: String): void
+    + getFullName(): String
+    + setFullName(fullName: String): void
+    + getSecurityQuestion(): String
+    + setSecurityQuestion(securityQuestion: String): void
+    + getSecurityAnswer(): String
+    + setSecurityAnswer(securityAnswer: String): void
+    + getPasswordSalt(): String
+    + setPasswordSalt(passwordSalt: String): void
+    + getAssignedClubId(): Integer
+    + setAssignedClubId(assignedClubId: Integer): void
+    + isFirstLoginCompleted(): boolean
+    + setFirstLoginCompleted(firstLoginCompleted: boolean): void
+    + getCreatedAt(): LocalDateTime
+    + setCreatedAt(createdAt: LocalDateTime): void
+    + getLastLogin(): LocalDateTime
+    + setLastLogin(lastLogin: LocalDateTime): void
+    + isActive(): boolean
+    + setActive(active: boolean): void
+    + toString(): String
+}
+
+enum UserRole {
+    CLUB_MANAGER
+    GRADE_11
+    GRADE_9
+}
+
+class Club {
+    - id: int
+    - name: String
+
+    + Club()
+    + Club(name: String)
+    + Club(id: int, name: String)
+    + getId(): int
+    + setId(id: int): void
+    + getName(): String
+    + setName(name: String): void
+    + toString(): String
+}
+
+class Proposal {
+    - id: int
+    - studentId: int
+    - filePath: String
+    - status: ProposalStatus
+
+    + Proposal()
+    + Proposal(studentId: int, filePath: String)
+    + Proposal(id: int, studentId: int, filePath: String, status: ProposalStatus)
+    + getId(): int
+    + setId(id: int): void
+    + getStudentId(): int
+    + setStudentId(studentId: int): void
+    + getFilePath(): String
+    + setFilePath(filePath: String): void
+    + getStatus(): ProposalStatus
+    + setStatus(status: ProposalStatus): void
+    + toString(): String
+}
+
+enum ProposalStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+class Attendance {
+    - id: int
+    - studentId: int
+    - clubId: int
+    - markedById: int
+    - sessionDate: LocalDate
+    - sessionTime: LocalTime
+    - status: AttendanceStatus
+    - notes: String
+    - createdAt: LocalDateTime
+    - updatedAt: LocalDateTime
+    - studentName: String
+    - markerName: String
+    - clubName: String
+
+    + Attendance()
+    + Attendance(id: int, studentId: int, clubId: int, markedById: int, sessionDate: LocalDate, sessionTime: LocalTime, status: AttendanceStatus, notes: String, createdAt: LocalDateTime, updatedAt: LocalDateTime)
+    + Attendance(studentId: int, clubId: int, markedById: int, sessionDate: LocalDate, status: AttendanceStatus, notes: String)
+    + getId(): int
+    + setId(id: int): void
+    + getStudentId(): int
+    + setStudentId(studentId: int): void
+    + getClubId(): int
+    + setClubId(clubId: int): void
+    + getMarkedById(): int
+    + setMarkedById(markedById: int): void
+    + getSessionDate(): LocalDate
+    + setSessionDate(sessionDate: LocalDate): void
+    + getSessionTime(): LocalTime
+    + setSessionTime(sessionTime: LocalTime): void
+    + getStatus(): AttendanceStatus
+    + setStatus(status: AttendanceStatus): void
+    + setStatus(statusStr: String): void
+    + getNotes(): String
+    + setNotes(notes: String): void
+    + getCreatedAt(): LocalDateTime
+    + setCreatedAt(createdAt: LocalDateTime): void
+    + getUpdatedAt(): LocalDateTime
+    + setUpdatedAt(updatedAt: LocalDateTime): void
+    + getStudentName(): String
+    + setStudentName(studentName: String): void
+    + getMarkerName(): String
+    + setMarkerName(markerName: String): void
+    + getClubName(): String
+    + setClubName(clubName: String): void
+    + getSessionNumber(): int
+    + isPresent(): boolean
+    + toString(): String
+}
+
+enum AttendanceStatus {
+    PRESENT("Present", "✅")
+    ABSENT("Absent", "❌")
+    LATE("Late", "⏱️")
+    EXCUSED("Excused", "📝")
+
+    - displayName: String
+    - emoji: String
+
+    + AttendanceStatus(displayName: String, emoji: String)
+    + getDisplayName(): String
+    + getEmoji(): String
+    + toString(): String
+}
+
+class ClubAllocation {
+    - id: int
+    - studentId: int
+    - clubId: int
+
+    + ClubAllocation()
+    + ClubAllocation(studentId: int, clubId: int)
+    + ClubAllocation(id: int, studentId: int, clubId: int)
+    + getId(): int
+    + setId(id: int): void
+    + getStudentId(): int
+    + setStudentId(studentId: int): void
+    + getClubId(): int
+    + setClubId(clubId: int): void
+    + toString(): String
+}
+
+class AttendanceSession {
+    - id: int
+    - clubId: int
+    - sessionDate: LocalDate
+    - sessionTime: LocalTime
+    - sessionTitle: String
+    - sessionDescription: String
+    - createdById: int
+    - createdAt: LocalDateTime
+    - isActive: boolean
+    - clubName: String
+    - creatorName: String
+
+    + AttendanceSession()
+    + AttendanceSession(id: int, clubId: int, sessionDate: LocalDate, sessionTime: LocalTime, sessionTitle: String, sessionDescription: String, createdById: int, createdAt: LocalDateTime, isActive: boolean)
+    + AttendanceSession(clubId: int, sessionDate: LocalDate, sessionTitle: String, sessionDescription: String, createdById: int)
+    + getId(): int
+    + setId(id: int): void
+    + getClubId(): int
+    + setClubId(clubId: int): void
+    + getSessionDate(): LocalDate
+    + setSessionDate(sessionDate: LocalDate): void
+    + getSessionTime(): LocalTime
+    + setSessionTime(sessionTime: LocalTime): void
+    + getSessionTitle(): String
+    + setSessionTitle(sessionTitle: String): void
+    + getSessionDescription(): String
+    + setSessionDescription(sessionDescription: String): void
+    + getCreatedById(): int
+    + setCreatedById(createdById: int): void
+    + getCreatedAt(): LocalDateTime
+    + setCreatedAt(createdAt: LocalDateTime): void
+    + isActive(): boolean
+    + setActive(active: boolean): void
+    + getClubName(): String
+    + setClubName(clubName: String): void
+    + getCreatorName(): String
+    + setCreatorName(creatorName: String): void
+    + toString(): String
+}
+
+' GUI Classes with Inheritance
+class JFrame {
+    # rootPane: JRootPane
+    # menuBar: JMenuBar
+    # contentPane: Container
+    # layeredPane: JLayeredPane
+    # glassPane: Component
+
+    + JFrame()
+    + JFrame(title: String)
+    + setTitle(title: String): void
+    + getTitle(): String
+    + setDefaultCloseOperation(operation: int): void
+    + setVisible(visible: boolean): void
+    + pack(): void
+    + setSize(width: int, height: int): void
+    + setLocation(x: int, y: int): void
+    + setResizable(resizable: boolean): void
+}
+
+class JPanel {
+    - layout: LayoutManager
+
+    + JPanel()
+    + JPanel(layout: LayoutManager)
+    + add(component: Component): Component
+    + remove(component: Component): void
+    + setLayout(mgr: LayoutManager): void
+    + getLayout(): LayoutManager
+    + setBackground(bg: Color): void
+    + setForeground(fg: Color): void
+}
+
+class LoginFrame {
+    - usernameField: JTextField
+    - passwordField: JPasswordField
+    - loginButton: JButton
+    - signUpButton: JButton
+    - forgotPasswordButton: JButton
+    - authService: AuthenticationService
+
+    + LoginFrame()
+    - initializeComponents(): void
+    - setupLayout(): void
+    - setupEventHandlers(): void
+    - setupFrame(): void
+    - handleLogin(): void
+    - openDashboard(user: User): void
+    - handleSignUp(): void
+    - handleForgotPassword(): void
+}
+
+class MainDashboard {
+    - authService: AuthenticationService
+    - contentPanel: JPanel
+    - cardLayout: CardLayout
+    - toolbar: NavigationToolbar
+    - statusLabel: JLabel
+
+    + MainDashboard(authService: AuthenticationService)
+    - initializeComponents(): void
+    - setupLayout(): void
+    - setupEventHandlers(): void
+    - setupFrame(): void
+    - createTitlePanel(): JPanel
+    - createStatusPanel(): JPanel
+    - loadInitialContent(): void
+    + setStatusMessage(message: String): void
+    + showPanel(panelName: String): void
+}
+
+class Grade11EnhancedDashboard {
+    - authService: AuthenticationService
+    - contentPanel: JPanel
+    - cardLayout: CardLayout
+    - currentUser: User
+    - attendancePanel: Grade11SelfAttendancePanel
+    - proposalSubmissionPanel: ProposalSubmissionPanel
+    - proposalStatusPanel: ProposalStatusPanel
+    - grade9StudentsViewPanel: Grade9StudentsViewPanel
+    - attendanceButton: JButton
+    - uploadProposalButton: JButton
+    - checkProposalStatusButton: JButton
+    - viewGrade9StudentsButton: JButton
+    - logoutButton: JButton
+    - logoutCallback: Runnable
+
+    + Grade11EnhancedDashboard(authService: AuthenticationService)
+    - initializeComponents(): void
+    - setupLayout(): void
+    - setupEventHandlers(): void
+    - showAttendancePanel(): void
+    - showProposalSubmissionPanel(): void
+    - showProposalStatusPanel(): void
+    - showGrade9StudentsPanel(): void
+    + setLogoutCallback(callback: Runnable): void
+    - handleLogout(): void
+}
+
+' Service Classes
+class AuthenticationService {
+    - userDAO: UserDAO
+    - currentUser: User
+
+    + AuthenticationService()
+    + authenticate(username: String, password: String): User
+    + validatePassword(user: User, password: String): boolean
+    + hashPassword(password: String): String
+    + createUser(user: User): boolean
+    + getCurrentUser(): User
+    + setCurrentUser(user: User): void
+    + logout(): void
+    + changePassword(userId: int, newPassword: String): boolean
+    + resetPassword(username: String, securityAnswer: String, newPassword: String): boolean
+}
+
+' Aggregation and Composition Relationships
+User ||--o{ Proposal : "submits >"
+User ||--o{ Attendance : "marks >"
+User ||--o{ ClubAllocation : "allocated to >"
+User ||-- UserRole : "has >"
+
+Club ||--o{ ClubAllocation : "contains >"
+Club ||--o{ Attendance : "tracks >"
+Club ||--o{ AttendanceSession : "hosts >"
+
+Proposal ||-- ProposalStatus : "has >"
+Attendance ||-- AttendanceStatus : "has >"
+
+AttendanceSession }o--|| Club : "belongs to"
+AttendanceSession }o--|| User : "created by"
+
+' Inheritance Relationships
+JFrame <|-- LoginFrame : "extends"
+JFrame <|-- MainDashboard : "extends"
+JPanel <|-- Grade11EnhancedDashboard : "extends"
+
+' Aggregation Relationships (has-a)
+LoginFrame o-- AuthenticationService : "uses"
+MainDashboard o-- AuthenticationService : "uses"
+Grade11EnhancedDashboard o-- AuthenticationService : "uses"
+Grade11EnhancedDashboard o-- User : "current user"
+
+' Composition Relationships (part-of)
+LoginFrame *-- JTextField : "username field"
+LoginFrame *-- JPasswordField : "password field"
+LoginFrame *-- JButton : "login button"
+LoginFrame *-- JButton : "signup button"
+LoginFrame *-- JButton : "forgot password button"
+
+MainDashboard *-- JPanel : "content panel"
+MainDashboard *-- CardLayout : "card layout"
+MainDashboard *-- JLabel : "status label"
+
+Grade11EnhancedDashboard *-- JPanel : "content panel"
+Grade11EnhancedDashboard *-- CardLayout : "card layout"
+Grade11EnhancedDashboard *-- JButton : "attendance button"
+Grade11EnhancedDashboard *-- JButton : "upload proposal button"
+Grade11EnhancedDashboard *-- JButton : "check proposal status button"
+Grade11EnhancedDashboard *-- JButton : "view grade9 students button"
+Grade11EnhancedDashboard *-- JButton : "logout button"
+
+' Note about relationship types
+note bottom : "Relationships Legend:\n||--o{ : One-to-Many Association\n<|-- : Inheritance (is-a)\no-- : Aggregation (has-a)\n*-- : Composition (part-of)\n}o--|| : Many-to-One Association"
+
+@enduml

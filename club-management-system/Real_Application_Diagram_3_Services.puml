@@ -1,0 +1,422 @@
+@startuml Real Application Diagram 3 - Service and DAO Classes from Actual Code
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam classAttributeFontSize 9
+skinparam classOperationFontSize 9
+skinparam linetype ortho
+
+title **REAL APPLICATION DIAGRAM 3: ACTUAL SERVICE & DAO CLASSES**\n**SHOWS:** Real private/public variables and methods from your service layer\n**SOURCE:** Extracted from AuthenticationService.java, UserDAO.java, ClubAllocationService.java
+
+class AuthenticationService {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ACTUAL ATTRIBUTES**
+  ====================================
+  **PRIVATE DAO OBJECTS FROM CODE (-)**
+  ====================================
+  - userDAO : UserDAO
+
+  ====================================
+  **PRIVATE STATE VARIABLES FROM CODE (-)**
+  ====================================
+  - currentUser : User
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTOR FROM CODE (+)**
+  ====================================
+  + AuthenticationService()
+
+  ====================================
+  **PUBLIC AUTH METHODS FROM CODE (+)**
+  ====================================
+  + login(username:String, password:String) : boolean
+  + logout() : void
+  + setCurrentUser(user:User) : void
+  + getCurrentUser() : User
+  + isLoggedIn() : boolean
+
+  ====================================
+  **PUBLIC ROLE METHODS FROM CODE (+)**
+  ====================================
+  + hasRole(role:UserRole) : boolean
+  + isClubManager() : boolean
+  + isGrade11() : boolean
+  + isGrade9() : boolean
+
+  ====================================
+  **PUBLIC USER MANAGEMENT FROM CODE (+)**
+  ====================================
+  + registerUser(username:String, password:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String, role:UserRole) : boolean
+  + changePassword(currentPassword:String, newPassword:String) : boolean
+  + resetPassword(username:String, securityAnswer:String, newPassword:String) : boolean
+  + getUserByUsername(username:String) : User
+  + getUserByEmail(email:String) : User
+  + validateCredentials(username:String, password:String) : boolean
+
+  ====================================
+  **PUBLIC VALIDATION FROM CODE (+)**
+  ====================================
+  + validateRegistrationData(username:String, password:String, confirmPassword:String, email:String, fullName:String, securityQuestion:String, securityAnswer:String) : String
+
+  ====================================
+  **PUBLIC PASSWORD RESET FROM CODE (+)**
+  ====================================
+  + requestPasswordReset(usernameOrEmail:String) : boolean
+  + resetPasswordWithToken(token:String, newPassword:String) : boolean
+
+  ====================================
+  **PUBLIC STATUS METHODS FROM CODE (+)**
+  ====================================
+  + needsFirstLoginCompletion() : boolean
+  + hasAssignedClub() : boolean
+  + needsClubSelection() : boolean
+  + markFirstLoginCompleted(userId:int) : void
+  + hasCompletedFirstLogin() : boolean
+
+  ====================================
+  **PUBLIC UTILITY METHODS FROM CODE (+)**
+  ====================================
+  + cleanupExpiredTokens() : void
+
+  ====================================
+  **PRIVATE UTILITY METHODS FROM CODE (-)**
+  ====================================
+  - isValidEmail(email:String) : boolean
+}
+
+class ClubAllocationService {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ACTUAL ATTRIBUTES**
+  ====================================
+  **PRIVATE DAO OBJECTS FROM CODE (-)**
+  ====================================
+  - allocationDAO : ClubAllocationDAO
+  - clubDAO : ClubDAO
+  - userDAO : UserDAO
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTOR FROM CODE (+)**
+  ====================================
+  + ClubAllocationService()
+
+  ====================================
+  **PUBLIC ALLOCATION METHODS FROM CODE (+)**
+  ====================================
+  + allocateStudentsToClubs() : boolean
+  + getAllAllocations() : List<ClubAllocation>
+  + getAllocationsByClub(clubId:int) : List<ClubAllocation>
+  + getStudentAllocation(studentId:int) : ClubAllocation
+  + reallocateStudent(studentId:int, newClubId:int) : boolean
+
+  ====================================
+  **PUBLIC UTILITY METHODS FROM CODE (+)**
+  ====================================
+  + getClubMemberCount(clubId:int) : int
+  + isAllocationComplete() : boolean
+}
+
+class UserDAO {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (NONE)**
+  ====================================
+  **NO INSTANCE VARIABLES**
+  ====================================
+  (No private fields - stateless DAO)
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTOR FROM CODE (+)**
+  ====================================
+  + UserDAO()
+
+  ====================================
+  **PUBLIC AUTHENTICATION FROM CODE (+)**
+  ====================================
+  + authenticate(username:String, password:String) : User
+
+  ====================================
+  **PUBLIC CRUD OPERATIONS FROM CODE (+)**
+  ====================================
+  + getUserById(id:int) : User
+  + getUserByUsername(username:String) : User
+  + getUserByEmail(email:String) : User
+  + insertUser(user:User) : boolean
+  + getAllUsers() : List<User>
+  + getUsersByRole(role:UserRole) : List<User>
+
+  ====================================
+  **PUBLIC UPDATE METHODS FROM CODE (+)**
+  ====================================
+  + updatePassword(username:String, newPassword:String) : boolean
+  + updatePasswordWithSalt(userId:int, hashedPassword:String, salt:String) : boolean
+  + updateUserClubAssignment(userId:int, clubId:int) : boolean
+  + updateFirstLoginCompleted(userId:int, completed:boolean) : boolean
+  + updateLastLogin(userId:int) : boolean
+  + updateUserProfile(user:User) : boolean
+
+  ====================================
+  **PUBLIC VALIDATION FROM CODE (+)**
+  ====================================
+  + validateSecurityAnswer(username:String, securityAnswer:String) : boolean
+  + usernameExists(username:String) : boolean
+  + emailExists(email:String) : boolean
+
+  ====================================
+  **PUBLIC TOKEN METHODS FROM CODE (+)**
+  ====================================
+  + storePasswordResetToken(token:String, userId:int, email:String, expiresAt:LocalDateTime) : boolean
+  + getUserByResetToken(token:String) : User
+  + markTokenAsUsed(token:String) : boolean
+  + cleanupExpiredTokens() : void
+
+  ====================================
+  **PUBLIC SPECIALIZED QUERIES FROM CODE (+)**
+  ====================================
+  + getGrade9StudentsWithClubAssignments() : List<User>
+  + markFirstLoginCompleted(userId:int) : boolean
+
+  ====================================
+  **PRIVATE HELPER METHODS FROM CODE (-)**
+  ====================================
+  - getStringOrNull(rs:ResultSet, columnName:String) : String
+  - getBooleanOrDefault(rs:ResultSet, columnName:String, defaultValue:boolean) : boolean
+  - getIntegerOrNull(rs:ResultSet, columnName:String) : Integer
+  - getTimestampOrNull(rs:ResultSet, columnName:String) : LocalDateTime
+}
+
+class ClubDAO {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (NONE)**
+  ====================================
+  **NO INSTANCE VARIABLES**
+  ====================================
+  (No private fields - stateless DAO)
+
+  ====================================
+  **SECTION 3: METHODS (INFERRED)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + ClubDAO()
+
+  ====================================
+  **PUBLIC CRUD OPERATIONS (+)**
+  ====================================
+  + getAllClubs() : List<Club>
+  + getClubById(id:int) : Club
+  + getClubByName(name:String) : Club
+  + insertClub(club:Club) : boolean
+  + updateClub(club:Club) : boolean
+  + deleteClub(id:int) : boolean
+
+  ====================================
+  **PUBLIC QUERY METHODS (+)**
+  ====================================
+  + getClubCount() : int
+  + clubExists(name:String) : boolean
+}
+
+class ClubAllocationDAO {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (NONE)**
+  ====================================
+  **NO INSTANCE VARIABLES**
+  ====================================
+  (No private fields - stateless DAO)
+
+  ====================================
+  **SECTION 3: METHODS (INFERRED)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + ClubAllocationDAO()
+
+  ====================================
+  **PUBLIC ALLOCATION METHODS (+)**
+  ====================================
+  + allocateStudentToClub(studentId:int, clubId:int) : boolean
+  + getAllAllocations() : List<ClubAllocation>
+  + getAllocationsByClubId(clubId:int) : List<ClubAllocation>
+  + getAllocationByStudentId(studentId:int) : ClubAllocation
+  + removeAllocation(studentId:int) : boolean
+
+  ====================================
+  **PUBLIC QUERY METHODS (+)**
+  ====================================
+  + getClubMemberCount(clubId:int) : int
+  + isStudentAllocated(studentId:int) : boolean
+  + getAllocationCount() : int
+}
+
+class DatabaseManager {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ACTUAL ATTRIBUTES**
+  ====================================
+  **PRIVATE STATIC CONSTANTS FROM CODE (-)**
+  ====================================
+  - {static} DB_NAME : String = "club_management.db"
+  - {static} DB_URL : String
+  - {static} connection : Connection
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC STATIC CONNECTION FROM CODE (+)**
+  ====================================
+  + {static} getConnection() : Connection
+  + {static} closeConnection() : void
+
+  ====================================
+  **PRIVATE STATIC INITIALIZATION FROM CODE (-)**
+  ====================================
+  - {static} initializeDatabase() : void
+  - {static} createTables() : void
+  - {static} migrateDatabase() : void
+  - {static} insertDefaultData() : void
+  - {static} insertDefaultClubs() : void
+  - {static} insertDefaultUsers() : void
+  - {static} updateExistingUsersWithDefaults() : void
+}
+
+' ==========================================
+' ACTUAL AGGREGATION FROM YOUR CODE
+' ==========================================
+
+AuthenticationService o-- UserDAO : "userDAO"
+ClubAllocationService o-- ClubAllocationDAO : "allocationDAO"
+ClubAllocationService o-- ClubDAO : "clubDAO"
+ClubAllocationService o-- UserDAO : "userDAO"
+
+AuthenticationService o-- User : "currentUser"
+
+' ==========================================
+' ACTUAL DEPENDENCIES FROM YOUR CODE
+' ==========================================
+
+UserDAO ..> DatabaseManager : "uses getConnection()"
+ClubDAO ..> DatabaseManager : "uses getConnection()"
+ClubAllocationDAO ..> DatabaseManager : "uses getConnection()"
+
+AuthenticationService ..> User : "manages"
+ClubAllocationService ..> ClubAllocation : "manages"
+ClubAllocationService ..> Club : "manages"
+ClubAllocationService ..> User : "manages"
+
+UserDAO ..> User : "creates/returns"
+ClubDAO ..> Club : "creates/returns"
+ClubAllocationDAO ..> ClubAllocation : "creates/returns"
+
+' ==========================================
+' NOTES ABOUT YOUR ACTUAL SERVICE CODE
+' ==========================================
+
+note top of AuthenticationService
+  **YOUR ACTUAL AUTH SERVICE:**
+  From AuthenticationService.java:
+  • 2 private fields (userDAO, currentUser)
+  • 25+ public methods for authentication
+  • Role checking methods (isClubManager, isGrade11, etc.)
+  • Password reset with token system
+  • First login completion tracking
+  • Registration validation
+end note
+
+note top of UserDAO
+  **YOUR ACTUAL USER DAO:**
+  From UserDAO.java:
+  • Stateless DAO (no instance variables)
+  • 20+ public methods for user operations
+  • Full CRUD operations with SQL
+  • Security features (password reset tokens)
+  • Helper methods for null-safe database access
+  • Role-based user queries
+end note
+
+note top of ClubAllocationService
+  **YOUR ALLOCATION SERVICE:**
+  From ClubAllocationService.java:
+  • 3 private DAO dependencies
+  • Equal distribution algorithm
+  • Student shuffling for fairness
+  • Club member count tracking
+  • Reallocation support
+end note
+
+note as ServicePatterns
+  **YOUR SERVICE LAYER PATTERNS:**
+
+  **AGGREGATION:**
+  • Services use DAO objects for data access
+  • AuthenticationService HAS-A UserDAO
+  • ClubAllocationService HAS-A multiple DAOs
+  • Loose coupling for testing
+
+  **STATELESS DAOs:**
+  • DAOs have no instance variables
+  • Each method gets fresh database connection
+  • Thread-safe and simple
+
+  **SERVICE ORCHESTRATION:**
+  • Services coordinate multiple DAOs
+  • Business logic in service layer
+  • DAOs focus only on data access
+end note
+
+note as DatabaseAccess
+  **YOUR DATABASE ACCESS:**
+
+  **STATIC DATABASE MANAGER:**
+  • Singleton pattern for connections
+  • Static getConnection() method
+  • All DAOs depend on DatabaseManager
+  • Connection sharing across operations
+
+  **SQL OPERATIONS:**
+  • Direct SQL in DAO methods
+  • PreparedStatement for safety
+  • ResultSet to object mapping
+  • Transaction support available
+end note
+
+ServicePatterns -right-> ClubAllocationService
+DatabaseAccess -left-> DatabaseManager
+
+note bottom
+  **DIAGRAM 3 EXPLANATION:**
+
+  **REPRESENTS:** Your actual service and data access architecture
+  **DATA SOURCE:** Real variables and methods from your service .java files
+  **SHOWS:**
+  • Exact private DAO fields in services
+  • Actual method names and signatures from your code
+  • Real aggregation relationships
+  • Database dependency patterns
+
+  **YOUR SERVICE FEATURES:**
+  • Authentication with role checking
+  • User registration and validation
+  • Password reset with tokens
+  • Club allocation algorithms
+  • Stateless DAO pattern
+  • Database connection management
+end note
+
+@enduml

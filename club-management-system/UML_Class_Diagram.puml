@@ -1,0 +1,299 @@
+@startuml Club Management System - Class Diagram
+
+!theme cerulean-outline
+
+title Club Management System - Class Diagram
+
+package "Models" {
+    class User {
+        - id: int
+        - username: String
+        - password: String
+        - passwordSalt: String
+        - email: String
+        - fullName: String
+        - securityQuestion: String
+        - securityAnswer: String
+        - role: UserRole
+        - assignedClubId: Integer
+        - firstLoginCompleted: boolean
+        - createdAt: LocalDateTime
+        - lastLogin: LocalDateTime
+        - isActive: boolean
+
+        + User()
+        + User(username, password, role)
+        + getId(): int
+        + setId(id: int): void
+        + getUsername(): String
+        + setUsername(username: String): void
+        + getRole(): UserRole
+        + setRole(role: UserRole): void
+        + isFirstLoginCompleted(): boolean
+        + setFirstLoginCompleted(completed: boolean): void
+    }
+
+    enum UserRole {
+        CLUB_MANAGER
+        GRADE_11
+        GRADE_9
+    }
+
+    class Club {
+        - id: int
+        - name: String
+
+        + Club()
+        + Club(name: String)
+        + Club(id: int, name: String)
+        + getId(): int
+        + setId(id: int): void
+        + getName(): String
+        + setName(name: String): void
+    }
+
+    class Proposal {
+        - id: int
+        - studentId: int
+        - filePath: String
+        - status: ProposalStatus
+
+        + Proposal()
+        + Proposal(studentId: int, filePath: String)
+        + getId(): int
+        + setId(id: int): void
+        + getStudentId(): int
+        + setStudentId(studentId: int): void
+        + getStatus(): ProposalStatus
+        + setStatus(status: ProposalStatus): void
+    }
+
+    enum ProposalStatus {
+        PENDING
+        ACCEPTED
+        REJECTED
+    }
+
+    class Attendance {
+        - id: int
+        - studentId: int
+        - clubId: int
+        - markedById: int
+        - sessionDate: LocalDate
+        - sessionTime: LocalTime
+        - status: AttendanceStatus
+        - notes: String
+        - createdAt: LocalDateTime
+        - updatedAt: LocalDateTime
+
+        + Attendance()
+        + getId(): int
+        + setId(id: int): void
+        + getStudentId(): int
+        + setStudentId(studentId: int): void
+        + getStatus(): AttendanceStatus
+        + setStatus(status: AttendanceStatus): void
+    }
+
+    enum AttendanceStatus {
+        PRESENT
+        ABSENT
+        LATE
+        EXCUSED
+    }
+
+    class ClubAllocation {
+        - id: int
+        - studentId: int
+        - clubId: int
+
+        + ClubAllocation()
+        + ClubAllocation(studentId: int, clubId: int)
+        + getId(): int
+        + setId(id: int): void
+        + getStudentId(): int
+        + setStudentId(studentId: int): void
+        + getClubId(): int
+        + setClubId(clubId: int): void
+    }
+
+    class AttendanceSession {
+        - id: int
+        - clubId: int
+        - sessionDate: LocalDate
+        - sessionTime: LocalTime
+        - sessionTitle: String
+        - sessionDescription: String
+        - createdById: int
+        - createdAt: LocalDateTime
+        - isActive: boolean
+
+        + AttendanceSession()
+        + getId(): int
+        + setId(id: int): void
+        + getClubId(): int
+        + setClubId(clubId: int): void
+        + getSessionDate(): LocalDate
+        + setSessionDate(date: LocalDate): void
+    }
+}
+
+package "Data Access Layer" {
+    interface UserDAO {
+        + getUserByUsername(username: String): User
+        + getUserById(id: int): User
+        + createUser(user: User): boolean
+        + updateUser(user: User): boolean
+        + getAllUsers(): List<User>
+        + getUsersByRole(role: UserRole): List<User>
+    }
+
+    interface ClubDAO {
+        + getAllClubs(): List<Club>
+        + getClubById(id: int): Club
+        + createClub(club: Club): boolean
+        + updateClub(club: Club): boolean
+    }
+
+    interface ProposalDAO {
+        + createProposal(proposal: Proposal): boolean
+        + getProposalsByStudent(studentId: int): List<Proposal>
+        + getAllProposals(): List<Proposal>
+        + updateProposalStatus(proposalId: int, status: ProposalStatus): boolean
+    }
+
+    interface AttendanceDAO {
+        + markAttendance(attendance: Attendance): boolean
+        + getAttendanceByStudent(studentId: int): List<Attendance>
+        + getAttendanceByClub(clubId: int): List<Attendance>
+        + updateAttendance(attendance: Attendance): boolean
+    }
+
+    interface ClubAllocationDAO {
+        + allocateStudentToClub(allocation: ClubAllocation): boolean
+        + getStudentClub(studentId: int): ClubAllocation
+        + getAllocations(): List<ClubAllocation>
+        + getAllocationsByClub(clubId: int): List<ClubAllocation>
+    }
+}
+
+package "Services" {
+    class AuthenticationService {
+        - userDAO: UserDAO
+
+        + authenticate(username: String, password: String): User
+        + validatePassword(user: User, password: String): boolean
+        + hashPassword(password: String): String
+        + createUser(user: User): boolean
+    }
+
+    class ClubAllocationService {
+        - clubAllocationDAO: ClubAllocationDAO
+        - clubDAO: ClubDAO
+        - userDAO: UserDAO
+
+        + allocateStudentsToClubs(): boolean
+        + getStudentClub(studentId: int): Club
+        + getAllocationsByClub(clubId: int): List<User>
+    }
+
+    class AttendanceService {
+        - attendanceDAO: AttendanceDAO
+        - userDAO: UserDAO
+        - clubDAO: ClubDAO
+
+        + markAttendance(studentId: int, clubId: int, status: AttendanceStatus): boolean
+        + getAttendanceReport(studentId: int): List<Attendance>
+        + getClubAttendanceReport(clubId: int): List<Attendance>
+    }
+}
+
+package "Database" {
+    class DatabaseManager {
+        - {static} DB_NAME: String = "club_management.db"
+        - {static} DB_URL: String
+        - {static} connection: Connection
+
+        + {static} getConnection(): Connection
+        - {static} initializeDatabase(): void
+        - {static} createTables(): void
+        - {static} insertDefaultData(): void
+        + {static} closeConnection(): void
+    }
+}
+
+package "GUI" {
+    class ClubManagementApp {
+        + {static} main(args: String[]): void
+    }
+
+    class LoginFrame {
+        - usernameField: JTextField
+        - passwordField: JPasswordField
+        - authService: AuthenticationService
+
+        + LoginFrame()
+        - handleLogin(): void
+        - openDashboard(user: User): void
+    }
+
+    abstract class DashboardFrame {
+        # user: User
+        # navigationToolbar: NavigationToolbar
+
+        + DashboardFrame(user: User)
+        # setupCommonComponents(): void
+        # handleLogout(): void
+    }
+
+    class ManagerDashboardFrame {
+        + ManagerDashboardFrame(user: User)
+        - initializeManagerComponents(): void
+    }
+
+    class Grade11DashboardFrame {
+        + Grade11DashboardFrame(user: User)
+        - initializeGrade11Components(): void
+    }
+
+    class Grade9DashboardFrame {
+        + Grade9DashboardFrame(user: User)
+        - initializeGrade9Components(): void
+    }
+}
+
+' Relationships
+User ||-- UserRole
+Proposal ||-- ProposalStatus
+Attendance ||-- AttendanceStatus
+
+User ||--o{ Proposal : "submits"
+User ||--o{ Attendance : "marks"
+User ||--o{ ClubAllocation : "allocated to"
+Club ||--o{ ClubAllocation : "contains"
+Club ||--o{ Attendance : "tracks"
+Club ||--o{ AttendanceSession : "hosts"
+
+UserDAO ..|> User : "manages"
+ClubDAO ..|> Club : "manages"
+ProposalDAO ..|> Proposal : "manages"
+AttendanceDAO ..|> Attendance : "manages"
+ClubAllocationDAO ..|> ClubAllocation : "manages"
+
+AuthenticationService --> UserDAO : "uses"
+ClubAllocationService --> ClubAllocationDAO : "uses"
+ClubAllocationService --> ClubDAO : "uses"
+ClubAllocationService --> UserDAO : "uses"
+AttendanceService --> AttendanceDAO : "uses"
+AttendanceService --> UserDAO : "uses"
+AttendanceService --> ClubDAO : "uses"
+
+LoginFrame --> AuthenticationService : "uses"
+DashboardFrame <|-- ManagerDashboardFrame
+DashboardFrame <|-- Grade11DashboardFrame
+DashboardFrame <|-- Grade9DashboardFrame
+
+ClubManagementApp --> DatabaseManager : "initializes"
+ClubManagementApp --> LoginFrame : "creates"
+
+@enduml

@@ -1,0 +1,568 @@
+@startuml Diagram 3 - Service Classes with Aggregation Relationships
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam classAttributeFontSize 9
+skinparam classOperationFontSize 9
+skinparam linetype ortho
+
+title **DIAGRAM 3: SERVICE CLASSES WITH AGGREGATION**\n**SHOWS:** Service layer architecture and data access object relationships\n**CONNECTIONS:** Service dependencies, DAO aggregation, Database management
+
+abstract class BaseService {
+  .. **SECTION 1: ABSTRACT CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PROTECTED COMMON ATTRIBUTES (#)**
+  ====================================
+  # logger : Logger
+  # initialized : boolean
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + BaseService()
+
+  ====================================
+  **PROTECTED COMMON METHODS (#)**
+  ====================================
+  # initialize() : void
+  # validateInput(input:Object) : boolean
+  # logOperation(operation:String) : void
+
+  ====================================
+  **PUBLIC ABSTRACT METHODS (+)**
+  ====================================
+  + {abstract} validateData() : boolean
+  + {abstract} cleanup() : void
+}
+
+class AuthenticationService {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE DAO OBJECTS (-)**
+  ====================================
+  - userDAO : UserDAO
+
+  ====================================
+  **PRIVATE STATE VARIABLES (-)**
+  ====================================
+  - currentUser : User
+  - sessionActive : boolean
+  - sessionStartTime : LocalDateTime
+  - failedLoginAttempts : Map<String, Integer>
+
+  ====================================
+  **PRIVATE SECURITY OBJECTS (-)**
+  ====================================
+  - passwordEncoder : PasswordEncoder
+  - saltGenerator : SecureRandom
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + AuthenticationService()
+
+  ====================================
+  **PUBLIC AUTHENTICATION METHODS (+)**
+  ====================================
+  + authenticate(username:String, password:String) : User
+  + validatePassword(user:User, password:String) : boolean
+  + logout() : void
+  + isSessionActive() : boolean
+  + getCurrentUser() : User
+  + setCurrentUser(user:User) : void
+
+  ====================================
+  **PUBLIC USER MANAGEMENT (+)**
+  ====================================
+  + createUser(user:User) : boolean
+  + changePassword(userId:int, newPassword:String) : boolean
+  + resetPassword(username:String, securityAnswer:String,
+                  newPassword:String) : boolean
+
+  ====================================
+  **PUBLIC SECURITY METHODS (+)**
+  ====================================
+  + hashPassword(password:String) : String
+  + validateSecurityAnswer(user:User, answer:String) : boolean
+
+  ====================================
+  **PRIVATE UTILITY METHODS (-)**
+  ====================================
+  - generateSalt() : String
+  - hashPasswordWithSalt(password:String, salt:String) : String
+  - incrementFailedAttempts(username:String) : void
+  - isAccountLocked(username:String) : boolean
+  - validateSession() : boolean
+
+  ====================================
+  **PROTECTED OVERRIDDEN METHODS (#)**
+  ====================================
+  # validateData() : boolean
+  # cleanup() : void
+}
+
+class ClubAllocationService {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE DAO OBJECTS (-)**
+  ====================================
+  - clubAllocationDAO : ClubAllocationDAO
+  - clubDAO : ClubDAO
+  - userDAO : UserDAO
+
+  ====================================
+  **PRIVATE ALLOCATION DATA (-)**
+  ====================================
+  - allocationAlgorithm : AllocationAlgorithm
+  - maxStudentsPerClub : int
+  - minStudentsPerClub : int
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + ClubAllocationService()
+
+  ====================================
+  **PUBLIC ALLOCATION METHODS (+)**
+  ====================================
+  + allocateStudentsToClubs() : boolean
+  + allocateStudentToClub(studentId:int, clubId:int) : boolean
+  + removeStudentFromClub(studentId:int) : boolean
+  + getStudentClub(studentId:int) : Club
+  + getAllocationsByClub(clubId:int) : List<User>
+  + getAllAllocations() : List<ClubAllocation>
+
+  ====================================
+  **PUBLIC VALIDATION METHODS (+)**
+  ====================================
+  + isAllocationValid() : boolean
+  + canAllocateToClub(clubId:int) : boolean
+  + getClubCapacity(clubId:int) : int
+
+  ====================================
+  **PRIVATE ALGORITHM METHODS (-)**
+  ====================================
+  - runEqualDistributionAlgorithm() : List<ClubAllocation>
+  - calculateOptimalClub(student:User) : Club
+  - balanceAllocations() : void
+  - validateAllocationConstraints() : boolean
+
+  ====================================
+  **PROTECTED OVERRIDDEN METHODS (#)**
+  ====================================
+  # validateData() : boolean
+  # cleanup() : void
+}
+
+class AttendanceService {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE DAO OBJECTS (-)**
+  ====================================
+  - attendanceDAO : AttendanceDAO
+  - userDAO : UserDAO
+  - clubDAO : ClubDAO
+  - attendanceSessionDAO : AttendanceSessionDAO
+
+  ====================================
+  **PRIVATE BUSINESS RULES (-)**
+  ====================================
+  - minimumAttendancePercentage : double
+  - totalRequiredSessions : int
+  - lateGracePeriodMinutes : int
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + AttendanceService()
+
+  ====================================
+  **PUBLIC ATTENDANCE METHODS (+)**
+  ====================================
+  + markAttendance(studentId:int, clubId:int,
+                   status:AttendanceStatus) : boolean
+  + markAttendance(studentId:int, clubId:int,
+                   status:AttendanceStatus, notes:String) : boolean
+  + updateAttendance(attendanceId:int,
+                     status:AttendanceStatus) : boolean
+  + getAttendanceByStudent(studentId:int) : List<Attendance>
+  + getAttendanceByClub(clubId:int) : List<Attendance>
+
+  ====================================
+  **PUBLIC REPORTING METHODS (+)**
+  ====================================
+  + generateAttendanceReport(studentId:int) : AttendanceReport
+  + getAttendancePercentage(studentId:int) : double
+  + getStudentsWithPoorAttendance() : List<User>
+  + getClubAttendanceStatistics(clubId:int) : AttendanceStats
+
+  ====================================
+  **PUBLIC SESSION METHODS (+)**
+  ====================================
+  + createAttendanceSession(clubId:int, sessionDate:LocalDate,
+                            sessionTitle:String) : boolean
+  + getActiveSessionsForClub(clubId:int) : List<AttendanceSession>
+
+  ====================================
+  **PRIVATE VALIDATION METHODS (-)**
+  ====================================
+  - canMarkAttendance(studentId:int, clubId:int) : boolean
+  - isAlreadyMarkedToday(studentId:int, clubId:int) : boolean
+  - validateAttendanceData(attendance:Attendance) : boolean
+
+  ====================================
+  **PROTECTED OVERRIDDEN METHODS (#)**
+  ====================================
+  # validateData() : boolean
+  # cleanup() : void
+}
+
+class ProposalService {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE DAO OBJECTS (-)**
+  ====================================
+  - proposalDAO : ProposalDAO
+  - userDAO : UserDAO
+
+  ====================================
+  **PRIVATE FILE HANDLING (-)**
+  ====================================
+  - fileUploadPath : String
+  - maxFileSize : long
+  - allowedFileTypes : Set<String>
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTOR (+)**
+  ====================================
+  + ProposalService()
+
+  ====================================
+  **PUBLIC PROPOSAL METHODS (+)**
+  ====================================
+  + submitProposal(studentId:int, filePath:String) : boolean
+  + updateProposalStatus(proposalId:int,
+                         status:ProposalStatus) : boolean
+  + getProposalsByStudent(studentId:int) : List<Proposal>
+  + getAllProposals() : List<Proposal>
+  + getPendingProposals() : List<Proposal>
+
+  ====================================
+  **PUBLIC FILE METHODS (+)**
+  ====================================
+  + uploadProposalFile(file:File) : String
+  + validateProposalFile(file:File) : boolean
+  + deleteProposalFile(filePath:String) : boolean
+
+  ====================================
+  **PRIVATE VALIDATION METHODS (-)**
+  ====================================
+  - validateFileType(fileName:String) : boolean
+  - validateFileSize(file:File) : boolean
+  - canStudentSubmitProposal(studentId:int) : boolean
+
+  ====================================
+  **PROTECTED OVERRIDDEN METHODS (#)**
+  ====================================
+  # validateData() : boolean
+  # cleanup() : void
+}
+
+interface UserDAO {
+  .. **SECTION 1: INTERFACE NAME** ..
+
+  ====================================
+  **SECTION 3: INTERFACE METHODS**
+  ====================================
+  **PUBLIC CRUD OPERATIONS (+)**
+  ====================================
+  + getUserByUsername(username:String) : User
+  + getUserById(id:int) : User
+  + createUser(user:User) : boolean
+  + updateUser(user:User) : boolean
+  + deleteUser(id:int) : boolean
+  + getAllUsers() : List<User>
+  + getUsersByRole(role:UserRole) : List<User>
+
+  ====================================
+  **PUBLIC QUERY METHODS (+)**
+  ====================================
+  + existsByUsername(username:String) : boolean
+  + existsByEmail(email:String) : boolean
+  + getUserCount() : int
+}
+
+interface ClubDAO {
+  .. **SECTION 1: INTERFACE NAME** ..
+
+  ====================================
+  **SECTION 3: INTERFACE METHODS**
+  ====================================
+  **PUBLIC CRUD OPERATIONS (+)**
+  ====================================
+  + getAllClubs() : List<Club>
+  + getClubById(id:int) : Club
+  + getClubByName(name:String) : Club
+  + createClub(club:Club) : boolean
+  + updateClub(club:Club) : boolean
+  + deleteClub(id:int) : boolean
+
+  ====================================
+  **PUBLIC QUERY METHODS (+)**
+  ====================================
+  + getClubCount() : int
+  + existsByName(name:String) : boolean
+}
+
+interface AttendanceDAO {
+  .. **SECTION 1: INTERFACE NAME** ..
+
+  ====================================
+  **SECTION 3: INTERFACE METHODS**
+  ====================================
+  **PUBLIC CRUD OPERATIONS (+)**
+  ====================================
+  + markAttendance(attendance:Attendance) : boolean
+  + updateAttendance(attendance:Attendance) : boolean
+  + getAttendanceById(id:int) : Attendance
+  + getAttendanceByStudent(studentId:int) : List<Attendance>
+  + getAttendanceByClub(clubId:int) : List<Attendance>
+  + getAttendanceByDate(date:LocalDate) : List<Attendance>
+
+  ====================================
+  **PUBLIC QUERY METHODS (+)**
+  ====================================
+  + isAttendanceMarked(studentId:int, clubId:int,
+                       date:LocalDate) : boolean
+  + getAttendanceCount(studentId:int) : int
+  + getPresentCount(studentId:int) : int
+}
+
+class DatabaseManager {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE STATIC DATABASE DATA (-)**
+  ====================================
+  - {static} DB_NAME : String = "club_management.db"
+  - {static} DB_URL : String
+  - {static} connection : Connection
+  - {static} initialized : boolean
+
+  ====================================
+  **PRIVATE CONNECTION POOL (-)**
+  ====================================
+  - {static} connectionPool : ConnectionPool
+  - {static} maxConnections : int = 10
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC STATIC CONNECTION METHODS (+)**
+  ====================================
+  + {static} getConnection() : Connection
+  + {static} closeConnection() : void
+  + {static} isConnectionValid() : boolean
+
+  ====================================
+  **PRIVATE STATIC INITIALIZATION (-)**
+  ====================================
+  - {static} initializeDatabase() : void
+  - {static} createTables() : void
+  - {static} migrateDatabase() : void
+  - {static} insertDefaultData() : void
+  - {static} insertDefaultClubs() : void
+  - {static} insertDefaultUsers() : void
+
+  ====================================
+  **PUBLIC STATIC UTILITY METHODS (+)**
+  ====================================
+  + {static} executeQuery(sql:String) : ResultSet
+  + {static} executeUpdate(sql:String) : int
+  + {static} beginTransaction() : void
+  + {static} commitTransaction() : void
+  + {static} rollbackTransaction() : void
+
+  ====================================
+  **PRIVATE STATIC HELPERS (-)**
+  ====================================
+  - {static} validateConnection() : boolean
+  - {static} handleSQLException(e:SQLException) : void
+}
+
+' ==========================================
+' INHERITANCE RELATIONSHIPS (IS-A)
+' ==========================================
+
+BaseService <|-- AuthenticationService : "extends"
+BaseService <|-- ClubAllocationService : "extends"
+BaseService <|-- AttendanceService : "extends"
+BaseService <|-- ProposalService : "extends"
+
+' ==========================================
+' AGGREGATION RELATIONSHIPS (HAS-A/USES)
+' ==========================================
+
+AuthenticationService o-- UserDAO : "uses"
+AuthenticationService o-- User : "manages current user"
+
+ClubAllocationService o-- ClubAllocationDAO : "uses"
+ClubAllocationService o-- ClubDAO : "uses"
+ClubAllocationService o-- UserDAO : "uses"
+
+AttendanceService o-- AttendanceDAO : "uses"
+AttendanceService o-- UserDAO : "uses"
+AttendanceService o-- ClubDAO : "uses"
+
+ProposalService o-- ProposalDAO : "uses"
+ProposalService o-- UserDAO : "uses"
+
+' ==========================================
+' DEPENDENCY RELATIONSHIPS (DEPENDS-ON)
+' ==========================================
+
+UserDAO ..> DatabaseManager : "depends on"
+ClubDAO ..> DatabaseManager : "depends on"
+AttendanceDAO ..> DatabaseManager : "depends on"
+
+AuthenticationService ..> DatabaseManager : "indirectly uses"
+ClubAllocationService ..> DatabaseManager : "indirectly uses"
+AttendanceService ..> DatabaseManager : "indirectly uses"
+ProposalService ..> DatabaseManager : "indirectly uses"
+
+' ==========================================
+' EXPLANATORY NOTES
+' ==========================================
+
+note top of BaseService
+  **ABSTRACT BASE CLASS:**
+  Provides common functionality
+  • Logging capabilities
+  • Input validation
+  • Initialization logic
+  • Template method pattern
+end note
+
+note top of AuthenticationService
+  **SERVICE AGGREGATION:**
+  Service USES DAO objects
+  • Loose coupling
+  • DAO can be replaced
+  • Service orchestrates business logic
+  • DAO handles data persistence
+end note
+
+note top of UserDAO
+  **INTERFACE DESIGN:**
+  DAO interfaces define contracts
+  • Abstract data access operations
+  • Implementation can vary
+  • Easy to mock for testing
+  • Database independence
+end note
+
+note bottom of DatabaseManager
+  **SINGLETON PATTERN:**
+  Database connection management
+  • Static methods and attributes
+  • Single point of database access
+  • Connection pooling
+  • Transaction management
+end note
+
+note as ServiceArchitecture
+  **SERVICE LAYER ARCHITECTURE:**
+
+  **AGGREGATION BENEFITS:**
+  • Loose coupling between layers
+  • Services can use multiple DAOs
+  • Easy to swap implementations
+  • Clear separation of concerns
+
+  **INHERITANCE HIERARCHY:**
+  • BaseService provides common functionality
+  • Concrete services extend base behavior
+  • Template method pattern implementation
+  • Code reuse and consistency
+
+  **DEPENDENCY INJECTION:**
+  • Services depend on DAO interfaces
+  • DAOs depend on DatabaseManager
+  • Clear dependency flow
+  • Easy to test and mock
+end note
+
+note as RelationshipPatterns
+  **RELATIONSHIP PATTERNS:**
+
+  **o-- : Aggregation (HAS-A)**
+  • Service HAS-A DAO
+  • Service HAS-A current User
+  • Weak ownership relationship
+  • Objects exist independently
+
+  **..> : Dependency (USES)**
+  • DAO depends on DatabaseManager
+  • Service indirectly uses database
+  • Compile-time dependency
+  • One-way relationship
+
+  **<|-- : Inheritance (IS-A)**
+  • AuthenticationService IS-A BaseService
+  • All services extend common base
+  • Method inheritance and overriding
+  • Polymorphic behavior
+end note
+
+ServiceArchitecture -up-> ClubAllocationService
+RelationshipPatterns -down-> AttendanceService
+
+note bottom
+  **DIAGRAM 3 STRUCTURE EXPLANATION:**
+
+  **REPRESENTS:** Service layer and data access architecture
+  **SHOWS:** How business services interact with data access objects
+  **INHERITANCE:**
+  • All services extend BaseService for common functionality
+  • Template method pattern for consistent service behavior
+
+  **AGGREGATION:**
+  • Services use DAO interfaces for data access
+  • Services manage domain objects (User, Club, etc.)
+  • Loose coupling allows for easy testing and replacement
+
+  **DEPENDENCIES:**
+  • DAOs depend on DatabaseManager for connections
+  • Services indirectly depend on database through DAOs
+  • Clear layered architecture with proper separation
+end note
+
+@enduml

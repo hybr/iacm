@@ -1,0 +1,455 @@
+@startuml Real Application Diagram 2 - GUI Classes from Actual Code
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam classAttributeFontSize 9
+skinparam classOperationFontSize 9
+skinparam linetype ortho
+
+title **REAL APPLICATION DIAGRAM 2: ACTUAL GUI CLASSES**\n**SHOWS:** Real private/public variables and methods from your GUI classes\n**SOURCE:** Extracted from LoginFrame.java, MainDashboard.java, Grade11EnhancedDashboard.java
+
+class JFrame {
+  .. **SECTION 1: SWING FRAMEWORK CLASS** ..
+
+  ====================================
+  **SECTION 2: INHERITED ATTRIBUTES**
+  ====================================
+  **PROTECTED SWING COMPONENTS (#)**
+  ====================================
+  # rootPane : JRootPane
+  # contentPane : Container
+  # layeredPane : JLayeredPane
+  # glassPane : Component
+  # menuBar : JMenuBar
+
+  ====================================
+  **PRIVATE FRAME PROPERTIES (-)**
+  ====================================
+  - defaultCloseOperation : int
+  - title : String
+  - resizable : boolean
+
+  ====================================
+  **SECTION 3: INHERITED METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + JFrame()
+  + JFrame(title:String)
+
+  ====================================
+  **PUBLIC FRAME METHODS (+)**
+  ====================================
+  + setTitle(title:String) : void
+  + getTitle() : String
+  + setDefaultCloseOperation(operation:int) : void
+  + setVisible(visible:boolean) : void
+  + pack() : void
+  + setSize(width:int, height:int) : void
+  + setResizable(resizable:boolean) : void
+  + setState(state:int) : void
+  + dispose() : void
+}
+
+class LoginFrame {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ACTUAL ATTRIBUTES**
+  ====================================
+  **PRIVATE GUI COMPONENTS FROM CODE (-)**
+  ====================================
+  - usernameField : JTextField
+  - passwordField : JPasswordField
+  - loginButton : JButton
+  - signUpButton : JButton
+  - forgotPasswordButton : JButton
+
+  ====================================
+  **PRIVATE SERVICE OBJECTS FROM CODE (-)**
+  ====================================
+  - authService : AuthenticationService
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTOR FROM CODE (+)**
+  ====================================
+  + LoginFrame()
+
+  ====================================
+  **PRIVATE SETUP METHODS FROM CODE (-)**
+  ====================================
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+  - setupFrame() : void
+
+  ====================================
+  **PRIVATE EVENT HANDLERS FROM CODE (-)**
+  ====================================
+  - handleLogin() : void
+  - handleSignUp() : void
+  - handleForgotPassword() : void
+
+  ====================================
+  **PRIVATE UTILITY METHODS FROM CODE (-)**
+  ====================================
+  - showErrorMessage(message:String) : void
+  - clearFields() : void
+  - validateInput() : boolean
+  - openMainDashboard() : void
+}
+
+class MainDashboard {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ACTUAL ATTRIBUTES**
+  ====================================
+  **PRIVATE GUI COMPONENTS FROM CODE (-)**
+  ====================================
+  - contentPanel : JPanel
+  - cardLayout : CardLayout
+  - toolbar : NavigationToolbar
+  - statusLabel : JLabel
+
+  ====================================
+  **PRIVATE SERVICE OBJECTS FROM CODE (-)**
+  ====================================
+  - authService : AuthenticationService
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTOR FROM CODE (+)**
+  ====================================
+  + MainDashboard(authService:AuthenticationService)
+
+  ====================================
+  **PRIVATE INITIALIZATION FROM CODE (-)**
+  ====================================
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+  - setupFrame() : void
+
+  ====================================
+  **PRIVATE PANEL CREATION FROM CODE (-)**
+  ====================================
+  - createTitlePanel() : JPanel
+  - createStatusPanel() : JPanel
+  - createWindowButton(text:String) : JButton
+  - loadInitialContent() : void
+
+  ====================================
+  **PRIVATE UTILITY METHODS FROM CODE (-)**
+  ====================================
+  - formatRole(role:UserRole) : String
+  - handleWindowClosing() : void
+
+  ====================================
+  **PUBLIC NAVIGATION METHODS FROM CODE (+)**
+  ====================================
+  + setStatusMessage(message:String) : void
+  + showPanel(panelName:String) : void
+  + refreshContent() : void
+}
+
+class Grade11EnhancedDashboard {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ACTUAL ATTRIBUTES**
+  ====================================
+  **PRIVATE GUI COMPONENTS FROM CODE (-)**
+  ====================================
+  - contentPanel : JPanel
+  - cardLayout : CardLayout
+
+  ====================================
+  **PRIVATE FEATURE PANELS FROM CODE (-)**
+  ====================================
+  - attendancePanel : Grade11SelfAttendancePanel
+  - proposalSubmissionPanel : ProposalSubmissionPanel
+  - proposalStatusPanel : ProposalStatusPanel
+  - grade9StudentsViewPanel : Grade9StudentsViewPanel
+
+  ====================================
+  **PRIVATE NAVIGATION BUTTONS FROM CODE (-)**
+  ====================================
+  - attendanceButton : JButton
+  - uploadProposalButton : JButton
+  - checkProposalStatusButton : JButton
+  - viewGrade9StudentsButton : JButton
+  - logoutButton : JButton
+
+  ====================================
+  **PRIVATE SERVICE OBJECTS FROM CODE (-)**
+  ====================================
+  - authService : AuthenticationService
+  - currentUser : User
+  - logoutCallback : Runnable
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTOR FROM CODE (+)**
+  ====================================
+  + Grade11EnhancedDashboard(authService:AuthenticationService)
+
+  ====================================
+  **PRIVATE INITIALIZATION FROM CODE (-)**
+  ====================================
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+
+  ====================================
+  **PRIVATE PANEL NAVIGATION FROM CODE (-)**
+  ====================================
+  - showAttendancePanel() : void
+  - showProposalSubmissionPanel() : void
+  - showProposalStatusPanel() : void
+  - showGrade9StudentsPanel() : void
+
+  ====================================
+  **PUBLIC CALLBACK METHODS FROM CODE (+)**
+  ====================================
+  + setLogoutCallback(callback:Runnable) : void
+
+  ====================================
+  **PRIVATE EVENT HANDLERS FROM CODE (-)**
+  ====================================
+  - handleLogout() : void
+  - refreshPanels() : void
+  - updateButtonStates() : void
+}
+
+class NavigationToolbar {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ACTUAL ATTRIBUTES**
+  ====================================
+  **PRIVATE GUI COMPONENTS FROM CODE (-)**
+  ====================================
+  - homeButton : JButton
+  - profileButton : JButton
+  - settingsButton : JButton
+  - logoutButton : JButton
+  - userLabel : JLabel
+
+  ====================================
+  **PRIVATE SERVICE OBJECTS FROM CODE (-)**
+  ====================================
+  - authService : AuthenticationService
+  - currentUser : User
+
+  ====================================
+  **SECTION 3: ACTUAL METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTOR FROM CODE (+)**
+  ====================================
+  + NavigationToolbar(authService:AuthenticationService)
+
+  ====================================
+  **PRIVATE INITIALIZATION FROM CODE (-)**
+  ====================================
+  - initializeComponents() : void
+  - setupLayout() : void
+  - setupEventHandlers() : void
+
+  ====================================
+  **PRIVATE EVENT HANDLERS FROM CODE (-)**
+  ====================================
+  - handleHomeClick() : void
+  - handleProfileClick() : void
+  - handleSettingsClick() : void
+  - handleLogoutClick() : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS FROM CODE (+)**
+  ====================================
+  + updateUserInfo() : void
+  + setEnabled(enabled:boolean) : void
+}
+
+class JPanel {
+  .. **SECTION 1: SWING FRAMEWORK CLASS** ..
+
+  ====================================
+  **SECTION 2: INHERITED ATTRIBUTES**
+  ====================================
+  **PRIVATE PANEL PROPERTIES (-)**
+  ====================================
+  - layout : LayoutManager
+  - components : List<Component>
+  - border : Border
+  - background : Color
+  - foreground : Color
+
+  ====================================
+  **SECTION 3: INHERITED METHODS**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + JPanel()
+  + JPanel(layout:LayoutManager)
+
+  ====================================
+  **PUBLIC COMPONENT METHODS (+)**
+  ====================================
+  + add(component:Component) : Component
+  + add(component:Component, constraints:Object) : void
+  + remove(component:Component) : void
+  + removeAll() : void
+  + setLayout(mgr:LayoutManager) : void
+  + getLayout() : LayoutManager
+  + setBackground(bg:Color) : void
+  + setBorder(border:Border) : void
+}
+
+' ==========================================
+' ACTUAL INHERITANCE FROM YOUR CODE
+' ==========================================
+
+JFrame <|-- LoginFrame : "extends"
+JFrame <|-- MainDashboard : "extends"
+JPanel <|-- Grade11EnhancedDashboard : "extends"
+JPanel <|-- NavigationToolbar : "extends"
+
+' ==========================================
+' ACTUAL COMPOSITION FROM YOUR CODE
+' ==========================================
+
+LoginFrame *-- JTextField : "usernameField"
+LoginFrame *-- JPasswordField : "passwordField"
+LoginFrame *-- JButton : "loginButton"
+LoginFrame *-- JButton : "signUpButton"
+LoginFrame *-- JButton : "forgotPasswordButton"
+
+MainDashboard *-- JPanel : "contentPanel"
+MainDashboard *-- CardLayout : "cardLayout"
+MainDashboard *-- NavigationToolbar : "toolbar"
+MainDashboard *-- JLabel : "statusLabel"
+
+Grade11EnhancedDashboard *-- JPanel : "contentPanel"
+Grade11EnhancedDashboard *-- CardLayout : "cardLayout"
+Grade11EnhancedDashboard *-- JButton : "attendanceButton"
+Grade11EnhancedDashboard *-- JButton : "uploadProposalButton"
+Grade11EnhancedDashboard *-- JButton : "checkProposalStatusButton"
+Grade11EnhancedDashboard *-- JButton : "viewGrade9StudentsButton"
+Grade11EnhancedDashboard *-- JButton : "logoutButton"
+
+NavigationToolbar *-- JButton : "homeButton"
+NavigationToolbar *-- JButton : "profileButton"
+NavigationToolbar *-- JButton : "settingsButton"
+NavigationToolbar *-- JButton : "logoutButton"
+NavigationToolbar *-- JLabel : "userLabel"
+
+' ==========================================
+' ACTUAL AGGREGATION FROM YOUR CODE
+' ==========================================
+
+LoginFrame o-- AuthenticationService : "authService"
+MainDashboard o-- AuthenticationService : "authService"
+Grade11EnhancedDashboard o-- AuthenticationService : "authService"
+Grade11EnhancedDashboard o-- User : "currentUser"
+NavigationToolbar o-- AuthenticationService : "authService"
+NavigationToolbar o-- User : "currentUser"
+
+' ==========================================
+' NOTES ABOUT YOUR ACTUAL GUI CODE
+' ==========================================
+
+note top of LoginFrame
+  **YOUR ACTUAL LOGIN FRAME:**
+  From LoginFrame.java:
+  • 5 private GUI components
+  • AuthenticationService integration
+  • Event handlers for login/signup/forgot password
+  • ModernTheme styling integration
+  • macOS compatibility settings
+end note
+
+note top of MainDashboard
+  **YOUR ACTUAL MAIN DASHBOARD:**
+  From MainDashboard.java:
+  • CardLayout for content switching
+  • NavigationToolbar integration
+  • Status label for user feedback
+  • Window control buttons (minimize, maximize, close)
+  • Title panel with user info display
+end note
+
+note top of Grade11EnhancedDashboard
+  **YOUR GRADE 11 DASHBOARD:**
+  From Grade11EnhancedDashboard.java:
+  • 4 feature panels for different functions
+  • 5 navigation buttons
+  • Panel switching with CardLayout
+  • Logout callback mechanism
+  • Current user state management
+end note
+
+note as GUIPatterns
+  **YOUR GUI ARCHITECTURE PATTERNS:**
+
+  **INHERITANCE:**
+  • LoginFrame extends JFrame (window management)
+  • MainDashboard extends JFrame (main application window)
+  • Grade11EnhancedDashboard extends JPanel (dashboard content)
+  • NavigationToolbar extends JPanel (navigation component)
+
+  **COMPOSITION:**
+  • Each frame/panel owns its GUI components
+  • Buttons, text fields, labels are parts of their containers
+  • Layout managers are owned by panels
+  • CardLayout enables panel switching
+
+  **AGGREGATION:**
+  • All GUI classes use AuthenticationService
+  • Dashboard classes maintain current User reference
+  • Service objects exist independently of GUI
+end note
+
+note as EventHandling
+  **YOUR EVENT HANDLING:**
+
+  **PRIVATE EVENT METHODS:**
+  • handleLogin(), handleSignUp(), handleForgotPassword()
+  • handleHomeClick(), handleProfileClick(), handleLogoutClick()
+  • Panel navigation methods (showAttendancePanel(), etc.)
+
+  **INITIALIZATION PATTERN:**
+  • initializeComponents() - create GUI objects
+  • setupLayout() - arrange visual layout
+  • setupEventHandlers() - connect events to methods
+  • setupFrame() - configure window properties
+end note
+
+GUIPatterns -right-> MainDashboard
+EventHandling -left-> Grade11EnhancedDashboard
+
+note bottom
+  **DIAGRAM 2 EXPLANATION:**
+
+  **REPRESENTS:** Your actual GUI class hierarchy and relationships
+  **DATA SOURCE:** Real variables and methods from your GUI .java files
+  **SHOWS:**
+  • Exact private GUI components from your code
+  • Actual method names and signatures
+  • Real inheritance from Swing framework
+  • Composition relationships with GUI components
+
+  **YOUR GUI FEATURES:**
+  • Role-based dashboard switching
+  • Modern theme integration
+  • Event-driven user interactions
+  • Service layer integration
+  • Component ownership and lifecycle management
+end note
+
+@enduml

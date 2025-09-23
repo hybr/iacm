@@ -1,0 +1,471 @@
+@startuml Diagram 1 - Core Model Classes with Inheritance and Aggregation
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam classAttributeFontSize 9
+skinparam classOperationFontSize 9
+skinparam linetype ortho
+
+title **DIAGRAM 1: CORE MODEL CLASSES**\n**SHOWS:** Inheritance and Aggregation relationships between domain models\n**CONNECTIONS:** Entity relationships, Enum inheritance, Object composition
+
+class User {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE CORE DATA (-)**
+  ====================================
+  - id : int
+  - username : String
+  - password : String
+  - passwordSalt : String
+  - email : String
+  - fullName : String
+  - securityQuestion : String
+  - securityAnswer : String
+  - role : UserRole
+  - assignedClubId : Integer
+  - firstLoginCompleted : boolean
+  - createdAt : LocalDateTime
+  - lastLogin : LocalDateTime
+  - isActive : boolean
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + User()
+  + User(username:String, password:String, role:UserRole)
+  + User(id:int, username:String, password:String, role:UserRole)
+
+  ====================================
+  **PUBLIC GETTERS (+)**
+  ====================================
+  + getId() : int
+  + getUsername() : String
+  + getRole() : UserRole
+  + getEmail() : String
+  + getFullName() : String
+  + isFirstLoginCompleted() : boolean
+  + isActive() : boolean
+
+  ====================================
+  **PUBLIC SETTERS (+)**
+  ====================================
+  + setId(id:int) : void
+  + setUsername(username:String) : void
+  + setRole(role:UserRole) : void
+  + setEmail(email:String) : void
+  + setActive(active:boolean) : void
+
+  ====================================
+  **PUBLIC BUSINESS METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+enum UserRole {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES**
+  ====================================
+  CLUB_MANAGER
+  GRADE_11
+  GRADE_9
+
+  ====================================
+  **SECTION 3: ENUM OPERATIONS**
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + valueOf(name:String) : UserRole
+  + values() : UserRole[]
+  + toString() : String
+}
+
+class Club {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE CORE DATA (-)**
+  ====================================
+  - id : int
+  - name : String
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Club()
+  + Club(name:String)
+  + Club(id:int, name:String)
+
+  ====================================
+  **PUBLIC ACCESSORS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getName() : String
+  + setName(name:String) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+class Proposal {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE CORE DATA (-)**
+  ====================================
+  - id : int
+  - studentId : int
+  - filePath : String
+  - status : ProposalStatus
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Proposal()
+  + Proposal(studentId:int, filePath:String)
+  + Proposal(id:int, studentId:int, filePath:String, status:ProposalStatus)
+
+  ====================================
+  **PUBLIC ACCESSORS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getFilePath() : String
+  + setFilePath(filePath:String) : void
+  + getStatus() : ProposalStatus
+  + setStatus(status:ProposalStatus) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+enum ProposalStatus {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES**
+  ====================================
+  PENDING
+  ACCEPTED
+  REJECTED
+
+  ====================================
+  **SECTION 3: ENUM OPERATIONS**
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + valueOf(name:String) : ProposalStatus
+  + values() : ProposalStatus[]
+  + toString() : String
+}
+
+class Attendance {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE CORE DATA (-)**
+  ====================================
+  - id : int
+  - studentId : int
+  - clubId : int
+  - markedById : int
+  - sessionDate : LocalDate
+  - sessionTime : LocalTime
+  - status : AttendanceStatus
+  - notes : String
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+
+  ====================================
+  **PRIVATE DISPLAY DATA (-)**
+  ====================================
+  - studentName : String
+  - markerName : String
+  - clubName : String
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + Attendance()
+  + Attendance(studentId:int, clubId:int, markedById:int,
+               sessionDate:LocalDate, status:AttendanceStatus,
+               notes:String)
+
+  ====================================
+  **PUBLIC CORE ACCESSORS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + getStatus() : AttendanceStatus
+  + setStatus(status:AttendanceStatus) : void
+
+  ====================================
+  **PUBLIC BUSINESS METHODS (+)**
+  ====================================
+  + isPresent() : boolean
+  + getSessionNumber() : int
+  + toString() : String
+}
+
+enum AttendanceStatus {
+  .. **SECTION 1: ENUM NAME** ..
+
+  ====================================
+  **SECTION 2: ENUM VALUES WITH DATA**
+  ====================================
+  PRESENT("Present", "✅")
+  ABSENT("Absent", "❌")
+  LATE("Late", "⏱️")
+  EXCUSED("Excused", "📝")
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE ENUM DATA (-)**
+  ====================================
+  - displayName : String
+  - emoji : String
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PACKAGE CONSTRUCTOR (~)**
+  ====================================
+  ~ AttendanceStatus(displayName:String, emoji:String)
+
+  ====================================
+  **PUBLIC ACCESSORS (+)**
+  ====================================
+  + getDisplayName() : String
+  + getEmoji() : String
+  + toString() : String
+}
+
+class ClubAllocation {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE CORE DATA (-)**
+  ====================================
+  - id : int
+  - studentId : int
+  - clubId : int
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + ClubAllocation()
+  + ClubAllocation(studentId:int, clubId:int)
+  + ClubAllocation(id:int, studentId:int, clubId:int)
+
+  ====================================
+  **PUBLIC ACCESSORS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getStudentId() : int
+  + setStudentId(studentId:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+class AttendanceSession {
+  .. **SECTION 1: CLASS NAME** ..
+
+  ====================================
+  **SECTION 2: ATTRIBUTES (DATA)**
+  ====================================
+  **PRIVATE CORE DATA (-)**
+  ====================================
+  - id : int
+  - clubId : int
+  - sessionDate : LocalDate
+  - sessionTime : LocalTime
+  - sessionTitle : String
+  - sessionDescription : String
+  - createdById : int
+  - createdAt : LocalDateTime
+  - isActive : boolean
+
+  ====================================
+  **PRIVATE DISPLAY DATA (-)**
+  ====================================
+  - clubName : String
+  - creatorName : String
+
+  ====================================
+  **SECTION 3: OPERATIONS (BEHAVIOR)**
+  ====================================
+  **PUBLIC CONSTRUCTORS (+)**
+  ====================================
+  + AttendanceSession()
+  + AttendanceSession(clubId:int, sessionDate:LocalDate,
+                      sessionTitle:String, sessionDescription:String,
+                      createdById:int)
+
+  ====================================
+  **PUBLIC ACCESSORS (+)**
+  ====================================
+  + getId() : int
+  + setId(id:int) : void
+  + getClubId() : int
+  + setClubId(clubId:int) : void
+  + getSessionDate() : LocalDate
+  + setSessionDate(sessionDate:LocalDate) : void
+  + getSessionTitle() : String
+  + setSessionTitle(sessionTitle:String) : void
+  + isActive() : boolean
+  + setActive(active:boolean) : void
+
+  ====================================
+  **PUBLIC UTILITY METHODS (+)**
+  ====================================
+  + toString() : String
+}
+
+' ==========================================
+' AGGREGATION RELATIONSHIPS (HAS-A)
+' ==========================================
+
+User ||-- UserRole : "has role >"
+Proposal ||-- ProposalStatus : "has status >"
+Attendance ||-- AttendanceStatus : "has status >"
+
+' ==========================================
+' ASSOCIATION RELATIONSHIPS (USES/CONTAINS)
+' ==========================================
+
+User "1" ||--o{ "0..*" Proposal : "submits >"
+User "1" ||--o{ "0..*" Attendance : "marks >"
+User "1" ||--o{ "0..1" ClubAllocation : "allocated to >"
+
+Club "1" ||--o{ "0..*" ClubAllocation : "contains >"
+Club "1" ||--o{ "0..*" Attendance : "tracks attendance for >"
+Club "1" ||--o{ "0..*" AttendanceSession : "hosts sessions >"
+
+User "1" ||--o{ "0..*" AttendanceSession : "creates >"
+
+' Foreign Key Relationships
+Proposal }o--|| User : "belongs to student"
+Attendance }o--|| User : "marked by user"
+Attendance }o--|| Club : "for club"
+ClubAllocation }o--|| User : "assigns student"
+ClubAllocation }o--|| Club : "to club"
+AttendanceSession }o--|| Club : "belongs to club"
+AttendanceSession }o--|| User : "created by user"
+
+' ==========================================
+' EXPLANATORY NOTES
+' ==========================================
+
+note top of User
+  **AGGREGATION EXAMPLE:**
+  User HAS-A UserRole
+  • User contains/owns a UserRole
+  • User exists independently
+  • UserRole defines user permissions
+  • Diamond on User side (owner)
+end note
+
+note top of Club
+  **ASSOCIATION EXAMPLE:**
+  Club CONTAINS many ClubAllocations
+  • One club has many student allocations
+  • Multiplicity: 1 to 0..*
+  • Club can exist without allocations
+  • Bidirectional relationship
+end note
+
+note bottom of Proposal
+  **FOREIGN KEY RELATIONSHIP:**
+  Proposal BELONGS TO User
+  • studentId references User.id
+  • Many proposals to one user
+  • User must exist for proposal
+  • Composition-like dependency
+end note
+
+note as RelationshipKey
+  **RELATIONSHIP SYMBOLS:**
+
+  **||-- : Aggregation (has-a)**
+  • Diamond on owner side
+  • "Has" or "Contains" relationship
+  • Owner can exist without owned object
+
+  **||--o{ : One-to-Many Association**
+  • One object relates to many others
+  • Multiplicity shown (1, 0..*, 1..*, etc.)
+  • Objects exist independently
+
+  **}o--|| : Many-to-One Association**
+  • Many objects relate to one
+  • Foreign key relationship
+  • Dependent object references owner
+
+  **MULTIPLICITY:**
+  • 1 : Exactly one
+  • 0..1 : Zero or one
+  • 0..* : Zero or many
+  • 1..* : One or many
+end note
+
+RelationshipKey -up-> AttendanceSession
+
+note bottom
+  **DIAGRAM 1 STRUCTURE EXPLANATION:**
+
+  **REPRESENTS:** Core domain model with business entities
+  **SHOWS:** How data objects relate to each other
+  **RELATIONSHIPS:**
+  • Aggregation: User has UserRole, Proposal has ProposalStatus
+  • Association: User submits many Proposals, Club contains many ClubAllocations
+  • Foreign Keys: Attendance belongs to User and Club
+
+  **DATA PLACEMENT:**
+  • Section 1: Class names clearly labeled
+  • Section 2: All private attributes with proper types
+  • Section 3: Public methods organized by purpose (constructors, accessors, business logic)
+  • Enums: Special format showing values and methods
+end note
+
+@enduml

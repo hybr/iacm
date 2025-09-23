@@ -1,0 +1,247 @@
+@startuml Component Diagram - System Architecture
+
+!theme cerulean-outline
+
+title **UML COMPONENT DIAGRAM**\n**REPRESENTS:** System architecture and component dependencies\n**PURPOSE:** Shows how system components are organized and interact
+
+!define COMPONENT rectangle
+!define INTERFACE interface
+!define DATABASE database
+
+package "**PRESENTATION LAYER**" <<Layer>> #lightblue {
+
+  COMPONENT "User Interface Components" as UI {
+    [LoginFrame]
+    [MainDashboard]
+    [ManagerDashboardFrame]
+    [Grade11DashboardFrame]
+    [Grade9DashboardFrame]
+  }
+
+  COMPONENT "GUI Panels" as Panels {
+    [ProposalManagementPanel]
+    [ClubAllocationPanel]
+    [AttendanceMarkingPanel]
+    [AttendanceReportPanel]
+    [ClubInfoPanel]
+  }
+
+  COMPONENT "Navigation Components" as NavComponents {
+    [NavigationToolbar]
+    [RibbonComponent]
+    [MenuComponents]
+  }
+
+  INTERFACE "Display Interface" as IDisplay
+  INTERFACE "User Input Interface" as IInput
+
+  UI -down-> IDisplay : provides
+  UI -down-> IInput : uses
+  Panels -up-> IDisplay : implements
+  NavComponents -up-> IInput : implements
+}
+
+package "**BUSINESS LOGIC LAYER**" <<Layer>> #lightgreen {
+
+  COMPONENT "Authentication Services" as AuthServices {
+    [AuthenticationService]
+    [PasswordService]
+    [SecurityService]
+    [SessionManager]
+  }
+
+  COMPONENT "Core Business Services" as CoreServices {
+    [ClubAllocationService]
+    [AttendanceService]
+    [ProposalService]
+    [ReportingService]
+    [ValidationService]
+  }
+
+  COMPONENT "Utility Services" as Utils {
+    [FileService]
+    [NotificationService]
+    [LoggingService]
+  }
+
+  INTERFACE "Authentication Interface" as IAuth
+  INTERFACE "Business Service Interface" as IBusiness
+  INTERFACE "Utility Interface" as IUtility
+
+  AuthServices -down-> IAuth : provides
+  CoreServices -down-> IBusiness : provides
+  Utils -down-> IUtility : provides
+}
+
+package "**DATA ACCESS LAYER**" <<Layer>> #lightyellow {
+
+  COMPONENT "Data Access Objects" as DAOs {
+    [UserDAO]
+    [ClubDAO]
+    [ProposalDAO]
+    [AttendanceDAO]
+    [ClubAllocationDAO]
+    [Grade11ClubAssignmentDAO]
+  }
+
+  COMPONENT "Database Connection" as DBConnection {
+    [DatabaseManager]
+    [ConnectionPool]
+    [TransactionManager]
+  }
+
+  INTERFACE "Data Access Interface" as IDataAccess
+  INTERFACE "Database Interface" as IDatabase
+
+  DAOs -down-> IDataAccess : provides
+  DBConnection -down-> IDatabase : provides
+}
+
+package "**DATA STORAGE LAYER**" <<Layer>> #lightcoral {
+
+  DATABASE "SQLite Database" as DB {
+    [users table]
+    [clubs table]
+    [proposals table]
+    [attendance table]
+    [club_allocation table]
+    [grade11_student_clubs table]
+    [attendance_sessions table]
+    [password_reset_tokens table]
+    [user_sessions table]
+  }
+
+  COMPONENT "File Storage" as FileStorage {
+    [PDF Documents]
+    [Configuration Files]
+    [Log Files]
+    [Backup Files]
+  }
+}
+
+package "**EXTERNAL DEPENDENCIES**" <<External>> #lightgray {
+
+  COMPONENT "Java Swing Framework" as Swing {
+    [JFrame]
+    [JPanel]
+    [JButton]
+    [JTextField]
+    [JTable]
+    [JFileChooser]
+  }
+
+  COMPONENT "JDBC Driver" as JDBC {
+    [SQLite JDBC Driver]
+    [Connection Management]
+    [Statement Execution]
+  }
+
+  COMPONENT "Java Standard Library" as JavaStd {
+    [Collections Framework]
+    [Date/Time API]
+    [I/O Classes]
+    [Security Classes]
+  }
+}
+
+' **COMPONENT DEPENDENCIES** (Top to Bottom)
+
+' Presentation Layer Dependencies
+UI --> IAuth : uses
+UI --> IBusiness : uses
+Panels --> IBusiness : uses
+NavComponents --> IAuth : uses
+
+' Business Logic Dependencies
+AuthServices --> IDataAccess : uses
+CoreServices --> IDataAccess : uses
+Utils --> IUtility : provides
+
+' Data Access Dependencies
+DAOs --> IDatabase : uses
+DBConnection --> DB : connects to
+DBConnection --> FileStorage : manages
+
+' External Dependencies
+UI --> Swing : extends
+Panels --> Swing : extends
+NavComponents --> Swing : extends
+DBConnection --> JDBC : uses
+AuthServices --> JavaStd : uses
+CoreServices --> JavaStd : uses
+Utils --> JavaStd : uses
+
+' **INTERFACE REALIZATIONS**
+IDisplay <|.. UI
+IInput <|.. NavComponents
+IAuth <|.. AuthServices
+IBusiness <|.. CoreServices
+IUtility <|.. Utils
+IDataAccess <|.. DAOs
+IDatabase <|.. DBConnection
+
+' **COMPONENT INTERACTIONS**
+note as ComponentNote
+**COMPONENT INTERACTION PATTERNS:**
+
+**Layered Dependencies:**
+• Each layer depends only on layers below it
+• No circular dependencies between layers
+• Clear separation of concerns
+
+**Interface Usage:**
+• Components communicate through interfaces
+• Loose coupling between layers
+• Easy to mock and test
+
+**External Dependencies:**
+• System relies on Java Swing for GUI
+• SQLite for data persistence
+• JDBC for database connectivity
+end note
+
+note as ArchitecturalNote
+**ARCHITECTURAL PATTERNS:**
+
+**Layered Architecture:**
+• Presentation Layer: User interface
+• Business Logic: Core functionality
+• Data Access: Database operations
+• Data Storage: Persistent storage
+
+**Component Organization:**
+• High cohesion within components
+• Low coupling between components
+• Interface-based communication
+• Dependency injection ready
+end note
+
+ComponentNote -right-> UI
+ArchitecturalNote -left-> DB
+
+note bottom
+  **DIAGRAM EXPLANATION:**
+
+  **STRUCTURE REPRESENTED:** Component Diagram
+  **SHOWS:** System architecture and component relationships
+  **ELEMENTS:**
+  • Components (rectangles with component icon)
+  • Interfaces (lollipop notation)
+  • Dependencies (dashed arrows)
+  • Realizations (solid arrows with triangles)
+  • Packages (folders grouping related components)
+
+  **LAYERS:**
+  • Presentation: User interface components
+  • Business Logic: Core application services
+  • Data Access: Database interaction layer
+  • Data Storage: Persistent data storage
+  • External Dependencies: Third-party libraries
+
+  **DEPENDENCY FLOW:**
+  • Top-down dependency flow
+  • Interface-based communication
+  • Clear architectural boundaries
+end note
+
+@enduml
