@@ -1,0 +1,33 @@
+@startuml Simple User-Student Relationships
+
+class User {
+    -name: String
+    -id: int
+    +login(): void
+}
+
+class Student {
+    -grade: int
+    +study(): void
+}
+
+class Address {
+    -street: String
+    -city: String
+}
+
+class UserDAO {
+    +saveUser(): void
+    +findUser(): User
+}
+
+' Inheritance (IS-A)
+User <|-- Student
+
+' Aggregation (HAS-A)
+User o-- Address
+
+' Association (USES)
+UserDAO ..> User
+
+@enduml

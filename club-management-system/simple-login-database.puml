@@ -1,0 +1,33 @@
+@startuml Simple Login-Database Relationships
+
+class Window {
+    -title: String
+    +show(): void
+}
+
+class LoginWindow {
+    -username: String
+    -password: String
+    +authenticate(): void
+}
+
+class Connection {
+    -url: String
+    +connect(): void
+}
+
+class Database {
+    +query(): String
+    +save(): void
+}
+
+' Inheritance (IS-A)
+Window <|-- LoginWindow
+
+' Aggregation (HAS-A)
+Database o-- Connection
+
+' Association (USES)
+LoginWindow ..> Database
+
+@enduml

@@ -1,0 +1,32 @@
+@startuml Simple Club-Member Relationships
+
+class Activity {
+    -name: String
+    +start(): void
+}
+
+class Club {
+    -clubName: String
+    +meetWeekly(): void
+}
+
+class Member {
+    -memberName: String
+    +attend(): void
+}
+
+class ClubService {
+    +addMember(): void
+    +removeMe​mber(): void
+}
+
+' Inheritance (IS-A)
+Activity <|-- Club
+
+' Aggregation (HAS-A)
+Club o-- Member
+
+' Association (USES)
+ClubService ..> Club
+
+@enduml
