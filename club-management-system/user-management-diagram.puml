@@ -1,0 +1,60 @@
+@startuml User Management System
+
+!define ENTITY class
+!define ENUM enum
+
+package "User Management" {
+  ENTITY User {
+    -id: int
+    -username: String
+    -password: String
+    -passwordSalt: String
+    -email: String
+    -fullName: String
+    -role: UserRole
+    -assignedClubId: Integer
+    -firstLoginCompleted: boolean
+    -isActive: boolean
+    +authenticate(): boolean
+    +getFullName(): String
+    +isFirstLoginCompleted(): boolean
+  }
+
+  ENUM UserRole {
+    CLUB_MANAGER
+    GRADE_11
+    GRADE_9
+  }
+
+  ENTITY UserDAO {
+    +authenticate(username: String, password: String): User
+    +getUserById(id: int): User
+    +insertUser(user: User): boolean
+    +updatePassword(username: String, newPassword: String): boolean
+    +validateSecurityAnswer(username: String, answer: String): boolean
+    +usernameExists(username: String): boolean
+    +emailExists(email: String): boolean
+    +updateFirstLoginCompleted(userId: int, completed: boolean): boolean
+    +getGrade9StudentsWithClubAssignments(): List<User>
+  }
+
+  ENTITY PasswordHasher {
+    +hashPassword(password: String): String {static}
+    +verifyPassword(password: String, hash: String, salt: String): boolean {static}
+    +generateSalt(): String {static}
+  }
+
+  ENTITY DatabaseManager {
+    -connection: Connection {static}
+    +getConnection(): Connection {static}
+    +closeConnection(): void {static}
+  }
+}
+
+' Relationships
+User ||--|| UserRole : has
+UserDAO ..> User : manages
+UserDAO ..> DatabaseManager : uses
+UserDAO ..> PasswordHasher : uses
+
+@enduml

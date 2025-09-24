@@ -1,0 +1,36 @@
+@startuml
+!define RECTANGLE class
+
+class User {
+  -id: String
+  -name: String
+  -email: String
+  -password: String
+  +login(): boolean
+  +logout(): void
+  +updateProfile(): void
+}
+
+class Club {
+  -id: String
+  -name: String
+  -description: String
+  -maxMembers: int
+  -currentMembers: int
+  +addMember(user: User): boolean
+  +removeMember(user: User): boolean
+  +getMembers(): List<User>
+}
+
+class Manager {
+  -department: String
+  +approveClub(club: Club): void
+  +rejectClub(club: Club): void
+  +allocateResources(): void
+}
+
+User ||--o{ Club : "member of"
+Manager --|> User
+Club }o--|| Manager : "managed by"
+
+@enduml

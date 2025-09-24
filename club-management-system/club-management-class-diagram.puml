@@ -1,0 +1,309 @@
+@startuml Club Management System Class Diagram
+
+!define ENTITY class
+!define DAO interface
+!define GUI class
+!define ENUM enum
+
+package "Models" {
+  ENTITY User {
+    -id: int
+    -username: String
+    -password: String
+    -passwordSalt: String
+    -email: String
+    -fullName: String
+    -securityQuestion: String
+    -securityAnswer: String
+    -role: UserRole
+    -assignedClubId: Integer
+    -firstLoginCompleted: boolean
+    -createdAt: LocalDateTime
+    -lastLogin: LocalDateTime
+    -isActive: boolean
+    +authenticate(): boolean
+    +updateProfile(): void
+    +getFullName(): String
+  }
+
+  ENUM UserRole {
+    CLUB_MANAGER
+    GRADE_11
+    GRADE_9
+  }
+
+  ENTITY Club {
+    -id: int
+    -name: String
+    +getId(): int
+    +getName(): String
+    +setName(name: String): void
+  }
+
+  ENTITY Proposal {
+    -id: int
+    -studentId: int
+    -filePath: String
+    -status: ProposalStatus
+    +getStatus(): ProposalStatus
+    +setStatus(status: ProposalStatus): void
+  }
+
+  ENUM ProposalStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+  }
+
+  ENTITY Attendance {
+    -id: int
+    -studentId: int
+    -clubId: int
+    -markedById: int
+    -sessionDate: LocalDate
+    -sessionTime: LocalTime
+    -status: AttendanceStatus
+    -notes: String
+    -createdAt: LocalDateTime
+    -updatedAt: LocalDateTime
+    -studentName: String
+    -markerName: String
+    -clubName: String
+    +isPresent(): boolean
+    +setStatus(status: AttendanceStatus): void
+  }
+
+  ENUM AttendanceStatus {
+    PRESENT("Present", "✅")
+    ABSENT("Absent", "❌")
+    LATE("Late", "⏱️")
+    EXCUSED("Excused", "📝")
+  }
+
+  ENTITY AttendanceSession {
+    -id: int
+    -clubId: int
+    -sessionDate: LocalDate
+    -sessionTime: LocalTime
+    -sessionTitle: String
+    -sessionDescription: String
+    -createdById: int
+    -createdAt: LocalDateTime
+    -isActive: boolean
+    -clubName: String
+    -creatorName: String
+  }
+
+  ENTITY ClubAllocation {
+    -id: int
+    -studentId: int
+    -clubId: int
+    +getStudentId(): int
+    +getClubId(): int
+  }
+}
+
+package "Database" {
+  ENTITY DatabaseManager {
+    -DB_NAME: String {static}
+    -DB_URL: String {static}
+    -connection: Connection {static}
+    +getConnection(): Connection {static}
+    +closeConnection(): void {static}
+    -initializeDatabase(): void {static}
+    -createTables(): void {static}
+    -migrateDatabase(): void {static}
+    -insertDefaultData(): void {static}
+  }
+}
+
+package "DAO Layer" {
+  DAO UserDAO {
+    +authenticate(username: String, password: String): User
+    +getUserById(id: int): User
+    +getUserByUsername(username: String): User
+    +getUserByEmail(email: String): User
+    +insertUser(user: User): boolean
+    +getAllUsers(): List<User>
+    +getUsersByRole(role: UserRole): List<User>
+    +updatePassword(username: String, newPassword: String): boolean
+    +validateSecurityAnswer(username: String, answer: String): boolean
+    +usernameExists(username: String): boolean
+    +emailExists(email: String): boolean
+    +updateUserClubAssignment(userId: int, clubId: int): boolean
+    +updateFirstLoginCompleted(userId: int, completed: boolean): boolean
+    +updateLastLogin(userId: int): boolean
+    +getGrade9StudentsWithClubAssignments(): List<User>
+  }
+
+  DAO ClubDAO {
+    +getAllClubs(): List<Club>
+    +getClubById(id: int): Club
+    +getClubByName(name: String): Club
+    +insertClub(club: Club): boolean
+    +updateClub(club: Club): boolean
+    +deleteClub(id: int): boolean
+  }
+
+  DAO AttendanceDAO {
+    +markAttendance(attendance: Attendance): boolean
+    +getAttendanceByStudent(studentId: int): List<Attendance>
+    +getAttendanceByClub(clubId: int): List<Attendance>
+    +getAttendanceByDate(date: LocalDate): List<Attendance>
+    +updateAttendance(attendance: Attendance): boolean
+    +deleteAttendance(id: int): boolean
+  }
+
+  DAO ProposalDAO {
+    +submitProposal(proposal: Proposal): boolean
+    +getProposalsByStudent(studentId: int): List<Proposal>
+    +getAllProposals(): List<Proposal>
+    +updateProposalStatus(id: int, status: ProposalStatus): boolean
+    +getProposalById(id: int): Proposal
+  }
+
+  DAO ClubAllocationDAO {
+    +allocateStudentToClub(studentId: int, clubId: int): boolean
+    +getAllocations(): List<ClubAllocation>
+    +getAllocationByStudent(studentId: int): ClubAllocation
+    +updateAllocation(allocation: ClubAllocation): boolean
+    +removeAllocation(studentId: int): boolean
+  }
+
+  DAO Grade11ClubAssignmentDAO {
+    +assignStudentToClub(studentId: int, clubId: int): boolean
+    +getClubsForStudent(studentId: int): List<Club>
+    +getStudentsForClub(clubId: int): List<User>
+    +removeAssignment(studentId: int, clubId: int): boolean
+  }
+}
+
+package "GUI Layer" {
+  GUI ClubManagementApp {
+    +main(args: String[]): void {static}
+  }
+
+  GUI LoginFrame {
+    -usernameField: JTextField
+    -passwordField: JPasswordField
+    +authenticate(): void
+    +showLoginError(): void
+  }
+
+  GUI MainDashboard {
+    -currentUser: User
+    -contentPanel: JPanel
+    +switchToPanel(panel: JPanel): void
+    +logout(): void
+  }
+
+  GUI ClubSelectionFrame {
+    -clubs: List<Club>
+    -selectedClub: Club
+    +loadClubs(): void
+    +selectClub(): void
+  }
+
+  GUI Grade11ClubSelectionFrame {
+    -availableClubs: List<Club>
+    -selectedClubs: List<Club>
+    +loadAvailableClubs(): void
+    +addClubSelection(): void
+    +removeClubSelection(): void
+  }
+
+  GUI AttendanceTrackingFrame {
+    -sessions: List<AttendanceSession>
+    -students: List<User>
+    +createSession(): void
+    +markAttendance(): void
+    +viewAttendanceHistory(): void
+  }
+
+  GUI ProposalManagementPanel {
+    -proposals: List<Proposal>
+    +submitProposal(): void
+    +reviewProposal(): void
+    +updateProposalStatus(): void
+  }
+
+  GUI ManagerClubAssignmentsViewPanel {
+    -grade9Students: List<User>
+    -clubAllocations: List<ClubAllocation>
+    +viewStudentAllocations(): void
+    +modifyAllocations(): void
+  }
+
+  GUI SignUpFrame {
+    -registrationFields: Map<String, JComponent>
+    +validateInput(): boolean
+    +registerUser(): void
+  }
+
+  GUI ForgotPasswordFrame {
+    -emailField: JTextField
+    -securityAnswerField: JTextField
+    +validateSecurityAnswer(): boolean
+    +resetPassword(): void
+  }
+}
+
+package "Security" {
+  ENTITY PasswordHasher {
+    +hashPassword(password: String): String {static}
+    +verifyPassword(password: String, hash: String, salt: String): boolean {static}
+    +generateSalt(): String {static}
+  }
+}
+
+' Relationships
+User ||--o{ UserRole : has
+User ||--o{ Proposal : submits
+User ||--o{ Attendance : has
+User ||--o{ ClubAllocation : assigned_to
+User ||--o{ AttendanceSession : creates
+
+Club ||--o{ ClubAllocation : contains
+Club ||--o{ Attendance : tracks
+Club ||--o{ AttendanceSession : hosts
+
+Proposal ||--o{ ProposalStatus : has
+Attendance ||--o{ AttendanceStatus : has
+
+' DAO relationships
+UserDAO ..> User : manages
+ClubDAO ..> Club : manages
+AttendanceDAO ..> Attendance : manages
+ProposalDAO ..> Proposal : manages
+ClubAllocationDAO ..> ClubAllocation : manages
+Grade11ClubAssignmentDAO ..> User : manages
+Grade11ClubAssignmentDAO ..> Club : manages
+
+' Database relationships
+UserDAO ..> DatabaseManager : uses
+ClubDAO ..> DatabaseManager : uses
+AttendanceDAO ..> DatabaseManager : uses
+ProposalDAO ..> DatabaseManager : uses
+ClubAllocationDAO ..> DatabaseManager : uses
+Grade11ClubAssignmentDAO ..> DatabaseManager : uses
+
+' GUI relationships
+LoginFrame ..> UserDAO : authenticates
+MainDashboard ..> User : displays
+ClubSelectionFrame ..> ClubDAO : loads
+ClubSelectionFrame ..> ClubAllocationDAO : allocates
+Grade11ClubSelectionFrame ..> Grade11ClubAssignmentDAO : assigns
+AttendanceTrackingFrame ..> AttendanceDAO : manages
+ProposalManagementPanel ..> ProposalDAO : handles
+ManagerClubAssignmentsViewPanel ..> UserDAO : views
+SignUpFrame ..> UserDAO : registers
+ForgotPasswordFrame ..> UserDAO : resets
+
+' Security relationships
+UserDAO ..> PasswordHasher : uses
+SignUpFrame ..> PasswordHasher : uses
+
+ClubManagementApp --> LoginFrame : launches
+LoginFrame --> MainDashboard : navigates_to
+
+@enduml

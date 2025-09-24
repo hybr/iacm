@@ -1,0 +1,90 @@
+@startuml Club & Attendance Management
+
+!define ENTITY class
+!define ENUM enum
+
+package "Club & Attendance System" {
+  ENTITY Club {
+    -id: int
+    -name: String
+    +getId(): int
+    +getName(): String
+    +setName(name: String): void
+  }
+
+  ENTITY Attendance {
+    -id: int
+    -studentId: int
+    -clubId: int
+    -markedById: int
+    -sessionDate: LocalDate
+    -sessionTime: LocalTime
+    -status: AttendanceStatus
+    -notes: String
+    -createdAt: LocalDateTime
+    +isPresent(): boolean
+    +setStatus(status: AttendanceStatus): void
+  }
+
+  ENUM AttendanceStatus {
+    PRESENT("Present", "✅")
+    ABSENT("Absent", "❌")
+    LATE("Late", "⏱️")
+    EXCUSED("Excused", "📝")
+  }
+
+  ENTITY AttendanceSession {
+    -id: int
+    -clubId: int
+    -sessionDate: LocalDate
+    -sessionTime: LocalTime
+    -sessionTitle: String
+    -sessionDescription: String
+    -createdById: int
+    -isActive: boolean
+  }
+
+  ENTITY ClubAllocation {
+    -id: int
+    -studentId: int
+    -clubId: int
+    +getStudentId(): int
+    +getClubId(): int
+  }
+
+  ENTITY ClubDAO {
+    +getAllClubs(): List<Club>
+    +getClubById(id: int): Club
+    +insertClub(club: Club): boolean
+    +updateClub(club: Club): boolean
+  }
+
+  ENTITY AttendanceDAO {
+    +markAttendance(attendance: Attendance): boolean
+    +getAttendanceByStudent(studentId: int): List<Attendance>
+    +getAttendanceByClub(clubId: int): List<Attendance>
+    +getAttendanceByDate(date: LocalDate): List<Attendance>
+    +updateAttendance(attendance: Attendance): boolean
+  }
+
+  ENTITY ClubAllocationDAO {
+    +allocateStudentToClub(studentId: int, clubId: int): boolean
+    +getAllocations(): List<ClubAllocation>
+    +getAllocationByStudent(studentId: int): ClubAllocation
+    +removeAllocation(studentId: int): boolean
+  }
+}
+
+' Relationships
+Club ||--o{ ClubAllocation : contains
+Club ||--o{ Attendance : tracks
+Club ||--o{ AttendanceSession : hosts
+Attendance ||--|| AttendanceStatus : has
+AttendanceSession ||--|| Club : belongs_to
+ClubAllocation ||--|| Club : assigns_to
+
+ClubDAO ..> Club : manages
+AttendanceDAO ..> Attendance : manages
+ClubAllocationDAO ..> ClubAllocation : manages
+
+@enduml

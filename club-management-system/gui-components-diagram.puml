@@ -1,0 +1,93 @@
+@startuml GUI Components
+
+!define GUI class
+
+package "GUI Layer" {
+  GUI ClubManagementApp {
+    +main(args: String[]): void {static}
+  }
+
+  GUI LoginFrame {
+    -usernameField: JTextField
+    -passwordField: JPasswordField
+    -loginButton: JButton
+    -signUpButton: JButton
+    -forgotPasswordButton: JButton
+    +authenticate(): void
+    +showLoginError(): void
+    +openSignUpFrame(): void
+    +openForgotPasswordFrame(): void
+  }
+
+  GUI MainDashboard {
+    -currentUser: User
+    -contentPanel: JPanel
+    -menuBar: JMenuBar
+    -statusLabel: JLabel
+    +switchToPanel(panel: JPanel): void
+    +logout(): void
+    +showUserInfo(): void
+  }
+
+  GUI ClubSelectionFrame {
+    -clubs: List<Club>
+    -selectedClub: Club
+    -clubList: JList
+    -selectButton: JButton
+    +loadClubs(): void
+    +selectClub(): void
+    +confirmSelection(): void
+  }
+
+  GUI AttendanceTrackingFrame {
+    -sessions: List<AttendanceSession>
+    -students: List<User>
+    -attendanceTable: JTable
+    -dateChooser: JDateChooser
+    +createSession(): void
+    +markAttendance(): void
+    +viewAttendanceHistory(): void
+    +exportAttendance(): void
+  }
+
+  GUI SignUpFrame {
+    -usernameField: JTextField
+    -passwordField: JPasswordField
+    -emailField: JTextField
+    -fullNameField: JTextField
+    -roleComboBox: JComboBox
+    +validateInput(): boolean
+    +registerUser(): void
+    +checkUsernameAvailability(): boolean
+  }
+
+  GUI ForgotPasswordFrame {
+    -emailField: JTextField
+    -securityAnswerField: JTextField
+    -newPasswordField: JPasswordField
+    +validateSecurityAnswer(): boolean
+    +resetPassword(): void
+    +sendResetEmail(): void
+  }
+
+  GUI ProposalManagementPanel {
+    -proposals: List<Proposal>
+    -proposalTable: JTable
+    -fileChooser: JFileChooser
+    +submitProposal(): void
+    +reviewProposal(): void
+    +updateProposalStatus(): void
+    +downloadProposal(): void
+  }
+}
+
+' Relationships
+ClubManagementApp --> LoginFrame : launches
+LoginFrame --> MainDashboard : navigates_to
+LoginFrame --> SignUpFrame : opens
+LoginFrame --> ForgotPasswordFrame : opens
+MainDashboard --> ClubSelectionFrame : contains
+MainDashboard --> AttendanceTrackingFrame : contains
+MainDashboard --> ProposalManagementPanel : contains
+
+@enduml
