@@ -1,0 +1,54 @@
+@startuml User Inheritance Hierarchy (IS-A Relationship)
+
+abstract class User {
+    #id: int
+    #username: String
+    #password: String
+    #email: String
+    #fullName: String
+    +login(): boolean
+    +logout(): void
+    +updateProfile(): void
+    {abstract} +getDashboard(): JPanel
+    {abstract} +getPermissions(): List<String>
+}
+
+class ClubManager {
+    -managedClubs: List<Club>
+    +getDashboard(): JPanel
+    +getPermissions(): List<String>
+    +approveProposals(): void
+    +viewAllAttendance(): void
+    +manageClubAllocations(): void
+}
+
+class Grade11Student {
+    -selectedClubs: List<Club>
+    -proposals: List<Proposal>
+    +getDashboard(): JPanel
+    +getPermissions(): List<String>
+    +selectMultipleClubs(): void
+    +submitProposal(): void
+    +viewMyAttendance(): void
+}
+
+class Grade9Student {
+    -assignedClub: Club
+    +getDashboard(): JPanel
+    +getPermissions(): List<String>
+    +selectSingleClub(): void
+    +viewMyClubInfo(): void
+    +markSelfAttendance(): void
+}
+
+' Inheritance relationships (IS-A)
+User <|-- ClubManager
+User <|-- Grade11Student
+User <|-- Grade9Student
+
+note right of User : Abstract base class\ndefines common user behavior
+note bottom of ClubManager : Manager IS-A User\nwith admin privileges
+note bottom of Grade11Student : Grade11 IS-A User\nwith multi-club selection
+note bottom of Grade9Student : Grade9 IS-A User\nwith single club assignment
+
+@enduml

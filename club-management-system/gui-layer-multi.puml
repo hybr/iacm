@@ -1,0 +1,114 @@
+@startuml GUI Layer - Multiple Relationships
+
+abstract class BaseFrame {
+    #title: String
+    #width: int
+    #height: int
+    +setTitle(title: String): void
+    +setSize(width: int, height: int): void
+    {abstract} +initializeComponents(): void
+    {abstract} +setupEventHandlers(): void
+}
+
+class LoginFrame {
+    -usernameField: JTextField
+    -passwordField: JPasswordField
+    +initializeComponents(): void
+    +setupEventHandlers(): void
+    +authenticate(): void
+}
+
+class MainDashboard {
+    -menuBar: JMenuBar
+    -contentPanel: JPanel
+    +initializeComponents(): void
+    +setupEventHandlers(): void
+    +switchPanel(panel: JPanel): void
+}
+
+class StudentDashboard {
+    -profilePanel: JPanel
+    -clubInfoPanel: JPanel
+    +initializeComponents(): void
+    +setupEventHandlers(): void
+    +showStudentInfo(): void
+}
+
+class ManagerDashboard {
+    -reportsPanel: JPanel
+    -adminPanel: JPanel
+    +initializeComponents(): void
+    +setupEventHandlers(): void
+    +generateReports(): void
+}
+
+class DialogBox {
+    -message: String
+    -dialogType: DialogType
+    +showDialog(): void
+    +getResult(): DialogResult
+}
+
+enum DialogType {
+    INFO
+    WARNING
+    ERROR
+    CONFIRMATION
+}
+
+enum DialogResult {
+    OK
+    CANCEL
+    YES
+    NO
+}
+
+class User {
+    -id: int
+    -username: String
+    -role: UserRole
+    +getRole(): UserRole
+}
+
+class UserDAO {
+    +authenticate(username: String, password: String): User
+    +getUserData(id: int): User
+}
+
+class EventHandler {
+    +handleButtonClick(event: ActionEvent): void
+    +handleWindowClose(event: WindowEvent): void
+}
+
+' Inheritance relationships (IS-A)
+BaseFrame <|-- LoginFrame
+BaseFrame <|-- MainDashboard
+MainDashboard <|-- StudentDashboard
+MainDashboard <|-- ManagerDashboard
+
+' Aggregation relationships (HAS-A)
+MainDashboard o-- User : has current user
+DialogBox o-- DialogType : has type
+DialogBox o-- DialogResult : has result
+
+' Association relationships (USES)
+LoginFrame ..> UserDAO : uses for authentication
+StudentDashboard ..> User : displays user info
+ManagerDashboard ..> UserDAO : accesses user data
+BaseFrame ..> DialogBox : shows dialogs
+
+' Composition relationships (OWNS)
+BaseFrame *-- EventHandler : owns event handlers
+MainDashboard *-- DialogBox : creates dialogs
+
+' Dependency relationships
+LoginFrame ..> MainDashboard : navigates to
+MainDashboard ..> StudentDashboard : creates
+MainDashboard ..> ManagerDashboard : creates
+
+note top of BaseFrame : Inheritance: All frames IS-A BaseFrame
+note right of MainDashboard : Aggregation: Dashboard HAS-A current User
+note bottom of LoginFrame : Association: LoginFrame USES UserDAO
+note left of BaseFrame : Composition: BaseFrame OWNS EventHandlers
+
+@enduml

@@ -1,0 +1,70 @@
+@startuml DAO Association Relationships (USES)
+
+class LoginFrame {
+    -usernameField: JTextField
+    -passwordField: JPasswordField
+    +authenticate(): void
+    +validateInput(): boolean
+    +showError(message: String): void
+}
+
+class UserDAO {
+    +authenticate(username: String, password: String): User
+    +insertUser(user: User): boolean
+    +getUserById(id: int): User
+    +updatePassword(username: String, password: String): boolean
+}
+
+class AttendanceTrackingFrame {
+    -sessionTable: JTable
+    -studentList: JList
+    +markAttendance(): void
+    +createSession(): void
+    +viewHistory(): void
+}
+
+class AttendanceDAO {
+    +markAttendance(attendance: Attendance): boolean
+    +getAttendanceByStudent(studentId: int): List<Attendance>
+    +getAttendanceByClub(clubId: int): List<Attendance>
+    +updateAttendance(attendance: Attendance): boolean
+}
+
+class ClubSelectionFrame {
+    -availableClubsList: JList
+    -selectedClubsList: JList
+    +loadClubs(): void
+    +selectClub(): void
+    +confirmSelection(): void
+}
+
+class ClubDAO {
+    +getAllClubs(): List<Club>
+    +getClubById(id: int): Club
+    +insertClub(club: Club): boolean
+    +getClubMembers(clubId: int): List<User>
+}
+
+class DatabaseManager {
+    -connection: Connection
+    +getConnection(): Connection
+    +executeQuery(sql: String): ResultSet
+    +executeUpdate(sql: String): int
+    +closeConnection(): void
+}
+
+' Association relationships (USES)
+LoginFrame ..> UserDAO : uses
+AttendanceTrackingFrame ..> AttendanceDAO : uses
+ClubSelectionFrame ..> ClubDAO : uses
+
+UserDAO ..> DatabaseManager : uses
+AttendanceDAO ..> DatabaseManager : uses
+ClubDAO ..> DatabaseManager : uses
+
+note right of LoginFrame : LoginFrame USES UserDAO\nto authenticate users
+note right of AttendanceTrackingFrame : AttendanceTrackingFrame USES\nAttendanceDAO to manage attendance
+note right of ClubSelectionFrame : ClubSelectionFrame USES\nClubDAO to load and select clubs
+note bottom of DatabaseManager : All DAOs USE DatabaseManager\nfor database connectivity
+
+@enduml

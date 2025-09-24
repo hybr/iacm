@@ -1,0 +1,87 @@
+@startuml User Management - Multiple Relationships
+
+abstract class User {
+    #id: int
+    #username: String
+    #password: String
+    #email: String
+    +login(): boolean
+    +logout(): void
+    {abstract} +getRole(): UserRole
+}
+
+class ClubManager {
+    -departmentCode: String
+    +getRole(): UserRole
+    +approveStudents(): void
+    +generateReports(): void
+}
+
+class Student {
+    -studentId: String
+    -grade: int
+    +getRole(): UserRole
+    +selectClubs(): void
+}
+
+class Grade11Student {
+    -proposalCount: int
+    +submitProposal(): void
+    +selectMultipleClubs(): void
+}
+
+class Grade9Student {
+    -hasSelectedClub: boolean
+    +selectSingleClub(): void
+}
+
+enum UserRole {
+    CLUB_MANAGER
+    GRADE_11
+    GRADE_9
+}
+
+class SecurityProfile {
+    -passwordHash: String
+    -salt: String
+    -securityQuestion: String
+    -securityAnswer: String
+    +validatePassword(password: String): boolean
+    +updateSecurity(): void
+}
+
+class UserDAO {
+    +authenticate(username: String, password: String): User
+    +createUser(user: User): boolean
+    +updateUser(user: User): boolean
+    +deleteUser(id: int): boolean
+}
+
+class PasswordHasher {
+    +hashPassword(password: String): String
+    +verifyPassword(password: String, hash: String): boolean
+}
+
+' Inheritance relationships (IS-A)
+User <|-- ClubManager
+User <|-- Student
+Student <|-- Grade11Student
+Student <|-- Grade9Student
+
+' Aggregation relationships (HAS-A)
+User o-- UserRole : has
+User o-- SecurityProfile : has
+
+' Association relationships (USES)
+UserDAO ..> User : manages
+UserDAO ..> PasswordHasher : uses
+SecurityProfile ..> PasswordHasher : uses
+
+' Composition (strong aggregation)
+User *-- SecurityProfile : owns
+
+note top of User : Inheritance: ClubManager, Student IS-A User
+note right of SecurityProfile : Aggregation: User HAS-A SecurityProfile
+note bottom of UserDAO : Association: UserDAO USES User and PasswordHasher
+
+@enduml

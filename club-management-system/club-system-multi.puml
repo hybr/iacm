@@ -1,0 +1,101 @@
+@startuml Club System - Multiple Relationships
+
+abstract class Activity {
+    #id: int
+    #name: String
+    #date: LocalDate
+    +getName(): String
+    {abstract} +getType(): String
+}
+
+class Club {
+    -clubCode: String
+    -maxMembers: int
+    +addMember(user: User): void
+    +removeMember(user: User): void
+    +getType(): String
+}
+
+class AttendanceSession {
+    -sessionTitle: String
+    -duration: int
+    +markAttendance(): void
+    +getType(): String
+}
+
+class Proposal {
+    -filePath: String
+    -submissionDate: LocalDate
+    +submit(): void
+    +getType(): String
+}
+
+enum ActivityType {
+    CLUB_MEETING
+    ATTENDANCE_SESSION
+    PROPOSAL_REVIEW
+}
+
+enum AttendanceStatus {
+    PRESENT
+    ABSENT
+    LATE
+    EXCUSED
+}
+
+class Attendance {
+    -studentId: int
+    -sessionId: int
+    -markedAt: LocalDateTime
+    -notes: String
+    +getStatus(): AttendanceStatus
+    +updateStatus(status: AttendanceStatus): void
+}
+
+class User {
+    -id: int
+    -username: String
+    +getUsername(): String
+}
+
+class ClubDAO {
+    +getAllClubs(): List<Club>
+    +saveClub(club: Club): boolean
+    +getClubMembers(clubId: int): List<User>
+}
+
+class AttendanceDAO {
+    +markAttendance(attendance: Attendance): boolean
+    +getSessionAttendance(sessionId: int): List<Attendance>
+}
+
+' Inheritance relationships (IS-A)
+Activity <|-- Club
+Activity <|-- AttendanceSession
+Activity <|-- Proposal
+
+' Aggregation relationships (HAS-A)
+Club o-- User : has members
+AttendanceSession o-- Attendance : has records
+Attendance o-- AttendanceStatus : has status
+Activity o-- ActivityType : has type
+
+' Association relationships (USES)
+ClubDAO ..> Club : manages
+ClubDAO ..> User : retrieves
+AttendanceDAO ..> Attendance : manages
+AttendanceDAO ..> AttendanceSession : accesses
+
+' Composition (strong ownership)
+AttendanceSession *-- Attendance : owns
+Club *-- ActivityType : defines
+
+' Dependency (weaker association)
+Proposal ..> User : submitted by
+
+note top of Activity : Inheritance: Club, AttendanceSession, Proposal IS-A Activity
+note right of Club : Aggregation: Club HAS-A members (Users)
+note bottom of ClubDAO : Association: DAOs USE domain objects
+note left of AttendanceSession : Composition: Session OWNS attendance records
+
+@enduml
