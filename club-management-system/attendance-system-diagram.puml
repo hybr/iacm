@@ -1,0 +1,60 @@
+@startuml Attendance System
+
+class Attendance {
+  - id: int
+  - studentId: int
+  - clubId: int
+  - markedById: int
+  - sessionDate: LocalDate
+  - sessionTime: LocalTime
+  - status: AttendanceStatus
+  - notes: String
+  - studentName: String
+  - markerName: String
+  + Attendance()
+  + Attendance(studentId: int, clubId: int, markedById: int, sessionDate: LocalDate, status: AttendanceStatus, notes: String)
+  + getId(): int
+  + getStudentId(): int
+  + getClubId(): int
+  + getStatus(): AttendanceStatus
+  + setStatus(status: AttendanceStatus): void
+  + setNotes(notes: String): void
+  + isPresent(): boolean
+}
+
+class User {
+  - id: int
+  - username: String
+  - fullName: String
+  - role: UserRole
+  - assignedClubId: Integer
+  + getId(): int
+  + getUsername(): String
+  + getFullName(): String
+  + getRole(): UserRole
+  + getAssignedClubId(): Integer
+}
+
+class Club {
+  - id: int
+  - name: String
+  + getId(): int
+  + getName(): String
+  + setName(name: String): void
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+  + getDisplayName(): String
+  + getEmoji(): String
+}
+
+User "1" -- "many" Attendance : marks
+User "1" -- "many" Attendance : has attendance
+Club "1" o-- "many" Attendance : tracks
+Attendance +-- AttendanceStatus
+
+@enduml

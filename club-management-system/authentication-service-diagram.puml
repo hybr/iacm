@@ -1,0 +1,55 @@
+@startuml Authentication Service
+
+class AuthenticationService {
+  - userDAO: UserDAO
+  - currentUser: User
+  + AuthenticationService()
+  + login(username: String, password: String): boolean
+  + logout(): void
+  + getCurrentUser(): User
+  + setCurrentUser(user: User): void
+  + isLoggedIn(): boolean
+  + hasRole(role: UserRole): boolean
+  + isClubManager(): boolean
+  + isGrade11(): boolean
+  + isGrade9(): boolean
+  + registerUser(username: String, password: String, email: String, fullName: String, securityQuestion: String, securityAnswer: String, role: UserRole): boolean
+  + changePassword(currentPassword: String, newPassword: String): boolean
+  + resetPassword(username: String, securityAnswer: String, newPassword: String): boolean
+  + validateCredentials(username: String, password: String): boolean
+  + needsClubSelection(): boolean
+  + hasAssignedClub(): boolean
+}
+
+class UserDAO {
+  + authenticate(username: String, password: String): User
+  + getUserByUsername(username: String): User
+  + getUserByEmail(email: String): User
+  + insertUser(user: User): boolean
+  + updatePassword(username: String, password: String): boolean
+  + usernameExists(username: String): boolean
+  + emailExists(email: String): boolean
+  + updateLastLogin(userId: int): void
+}
+
+class User {
+  - id: int
+  - username: String
+  - password: String
+  - email: String
+  - fullName: String
+  - role: UserRole
+  - assignedClubId: Integer
+  - isActive: boolean
+  + getId(): int
+  + getUsername(): String
+  + getPassword(): String
+  + getRole(): UserRole
+  + isActive(): boolean
+}
+
+AuthenticationService "1" o-- "1" UserDAO : uses
+AuthenticationService "1" -- "1" User : manages current
+UserDAO ..> User : creates/retrieves
+
+@enduml

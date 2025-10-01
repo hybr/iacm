@@ -1,0 +1,66 @@
+@startuml Club Management Models
+
+class User {
+  - id: int
+  - username: String
+  - password: String
+  - passwordSalt: String
+  - email: String
+  - fullName: String
+  - role: UserRole
+  - assignedClubId: Integer
+  - isActive: boolean
+  + User()
+  + User(username: String, password: String, role: UserRole)
+  + getId(): int
+  + getUsername(): String
+  + setPassword(password: String): void
+  + getRole(): UserRole
+  + getAssignedClubId(): Integer
+  + setAssignedClubId(clubId: Integer): void
+  + isActive(): boolean
+}
+
+class Club {
+  - id: int
+  - name: String
+  + Club()
+  + Club(id: int, name: String)
+  + getId(): int
+  + getName(): String
+  + setName(name: String): void
+  + toString(): String
+}
+
+class Proposal {
+  - id: int
+  - studentId: int
+  - filePath: String
+  - status: ProposalStatus
+  + Proposal()
+  + Proposal(studentId: int, filePath: String)
+  + getId(): int
+  + getStudentId(): int
+  + getStatus(): ProposalStatus
+  + setStatus(status: ProposalStatus): void
+  + getFilePath(): String
+}
+
+enum UserRole {
+  CLUB_MANAGER
+  GRADE_11
+  GRADE_9
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+User "many" -- "1" Club : assigned to
+User "1" -- "many" Proposal : submits
+User +-- UserRole
+Proposal +-- ProposalStatus
+
+@enduml
