@@ -1,0 +1,55 @@
+@startuml University System
+
+class University {
+  - universityName: String
+  - location: String
+  - departments: List<Department>
+  + University(universityName: String, location: String)
+  + addDepartment(department: Department): void
+  + removeDepartment(deptId: String): void
+  + getDepartments(): List<Department>
+  + getTotalStudents(): int
+}
+
+class Department {
+  - departmentId: String
+  - name: String
+  - headOfDepartment: String
+  - students: List<Student>
+  + Department(departmentId: String, name: String, headOfDepartment: String)
+  + addStudent(student: Student): void
+  + removeStudent(studentId: String): void
+  + getStudentCount(): int
+  + getName(): String
+}
+
+class Student {
+  - studentId: String
+  - firstName: String
+  - lastName: String
+  - email: String
+  - gpa: double
+  + Student(studentId: String, firstName: String, lastName: String, email: String)
+  + getStudentId(): String
+  + getFullName(): String
+  + setGPA(gpa: double): void
+  + getGPA(): double
+}
+
+class Course {
+  - courseId: String
+  - courseName: String
+  - credits: int
+  - instructor: String
+  + Course(courseId: String, courseName: String, credits: int, instructor: String)
+  + getCourseId(): String
+  + getCredits(): int
+  + setInstructor(instructor: String): void
+  + getCourseName(): String
+}
+
+University "1" *-- "many" Department : composed of
+Department "1" o-- "many" Student : contains
+Student "many" -- "many" Course : enrolls in
+
+@enduml

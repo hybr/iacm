@@ -1,0 +1,49 @@
+@startuml Vehicle Rental System
+
+class RentalAgency {
+  - agencyName: String
+  - location: String
+  - vehicles: List<Vehicle>
+  + RentalAgency(agencyName: String, location: String)
+  + addVehicle(vehicle: Vehicle): void
+  + removeVehicle(vehicleId: String): void
+  + getAvailableVehicles(): List<Vehicle>
+  + rentVehicle(vehicleId: String): boolean
+}
+
+class Vehicle {
+  - vehicleId: String
+  - brand: String
+  - model: String
+  - dailyRate: double
+  - isRented: boolean
+  + Vehicle(vehicleId: String, brand: String, model: String, dailyRate: double)
+  + getVehicleId(): String
+  + getDailyRate(): double
+  + setRented(rented: boolean): void
+  + isAvailable(): boolean
+}
+
+class Car {
+  - numDoors: int
+  - fuelType: String
+  + Car(vehicleId: String, brand: String, model: String, dailyRate: double, numDoors: int, fuelType: String)
+  + getNumDoors(): int
+  + getFuelType(): String
+  + calculateRent(days: int): double
+}
+
+class Motorcycle {
+  - engineCapacity: int
+  - hasStorage: boolean
+  + Motorcycle(vehicleId: String, brand: String, model: String, dailyRate: double, engineCapacity: int)
+  + getEngineCapacity(): int
+  + setStorage(hasStorage: boolean): void
+  + calculateRent(days: int): double
+}
+
+RentalAgency "1" o-- "many" Vehicle : manages
+Car --|> Vehicle : inherits
+Motorcycle --|> Vehicle : inherits
+
+@enduml
