@@ -1,61 +1,36 @@
 @startuml Club Management System Data Flow Diagram
 
-skinparam componentStyle rectangle
+left to right direction
+skinparam linetype ortho
 
-' External Entities
-rectangle "User\n(Student/Manager)" as User #lightblue
+rectangle "User" as User #lightblue
+rectangle "1.0\nLogin\nProcess" as Login #lightyellow
+database "Users DB" as UserDB #lightgreen
+rectangle "2.0\nValidate\nCredentials" as Validate #lightyellow
+rectangle "3.0\nLoad\nDashboard" as Dashboard #lightyellow
+rectangle "4.0\nSelect\nClub" as SelectClub #lightyellow
+database "Clubs DB" as ClubDB #lightgreen
+rectangle "5.0\nSave\nAllocation" as SaveAlloc #lightyellow
+database "Allocations DB" as AllocDB #lightgreen
+rectangle "6.0\nMark\nAttendance" as MarkAtt #lightyellow
+database "Attendance DB" as AttDB #lightgreen
+rectangle "7.0\nGenerate\nReport" as Report #lightyellow
 
-' Processes
-rectangle "1.0\nAuthentication\nProcess" as Auth #lightyellow
-rectangle "2.0\nClub Management\nProcess" as ClubMgmt #lightyellow
-rectangle "3.0\nProposal\nProcess" as Proposal #lightyellow
-rectangle "4.0\nAttendance\nProcess" as Attendance #lightyellow
-
-' Data Stores
-database "D1: Users" as UserDB #lightgreen
-database "D2: Clubs" as ClubDB #lightgreen
-database "D3: Proposals" as ProposalDB #lightgreen
-database "D4: Attendance" as AttendanceDB #lightgreen
-database "D5: Club Allocations" as AllocationDB #lightgreen
-
-' User to Authentication
-User --> Auth : login credentials
-Auth --> User : authentication status
-
-' Authentication to User Database
-Auth --> UserDB : validate credentials
-UserDB --> Auth : user data
-
-' User to Club Management
-User --> ClubMgmt : club selection
-ClubMgmt --> User : club information
-
-' Club Management to Databases
-ClubMgmt --> ClubDB : read/write club data
-ClubDB --> ClubMgmt : club records
-ClubMgmt --> AllocationDB : save allocations
-AllocationDB --> ClubMgmt : allocation records
-
-' User to Proposal Process
-User --> Proposal : submit proposal
-Proposal --> User : proposal status
-
-' Proposal Process to Databases
-Proposal --> ProposalDB : store proposal
-ProposalDB --> Proposal : proposal records
-Proposal --> UserDB : get student info
-UserDB --> Proposal : student data
-
-' User to Attendance Process
-User --> Attendance : mark attendance
-Attendance --> User : attendance report
-
-' Attendance Process to Databases
-Attendance --> AttendanceDB : save attendance
-AttendanceDB --> Attendance : attendance records
-Attendance --> ClubDB : get club info
-ClubDB --> Attendance : club data
-Attendance --> UserDB : get student info
-UserDB --> Attendance : student data
+User -right-> Login : enter credentials
+Login -right-> Validate : username, password
+Validate -down-> UserDB : query user
+UserDB -up-> Validate : user data
+Validate -right-> Dashboard : authenticated user
+Dashboard -right-> SelectClub : view clubs
+SelectClub -down-> ClubDB : get clubs
+ClubDB -up-> SelectClub : club list
+SelectClub -right-> SaveAlloc : selected club
+SaveAlloc -down-> AllocDB : save allocation
+AllocDB -up-> SaveAlloc : confirmation
+SaveAlloc -right-> MarkAtt : allocation saved
+MarkAtt -down-> AttDB : save attendance
+AttDB -up-> MarkAtt : confirmation
+MarkAtt -right-> Report : attendance data
+Report -down-> User : display report
 
 @enduml
