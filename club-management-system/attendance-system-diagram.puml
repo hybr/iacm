@@ -7,17 +7,17 @@ class Attendance {
   - markedById: int
   - sessionDate: LocalDate
   - sessionTime: LocalTime
-  - status: AttendanceStatus
+  - status: String
   - notes: String
   - studentName: String
   - markerName: String
   + Attendance()
-  + Attendance(studentId: int, clubId: int, markedById: int, sessionDate: LocalDate, status: AttendanceStatus, notes: String)
+  + Attendance(studentId: int, clubId: int, markedById: int)
   + getId(): int
   + getStudentId(): int
   + getClubId(): int
-  + getStatus(): AttendanceStatus
-  + setStatus(status: AttendanceStatus): void
+  + getStatus(): String
+  + setStatus(status: String): void
   + setNotes(notes: String): void
   + isPresent(): boolean
 }
@@ -26,35 +26,35 @@ class User {
   - id: int
   - username: String
   - fullName: String
-  - role: UserRole
   - assignedClubId: Integer
+  + User()
   + getId(): int
   + getUsername(): String
   + getFullName(): String
-  + getRole(): UserRole
   + getAssignedClubId(): Integer
 }
 
 class Club {
   - id: int
   - name: String
+  + Club()
+  + Club(name: String)
   + getId(): int
   + getName(): String
   + setName(name: String): void
 }
 
-enum AttendanceStatus {
-  PRESENT
-  ABSENT
-  LATE
-  EXCUSED
-  + getDisplayName(): String
-  + getEmoji(): String
+class AttendanceService {
+  - attendanceDAO: AttendanceDAO
+  + AttendanceService()
+  + markAttendance(studentId: int, clubId: int, status: String): boolean
+  + getAttendanceByStudent(studentId: int): List
+  + getAttendanceByClub(clubId: int): List
+  + updateAttendance(id: int, status: String): boolean
 }
 
-User "1" -- "many" Attendance : marks
-User "1" -- "many" Attendance : has attendance
-Club "1" o-- "many" Attendance : tracks
-Attendance +-- AttendanceStatus
+Club "1" o-- "*" Attendance : tracks
+User "1" o-- "*" Attendance : has records
+AttendanceService --> Attendance : uses
 
 @enduml

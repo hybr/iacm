@@ -9,19 +9,18 @@ class AuthenticationService {
   + getCurrentUser(): User
   + setCurrentUser(user: User): void
   + isLoggedIn(): boolean
-  + hasRole(role: UserRole): boolean
   + isClubManager(): boolean
   + isGrade11(): boolean
   + isGrade9(): boolean
-  + registerUser(username: String, password: String, email: String, fullName: String, securityQuestion: String, securityAnswer: String, role: UserRole): boolean
+  + registerUser(username: String, password: String, email: String): boolean
   + changePassword(currentPassword: String, newPassword: String): boolean
   + resetPassword(username: String, securityAnswer: String, newPassword: String): boolean
   + validateCredentials(username: String, password: String): boolean
-  + needsClubSelection(): boolean
-  + hasAssignedClub(): boolean
 }
 
 class UserDAO {
+  - connection: Connection
+  + UserDAO()
   + authenticate(username: String, password: String): User
   + getUserByUsername(username: String): User
   + getUserByEmail(email: String): User
@@ -38,18 +37,25 @@ class User {
   - password: String
   - email: String
   - fullName: String
-  - role: UserRole
   - assignedClubId: Integer
   - isActive: boolean
+  + User()
   + getId(): int
   + getUsername(): String
   + getPassword(): String
-  + getRole(): UserRole
+  + setPassword(password: String): void
   + isActive(): boolean
 }
 
-AuthenticationService "1" o-- "1" UserDAO : uses
-AuthenticationService "1" -- "1" User : manages current
-UserDAO ..> User : creates/retrieves
+class PasswordHasher {
+  + {static} hashPassword(password: String): String
+  + {static} verifyPassword(password: String, hash: String): boolean
+  + {static} generateSalt(): String
+}
+
+AuthenticationService o-- UserDAO : has
+AuthenticationService o-- User : manages
+AuthenticationService --> PasswordHasher : uses
+UserDAO --> User : creates
 
 @enduml

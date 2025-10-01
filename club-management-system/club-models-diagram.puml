@@ -7,15 +7,13 @@ class User {
   - passwordSalt: String
   - email: String
   - fullName: String
-  - role: UserRole
   - assignedClubId: Integer
   - isActive: boolean
   + User()
-  + User(username: String, password: String, role: UserRole)
+  + User(username: String, password: String)
   + getId(): int
   + getUsername(): String
   + setPassword(password: String): void
-  + getRole(): UserRole
   + getAssignedClubId(): Integer
   + setAssignedClubId(clubId: Integer): void
   + isActive(): boolean
@@ -36,31 +34,32 @@ class Proposal {
   - id: int
   - studentId: int
   - filePath: String
-  - status: ProposalStatus
+  - status: String
   + Proposal()
   + Proposal(studentId: int, filePath: String)
   + getId(): int
   + getStudentId(): int
-  + getStatus(): ProposalStatus
-  + setStatus(status: ProposalStatus): void
+  + getStatus(): String
+  + setStatus(status: String): void
   + getFilePath(): String
 }
 
-enum UserRole {
-  CLUB_MANAGER
-  GRADE_11
-  GRADE_9
+class ClubAllocation {
+  - id: int
+  - studentId: int
+  - clubId: int
+  - priority: int
+  + ClubAllocation()
+  + ClubAllocation(studentId: int, clubId: int, priority: int)
+  + getId(): int
+  + getStudentId(): int
+  + getClubId(): int
+  + getPriority(): int
 }
 
-enum ProposalStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-}
-
-User "many" -- "1" Club : assigned to
-User "1" -- "many" Proposal : submits
-User +-- UserRole
-Proposal +-- ProposalStatus
+User "many" o-- "1" Club : assigned to
+User "1" --> "many" Proposal : submits
+ClubAllocation "*" --> "1" User : belongs to
+ClubAllocation "*" --> "1" Club : allocates
 
 @enduml
