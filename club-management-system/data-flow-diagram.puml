@@ -1,0 +1,61 @@
+@startuml Club Management System Data Flow Diagram
+
+skinparam componentStyle rectangle
+
+' External Entities
+rectangle "User\n(Student/Manager)" as User #lightblue
+
+' Processes
+rectangle "1.0\nAuthentication\nProcess" as Auth #lightyellow
+rectangle "2.0\nClub Management\nProcess" as ClubMgmt #lightyellow
+rectangle "3.0\nProposal\nProcess" as Proposal #lightyellow
+rectangle "4.0\nAttendance\nProcess" as Attendance #lightyellow
+
+' Data Stores
+database "D1: Users" as UserDB #lightgreen
+database "D2: Clubs" as ClubDB #lightgreen
+database "D3: Proposals" as ProposalDB #lightgreen
+database "D4: Attendance" as AttendanceDB #lightgreen
+database "D5: Club Allocations" as AllocationDB #lightgreen
+
+' User to Authentication
+User --> Auth : login credentials
+Auth --> User : authentication status
+
+' Authentication to User Database
+Auth --> UserDB : validate credentials
+UserDB --> Auth : user data
+
+' User to Club Management
+User --> ClubMgmt : club selection
+ClubMgmt --> User : club information
+
+' Club Management to Databases
+ClubMgmt --> ClubDB : read/write club data
+ClubDB --> ClubMgmt : club records
+ClubMgmt --> AllocationDB : save allocations
+AllocationDB --> ClubMgmt : allocation records
+
+' User to Proposal Process
+User --> Proposal : submit proposal
+Proposal --> User : proposal status
+
+' Proposal Process to Databases
+Proposal --> ProposalDB : store proposal
+ProposalDB --> Proposal : proposal records
+Proposal --> UserDB : get student info
+UserDB --> Proposal : student data
+
+' User to Attendance Process
+User --> Attendance : mark attendance
+Attendance --> User : attendance report
+
+' Attendance Process to Databases
+Attendance --> AttendanceDB : save attendance
+AttendanceDB --> Attendance : attendance records
+Attendance --> ClubDB : get club info
+ClubDB --> Attendance : club data
+Attendance --> UserDB : get student info
+UserDB --> Attendance : student data
+
+@enduml
