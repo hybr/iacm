@@ -3,34 +3,63 @@
 left to right direction
 skinparam linetype ortho
 
-rectangle "User" as User #lightblue
-rectangle "1.0\nLogin\nProcess" as Login #lightyellow
-database "Users DB" as UserDB #lightgreen
-rectangle "2.0\nValidate\nCredentials" as Validate #lightyellow
-rectangle "3.0\nLoad\nDashboard" as Dashboard #lightyellow
-rectangle "4.0\nSelect\nClub" as SelectClub #lightyellow
-database "Clubs DB" as ClubDB #lightgreen
-rectangle "5.0\nSave\nAllocation" as SaveAlloc #lightyellow
-database "Allocations DB" as AllocDB #lightgreen
-rectangle "6.0\nMark\nAttendance" as MarkAtt #lightyellow
-database "Attendance DB" as AttDB #lightgreen
-rectangle "7.0\nGenerate\nReport" as Report #lightyellow
+' External Entity
+rectangle "User\n(Student/Manager)" as User #lightblue
 
-User -right-> Login : enter credentials
-Login -right-> Validate : username, password
-Validate -down-> UserDB : query user
-UserDB -up-> Validate : user data
-Validate -right-> Dashboard : authenticated user
-Dashboard -right-> SelectClub : view clubs
-SelectClub -down-> ClubDB : get clubs
-ClubDB -up-> SelectClub : club list
-SelectClub -right-> SaveAlloc : selected club
-SaveAlloc -down-> AllocDB : save allocation
-AllocDB -up-> SaveAlloc : confirmation
-SaveAlloc -right-> MarkAtt : allocation saved
-MarkAtt -down-> AttDB : save attendance
-AttDB -up-> MarkAtt : confirmation
-MarkAtt -right-> Report : attendance data
-Report -down-> User : display report
+' Authentication Flow
+rectangle "1.0\nLogin/Register" as Login #lightyellow
+database "D1\nUsers" as UserDB #lightgreen
+rectangle "2.0\nAuthenticate" as Auth #lightyellow
+
+' Dashboard Flow
+rectangle "3.0\nLoad\nDashboard" as Dashboard #lightyellow
+
+' Club Selection Flow
+rectangle "4.0\nView\nClubs" as ViewClubs #lightyellow
+database "D2\nClubs" as ClubDB #lightgreen
+rectangle "5.0\nSelect\nClub" as SelectClub #lightyellow
+database "D3\nAllocations" as AllocDB #lightgreen
+
+' Proposal Flow
+rectangle "6.0\nSubmit\nProposal" as SubmitProposal #lightyellow
+database "D4\nProposals" as ProposalDB #lightgreen
+rectangle "7.0\nReview\nProposal" as ReviewProposal #lightyellow
+
+' Attendance Flow
+rectangle "8.0\nMark\nAttendance" as MarkAtt #lightyellow
+database "D5\nAttendance" as AttDB #lightgreen
+rectangle "9.0\nView\nAttendance" as ViewAtt #lightyellow
+
+' Reporting Flow
+rectangle "10.0\nGenerate\nReport" as Report #lightyellow
+rectangle "11.0\nDisplay\nResults" as Display #lightyellow
+
+' Flow connections
+User -right-> Login : credentials
+Login -right-> Auth : validate
+Auth -down-> UserDB : query
+UserDB -up-> Auth : user data
+Auth -right-> Dashboard : session
+Dashboard -right-> ViewClubs : request clubs
+ViewClubs -down-> ClubDB : get clubs
+ClubDB -up-> ViewClubs : club list
+ViewClubs -right-> SelectClub : selection
+SelectClub -down-> AllocDB : save
+AllocDB -up-> SelectClub : confirm
+SelectClub -right-> SubmitProposal : proceed
+SubmitProposal -down-> ProposalDB : save proposal
+ProposalDB -up-> SubmitProposal : confirm
+SubmitProposal -right-> ReviewProposal : review
+ReviewProposal -down-> ProposalDB : update status
+ProposalDB -up-> ReviewProposal : status
+ReviewProposal -right-> MarkAtt : approved
+MarkAtt -down-> AttDB : save
+AttDB -up-> MarkAtt : confirm
+MarkAtt -right-> ViewAtt : view
+ViewAtt -down-> AttDB : query
+AttDB -up-> ViewAtt : records
+ViewAtt -right-> Report : generate
+Report -right-> Display : data
+Display -down-> User : results
 
 @enduml
