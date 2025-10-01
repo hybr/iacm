@@ -53,9 +53,9 @@ class PasswordHasher {
   + {static} generateSalt(): String
 }
 
-AuthenticationService o-- UserDAO : has
-AuthenticationService o-- User : manages
+AuthenticationService "1" o-- "1" UserDAO : many-to-one
+AuthenticationService "1" o-- "1" User : many-to-one
 AuthenticationService --> PasswordHasher : uses
-UserDAO --> User : creates
+UserDAO --> User : uses
 
 @enduml

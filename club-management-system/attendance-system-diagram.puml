@@ -53,8 +53,8 @@ class AttendanceService {
   + updateAttendance(id: int, status: String): boolean
 }
 
-Club "1" o-- "*" Attendance : tracks
-User "1" o-- "*" Attendance : has records
+Attendance "many" o-- "1" Club : many-to-one
+Attendance "many" o-- "1" User : many-to-one
 AttendanceService --> Attendance : uses
 
 @enduml

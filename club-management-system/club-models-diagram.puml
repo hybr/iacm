@@ -57,9 +57,9 @@ class ClubAllocation {
   + getPriority(): int
 }
 
-User "many" o-- "1" Club : assigned to
-User "1" --> "many" Proposal : submits
-ClubAllocation "*" --> "1" User : belongs to
-ClubAllocation "*" --> "1" Club : allocates
+User "many" o-- "1" Club : many-to-one
+User --> Proposal : uses
+ClubAllocation --> User : uses
+ClubAllocation --> Club : uses
 
 @enduml
