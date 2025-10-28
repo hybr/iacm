@@ -2,6 +2,7 @@ package com.clubmanagement.gui;
 
 import com.clubmanagement.dao.AttendanceDAO;
 import com.clubmanagement.dao.ClubDAO;
+import com.clubmanagement.dao.Grade11ClubAssignmentDAO;
 import com.clubmanagement.gui.theme.ModernTheme;
 import com.clubmanagement.models.Attendance;
 import com.clubmanagement.models.Attendance.AttendanceStatus;
@@ -16,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Self-attendance marking panel for Grade 11 students
@@ -24,6 +26,7 @@ public class Grade11SelfAttendancePanel extends JPanel {
     private AuthenticationService authService;
     private AttendanceDAO attendanceDAO;
     private ClubDAO clubDAO;
+    private Grade11ClubAssignmentDAO grade11AssignmentDAO;
 
     // UI Components
     private JLabel titleLabel;
@@ -38,11 +41,13 @@ public class Grade11SelfAttendancePanel extends JPanel {
     private LocalDate currentDate;
     private boolean hasMarkedToday;
     private AttendanceStatus todayStatus;
+    private Integer currentClubId; // The club ID for Grade 11 student
 
     public Grade11SelfAttendancePanel(AuthenticationService authService) {
         this.authService = authService;
         this.attendanceDAO = new AttendanceDAO();
         this.clubDAO = new ClubDAO();
+        this.grade11AssignmentDAO = new Grade11ClubAssignmentDAO();
         this.currentUser = authService.getCurrentUser();
         this.currentDate = LocalDate.now();
 
@@ -202,17 +207,22 @@ public class Grade11SelfAttendancePanel extends JPanel {
 
     private void loadAttendanceStatus() {
         try {
-            // Load club information
-            if (currentUser.getAssignedClubId() != null) {
-                Club club = clubDAO.getClubById(currentUser.getAssignedClubId());
-                if (club != null) {
+            // Load Grade 11 club assignments
+            List<Club> studentClubs = grade11AssignmentDAO.getStudentClubs(currentUser.getId());
+
+            if (studentClubs != null && !studentClubs.isEmpty()) {
+                // Use the first club for attendance (Grade 11 students can have multiple clubs)
+                Club club = studentClubs.get(0);
+                currentClubId = club.getId();
+
+                if (studentClubs.size() == 1) {
                     clubInfoLabel.setText("Club: " + club.getName());
                 } else {
-                    clubInfoLabel.setText("No club assignment found");
+                    clubInfoLabel.setText("Club: " + club.getName() + " (+" + (studentClubs.size() - 1) + " more)");
                 }
             } else {
                 clubInfoLabel.setText("You are not assigned to any club");
-                disableButtons("You are not assigned to any club. Please contact the administrator.");
+                disableButtons("You are not assigned to any club. Please complete club selection.");
                 return;
             }
 
@@ -229,7 +239,7 @@ public class Grade11SelfAttendancePanel extends JPanel {
         // Check if attendance is already marked for today
         Attendance todayAttendance = attendanceDAO.getStudentAttendanceForDate(
             currentUser.getId(),
-            currentUser.getAssignedClubId() != null ? currentUser.getAssignedClubId() : 0,
+            currentClubId != null ? currentClubId : 0,
             currentDate
         );
 
@@ -264,7 +274,7 @@ public class Grade11SelfAttendancePanel extends JPanel {
             // Create attendance record
             Attendance attendance = new Attendance(
                 currentUser.getId(),
-                currentUser.getAssignedClubId(),
+                currentClubId,
                 currentUser.getId(), // Self-marked
                 currentDate,
                 status,

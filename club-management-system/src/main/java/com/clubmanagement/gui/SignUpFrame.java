@@ -319,6 +319,25 @@ public class SignUpFrame extends JFrame {
             boolean success = userDAO.insertUser(newUser);
 
             if (success) {
+                // For Grade 11 students, also add to grade11_student_clubs table
+                if (role == User.UserRole.GRADE_11 && selectedClub != null) {
+                    try {
+                        com.clubmanagement.dao.Grade11ClubAssignmentDAO grade11DAO =
+                            new com.clubmanagement.dao.Grade11ClubAssignmentDAO();
+
+                        // Get the user ID after insertion
+                        User createdUser = userDAO.getUserByUsername(username);
+                        if (createdUser != null) {
+                            // Create a list with the selected club
+                            java.util.List<com.clubmanagement.models.Club> clubs = new java.util.ArrayList<>();
+                            clubs.add(selectedClub);
+                            grade11DAO.assignClubsToStudent(createdUser.getId(), clubs);
+                        }
+                    } catch (SQLException e) {
+                        System.err.println("Error assigning Grade 11 club: " + e.getMessage());
+                    }
+                }
+
                 String clubInfo = "";
                 if (selectedClub != null) {
                     clubInfo = "\nAssigned Club: " + selectedClub.getName() + "\n" +

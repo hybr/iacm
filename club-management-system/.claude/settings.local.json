@@ -3,7 +3,9 @@
     "allow": [
       "Bash(javac:*)",
       "Bash(./compile.bat)",
-      "Bash(java:*)"
+      "Bash(java:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

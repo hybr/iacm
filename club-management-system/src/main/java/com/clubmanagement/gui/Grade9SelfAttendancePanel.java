@@ -9,7 +9,6 @@ import com.clubmanagement.models.User;
 import com.clubmanagement.services.AuthenticationService;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,8 +16,10 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
+/**
+ * Simple attendance marking panel for Grade 9 students
+ */
 public class Grade9SelfAttendancePanel extends JPanel {
     private AuthenticationService authService;
     private AttendanceDAO attendanceDAO;
@@ -26,11 +27,6 @@ public class Grade9SelfAttendancePanel extends JPanel {
     private JButton markPresentButton;
     private JButton markAbsentButton;
     private JLabel statusLabel;
-    private JLabel clubInfoLabel;
-    private JLabel attendanceCountLabel;
-    private JTable attendanceHistoryTable;
-    private DefaultTableModel tableModel;
-    private JButton refreshButton;
 
     public Grade9SelfAttendancePanel(AuthenticationService authService) {
         this.authService = authService;
@@ -43,100 +39,63 @@ public class Grade9SelfAttendancePanel extends JPanel {
     }
 
     private void initializeComponents() {
-        // Main action buttons
-        markPresentButton = ModernTheme.createPrimaryButton("Mark Present ✅");
-        markAbsentButton = ModernTheme.createSecondaryButton("Mark Absent ❌");
-        refreshButton = ModernTheme.createSecondaryButton("Refresh");
+        // Main action buttons - large and prominent
+        markPresentButton = ModernTheme.createPrimaryButton("✅ Mark Present");
+        markPresentButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        markPresentButton.setPreferredSize(new Dimension(250, 80));
 
-        // Status and info labels
+        markAbsentButton = ModernTheme.createSecondaryButton("❌ Mark Absent");
+        markAbsentButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        markAbsentButton.setPreferredSize(new Dimension(250, 80));
+
+        // Status label
         statusLabel = ModernTheme.createBodyLabel("Ready to mark attendance for today");
-        clubInfoLabel = ModernTheme.createHeadingLabel("Loading club information...");
-        attendanceCountLabel = ModernTheme.createBodyLabel("Loading attendance statistics...");
-
-        // Attendance history table
-        String[] columnNames = {"Date", "Status", "Time Marked"};
-        tableModel = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        attendanceHistoryTable = new JTable(tableModel);
-        attendanceHistoryTable.setFont(ModernTheme.BODY_FONT);
-        attendanceHistoryTable.setRowHeight(25);
-        attendanceHistoryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
     }
 
     private void setupLayout() {
         setLayout(new BorderLayout());
         setBackground(ModernTheme.WHITE);
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
-        // Header panel
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(ModernTheme.WHITE);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        // Main content panel with centered layout
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(ModernTheme.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
 
-        JLabel titleLabel = ModernTheme.createTitleLabel("My Attendance");
-        titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        // Today's date label
+        JLabel dateLabel = ModernTheme.createHeadingLabel("Today: " +
+                LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")));
+        dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        dateLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(0, 0, 40, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+        mainPanel.add(dateLabel, gbc);
 
-        JPanel clubInfoPanel = new JPanel(new BorderLayout());
-        clubInfoPanel.setBackground(ModernTheme.WHITE);
-        clubInfoPanel.add(clubInfoLabel, BorderLayout.NORTH);
-        clubInfoPanel.add(attendanceCountLabel, BorderLayout.SOUTH);
+        // Attendance buttons
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(10, 20, 10, 20);
 
-        headerPanel.add(titleLabel, BorderLayout.WEST);
-        headerPanel.add(clubInfoPanel, BorderLayout.EAST);
+        gbc.gridx = 0;
+        mainPanel.add(markPresentButton, gbc);
 
-        // Today's attendance panel
-        JPanel todayPanel = ModernTheme.createCardPanel();
-        todayPanel.setLayout(new BorderLayout());
-        todayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        gbc.gridx = 1;
+        mainPanel.add(markAbsentButton, gbc);
 
-        JLabel todayTitle = ModernTheme.createHeadingLabel("Today's Attendance - " +
-                                                          LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-        todayTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        // Status label
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(40, 0, 0, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+        mainPanel.add(statusLabel, gbc);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-        buttonPanel.setBackground(ModernTheme.WHITE);
-        buttonPanel.add(markPresentButton);
-        buttonPanel.add(markAbsentButton);
-        buttonPanel.add(refreshButton);
-
-        JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        statusPanel.setBackground(ModernTheme.WHITE);
-        statusPanel.add(statusLabel);
-
-        JPanel todayContent = new JPanel(new BorderLayout());
-        todayContent.setBackground(ModernTheme.WHITE);
-        todayContent.add(todayTitle, BorderLayout.NORTH);
-        todayContent.add(buttonPanel, BorderLayout.CENTER);
-        todayContent.add(statusPanel, BorderLayout.SOUTH);
-
-        todayPanel.add(todayContent, BorderLayout.CENTER);
-
-        // History panel
-        JPanel historyPanel = ModernTheme.createCardPanel();
-        historyPanel.setLayout(new BorderLayout());
-        historyPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JLabel historyTitle = ModernTheme.createHeadingLabel("Attendance History");
-        historyTitle.setHorizontalAlignment(SwingConstants.LEFT);
-
-        JScrollPane tableScrollPane = new JScrollPane(attendanceHistoryTable);
-        tableScrollPane.setBorder(ModernTheme.createRoundedBorder(ModernTheme.MEDIUM_GRAY, 1));
-
-        historyPanel.add(historyTitle, BorderLayout.NORTH);
-        historyPanel.add(tableScrollPane, BorderLayout.CENTER);
-
-        // Main layout
-        JPanel mainContent = new JPanel(new GridLayout(2, 1, 0, 15));
-        mainContent.setBackground(ModernTheme.WHITE);
-        mainContent.add(todayPanel);
-        mainContent.add(historyPanel);
-
-        add(headerPanel, BorderLayout.NORTH);
-        add(mainContent, BorderLayout.CENTER);
+        // Add to main layout
+        add(mainPanel, BorderLayout.CENTER);
     }
 
     private void setupEventHandlers() {
@@ -153,89 +112,33 @@ public class Grade9SelfAttendancePanel extends JPanel {
                 markAttendance(false);
             }
         });
-
-        refreshButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadData();
-            }
-        });
     }
 
     private void loadData() {
         try {
             User currentUser = authService.getCurrentUser();
-
-            // Load club information
-            if (currentUser.getAssignedClubId() != null) {
-                Club club = clubDAO.getClubById(currentUser.getAssignedClubId());
-                if (club != null) {
-                    clubInfoLabel.setText("Club: " + club.getName());
-                } else {
-                    clubInfoLabel.setText("Club: Not found");
-                }
-            } else {
-                clubInfoLabel.setText("Club: Not assigned");
-            }
-
-            // Load attendance statistics
-            loadAttendanceStatistics(currentUser);
-
-            // Load attendance history
-            loadAttendanceHistory(currentUser);
+            LocalDate today = LocalDate.now();
 
             // Check if attendance already marked for today
-            checkTodayAttendance(currentUser);
+            boolean hasAttendanceToday = attendanceDAO.hasAttendanceForDate(currentUser.getId(), today);
+
+            if (hasAttendanceToday) {
+                markPresentButton.setEnabled(false);
+                markAbsentButton.setEnabled(false);
+                statusLabel.setText("✅ Attendance already marked for today");
+                statusLabel.setForeground(ModernTheme.PRIMARY_BLUE);
+            } else {
+                markPresentButton.setEnabled(true);
+                markAbsentButton.setEnabled(true);
+                statusLabel.setText("Ready to mark attendance for today");
+                statusLabel.setForeground(ModernTheme.TEXT_DARK);
+            }
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
                 "Error loading attendance data: " + e.getMessage(),
                 "Database Error",
                 JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void loadAttendanceStatistics(User user) throws SQLException {
-        List<Attendance> allAttendance = attendanceDAO.getAttendanceByStudentId(user.getId());
-        int totalDays = allAttendance.size();
-        long presentDays = allAttendance.stream().filter(a -> "PRESENT".equals(a.getStatus())).count();
-
-        attendanceCountLabel.setText(String.format("Attendance: %d/%d days present", presentDays, totalDays));
-    }
-
-    private void loadAttendanceHistory(User user) throws SQLException {
-        tableModel.setRowCount(0);
-
-        List<Attendance> attendanceList = attendanceDAO.getAttendanceByStudentId(user.getId());
-
-        for (Attendance attendance : attendanceList) {
-            String status = "PRESENT".equals(attendance.getStatus()) ? "Present ✅" : "Absent ❌";
-            String timeMarked = attendance.getCreatedAt() != null ?
-                attendance.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm")) : "N/A";
-
-            Object[] rowData = {
-                attendance.getSessionDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
-                status,
-                timeMarked
-            };
-            tableModel.addRow(rowData);
-        }
-    }
-
-    private void checkTodayAttendance(User user) throws SQLException {
-        LocalDate today = LocalDate.now();
-        boolean hasAttendanceToday = attendanceDAO.hasAttendanceForDate(user.getId(), today);
-
-        if (hasAttendanceToday) {
-            markPresentButton.setEnabled(false);
-            markAbsentButton.setEnabled(false);
-            statusLabel.setText("✅ Attendance already marked for today");
-            statusLabel.setForeground(ModernTheme.PRIMARY_BLUE);
-        } else {
-            markPresentButton.setEnabled(true);
-            markAbsentButton.setEnabled(true);
-            statusLabel.setText("Ready to mark attendance for today");
-            statusLabel.setForeground(ModernTheme.TEXT_DARK);
         }
     }
 
@@ -294,5 +197,12 @@ public class Grade9SelfAttendancePanel extends JPanel {
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Refresh panel data
+     */
+    public void refreshPanel() {
+        loadData();
     }
 }

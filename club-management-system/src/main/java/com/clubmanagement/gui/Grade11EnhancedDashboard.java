@@ -311,25 +311,17 @@ public class Grade11EnhancedDashboard extends JPanel {
     }
 
     /**
-     * Handle logout action with confirmation
+     * Handle logout action (confirmation is handled by the callback)
      */
     private void handleLogout() {
-        int result = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to logout?",
-                "Confirm Logout",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
-        if (result == JOptionPane.YES_OPTION) {
-            if (logoutCallback != null) {
-                logoutCallback.run();
-            } else {
-                // Fallback: show message if no callback is set
-                JOptionPane.showMessageDialog(this,
-                    "Logout functionality not properly configured.",
-                    "Logout Error",
-                    JOptionPane.ERROR_MESSAGE);
-            }
+        if (logoutCallback != null) {
+            logoutCallback.run();
+        } else {
+            // Fallback: show message if no callback is set
+            JOptionPane.showMessageDialog(this,
+                "Logout functionality not properly configured.",
+                "Logout Error",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 }

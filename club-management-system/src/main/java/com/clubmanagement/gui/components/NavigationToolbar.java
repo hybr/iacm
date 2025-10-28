@@ -52,11 +52,6 @@ public class NavigationToolbar extends JPanel {
     }
 
     private void createClubManagerButtons() {
-        // Dashboard button
-        JButton dashboardBtn = createToolbarButton("🏠 Dashboard", "View main dashboard");
-        dashboardBtn.addActionListener(e -> notifyAction("dashboard"));
-        add(dashboardBtn);
-
         // Proposals button
         JButton proposalsBtn = createToolbarButton("📋 Proposals", "Review and manage club proposals");
         proposalsBtn.addActionListener(e -> notifyAction("proposals"));
@@ -134,22 +129,25 @@ public class NavigationToolbar extends JPanel {
     }
 
     private void createCommonButtons() {
-        // Profile button
-        JButton profileBtn = createToolbarButton("👤 Profile", "View profile");
-        profileBtn.addActionListener(e -> notifyAction("profile"));
-        add(profileBtn);
+        // Only show Profile, Password, and Help buttons for non-manager users
+        if (!authService.isClubManager()) {
+            // Profile button
+            JButton profileBtn = createToolbarButton("👤 Profile", "View profile");
+            profileBtn.addActionListener(e -> notifyAction("profile"));
+            add(profileBtn);
 
-        // Change Password button
-        JButton passwordBtn = createToolbarButton("🔑 Password", "Change password");
-        passwordBtn.addActionListener(e -> notifyAction("changepassword"));
-        add(passwordBtn);
+            // Change Password button
+            JButton passwordBtn = createToolbarButton("🔑 Password", "Change password");
+            passwordBtn.addActionListener(e -> notifyAction("changepassword"));
+            add(passwordBtn);
 
-        // Help button
-        JButton helpBtn = createToolbarButton("ℹ️ Help", "Get help");
-        helpBtn.addActionListener(e -> notifyAction("userguide"));
-        add(helpBtn);
+            // Help button
+            JButton helpBtn = createToolbarButton("ℹ️ Help", "Get help");
+            helpBtn.addActionListener(e -> notifyAction("userguide"));
+            add(helpBtn);
+        }
 
-        // Logout button
+        // Logout button for all users
         JButton logoutBtn = createToolbarButton("🚪 Logout", "Sign out");
         logoutBtn.addActionListener(e -> notifyAction("logout"));
         logoutBtn.setBackground(new Color(180, 50, 50)); // Darker red for logout

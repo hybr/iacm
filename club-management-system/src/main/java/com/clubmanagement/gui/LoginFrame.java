@@ -283,8 +283,12 @@ public class LoginFrame extends JFrame {
                                 } else if (authService.needsClubSelection()) {
                                     // Grade 11 students need club selection (multiple clubs)
                                     new Grade11ClubSelectionFrame(authService).setVisible(true);
+                                } else if (authService.isGrade9()) {
+                                    // Grade 9 students get their own standalone dashboard (no blue bar)
+                                    Grade9DashboardFrame grade9Dashboard = new Grade9DashboardFrame(authService);
+                                    grade9Dashboard.setVisible(true);
                                 } else {
-                                    // Create and show main dashboard
+                                    // Create and show main dashboard for other roles
                                     MainDashboard dashboard = new MainDashboard(authService);
                                     dashboard.setVisible(true);
                                 }

@@ -17,232 +17,255 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Enhanced dashboard for Grade 9 students with modern UI matching Grade 11 style
+ */
 public class Grade9SimpleDashboardPanel extends JPanel {
     private AuthenticationService authService;
     private AttendanceDAO attendanceDAO;
     private ClubDAO clubDAO;
-    private JButton markPresentButton;
-    private JButton markAbsentButton;
+    private JPanel contentPanel;
+    private CardLayout cardLayout;
+    private User currentUser;
+
+    // Feature panels
+    private Grade9SelfAttendancePanel attendancePanel;
+
+    // Navigation buttons
+    private JButton attendanceButton;
     private JButton logoutButton;
-    private JLabel statusLabel;
-    private JLabel welcomeLabel;
+
+    // Logout callback
+    private Runnable logoutCallback;
 
     public Grade9SimpleDashboardPanel(AuthenticationService authService) {
         this.authService = authService;
         this.attendanceDAO = new AttendanceDAO();
         this.clubDAO = new ClubDAO();
+        this.currentUser = authService.getCurrentUser();
+
         initializeComponents();
         setupLayout();
         setupEventHandlers();
-        loadData();
+        showAttendancePanel(); // Default view
     }
 
     private void initializeComponents() {
-        User currentUser = authService.getCurrentUser();
+        cardLayout = new CardLayout();
+        contentPanel = ModernTheme.createContentPanel();
+        contentPanel.setLayout(cardLayout);
 
-        // Welcome message
-        welcomeLabel = ModernTheme.createTitleLabel("Welcome, " + currentUser.getFullName());
+        // Initialize feature panels
+        attendancePanel = new Grade9SelfAttendancePanel(authService);
 
-        // Main action buttons - large and prominent
-        markPresentButton = ModernTheme.createPrimaryButton("✅ Mark Present");
-        markPresentButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        markPresentButton.setPreferredSize(new Dimension(200, 60));
+        // Add panels to card layout
+        contentPanel.add(attendancePanel, "attendance");
 
-        markAbsentButton = ModernTheme.createSecondaryButton("❌ Mark Absent");
-        markAbsentButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        markAbsentButton.setPreferredSize(new Dimension(200, 60));
+        // Initialize navigation buttons
+        attendanceButton = createNavigationButton("📝 Mark Attendance", "Mark your daily attendance");
+        logoutButton = createLogoutButton("🚪 Logout", "Sign out of the application");
+    }
 
-        // Logout button
-        logoutButton = ModernTheme.createSecondaryButton("🚪 Logout");
-        logoutButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        logoutButton.setPreferredSize(new Dimension(120, 40));
+    private JButton createNavigationButton(String text, String tooltip) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setForeground(Color.WHITE);
+        button.setBackground(ModernTheme.PRIMARY_BLUE);
+        button.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createRaisedBevelBorder(),
+            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+        ));
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setToolTipText(tooltip);
+        button.setOpaque(true);
+        button.setBorderPainted(true);
+        button.setContentAreaFilled(true);
+        button.setPreferredSize(new Dimension(250, 60));
 
-        // Status label
-        statusLabel = ModernTheme.createBodyLabel("Ready to mark attendance for today");
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(ModernTheme.SECONDARY_BLUE);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(ModernTheme.PRIMARY_BLUE);
+            }
+        });
+
+        return button;
+    }
+
+    private JButton createLogoutButton(String text, String tooltip) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(220, 53, 69)); // Red color for logout
+        button.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createRaisedBevelBorder(),
+            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+        ));
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setToolTipText(tooltip);
+        button.setOpaque(true);
+        button.setBorderPainted(true);
+        button.setContentAreaFilled(true);
+        button.setPreferredSize(new Dimension(250, 60));
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(200, 35, 51)); // Darker red on hover
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(220, 53, 69)); // Original red
+            }
+        });
+
+        return button;
     }
 
     private void setupLayout() {
         setLayout(new BorderLayout());
         setBackground(ModernTheme.WHITE);
-        setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Header panel with welcome and logout
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(ModernTheme.WHITE);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+        // Header panel with title and user info (SAME AS GRADE 11)
+        JPanel headerPanel = createHeaderPanel();
+        add(headerPanel, BorderLayout.NORTH);
 
-        welcomeLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        headerPanel.add(welcomeLabel, BorderLayout.WEST);
-        headerPanel.add(logoutButton, BorderLayout.EAST);
+        // Navigation panel
+        JPanel navigationPanel = createNavigationPanel();
+        add(navigationPanel, BorderLayout.WEST);
 
         // Main content panel
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBackground(ModernTheme.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
+        JPanel mainContentPanel = new JPanel(new BorderLayout());
+        mainContentPanel.setBackground(ModernTheme.WHITE);
+        mainContentPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 1, 0, 0, ModernTheme.MEDIUM_GRAY),
+            BorderFactory.createEmptyBorder(0, 20, 0, 0)
+        ));
+        mainContentPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // Today's date label
-        JLabel dateLabel = ModernTheme.createHeadingLabel("Today: " +
-                                                         LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")));
-        dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(0, 0, 30, 0);
-        gbc.anchor = GridBagConstraints.CENTER;
-        mainPanel.add(dateLabel, gbc);
+        add(mainContentPanel, BorderLayout.CENTER);
+    }
 
-        // Attendance buttons
-        gbc.gridwidth = 1;
-        gbc.gridy = 1;
-        gbc.insets = new Insets(10, 20, 10, 20);
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(ModernTheme.WHITE);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
-        gbc.gridx = 0;
-        mainPanel.add(markPresentButton, gbc);
+        // Title
+        JLabel titleLabel = ModernTheme.createTitleLabel("Grade 9 Dashboard");
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        gbc.gridx = 1;
-        mainPanel.add(markAbsentButton, gbc);
+        // User info
+        JLabel userInfoLabel = ModernTheme.createBodyLabel("Welcome, " + currentUser.getFullName() + " (" + currentUser.getUsername() + ")");
+        userInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        userInfoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
 
-        // Status label
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(30, 0, 0, 0);
-        gbc.anchor = GridBagConstraints.CENTER;
-        mainPanel.add(statusLabel, gbc);
+        headerPanel.add(titleLabel, BorderLayout.NORTH);
+        headerPanel.add(userInfoLabel, BorderLayout.SOUTH);
 
-        // Add to main layout
-        add(headerPanel, BorderLayout.NORTH);
-        add(mainPanel, BorderLayout.CENTER);
+        return headerPanel;
+    }
+
+    private JPanel createNavigationPanel() {
+        JPanel navigationPanel = new JPanel();
+        navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.Y_AXIS));
+        navigationPanel.setBackground(ModernTheme.WHITE);
+        navigationPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
+        navigationPanel.setPreferredSize(new Dimension(280, 0));
+
+        // Navigation title
+        JLabel navTitle = ModernTheme.createHeadingLabel("Features");
+        navTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        navigationPanel.add(navTitle);
+        navigationPanel.add(Box.createVerticalStrut(20));
+
+        // Add navigation buttons
+        attendanceButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        navigationPanel.add(attendanceButton);
+        navigationPanel.add(Box.createVerticalGlue());
+
+        // Add logout button at the bottom with extra space
+        navigationPanel.add(Box.createVerticalStrut(30));
+        navigationPanel.add(logoutButton);
+        navigationPanel.add(Box.createVerticalStrut(20));
+
+        return navigationPanel;
     }
 
     private void setupEventHandlers() {
-        markPresentButton.addActionListener(new ActionListener() {
+        attendanceButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                markAttendance(true);
-            }
-        });
-
-        markAbsentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                markAttendance(false);
+                showAttendancePanel();
             }
         });
 
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                logout();
+                handleLogout();
             }
         });
     }
 
-    private void loadData() {
-        try {
-            User currentUser = authService.getCurrentUser();
-            LocalDate today = LocalDate.now();
-
-            // Check if attendance already marked for today
-            boolean hasAttendanceToday = attendanceDAO.hasAttendanceForDate(currentUser.getId(), today);
-
-            if (hasAttendanceToday) {
-                markPresentButton.setEnabled(false);
-                markAbsentButton.setEnabled(false);
-                statusLabel.setText("✅ Attendance already marked for today");
-                statusLabel.setForeground(ModernTheme.PRIMARY_BLUE);
-            } else {
-                markPresentButton.setEnabled(true);
-                markAbsentButton.setEnabled(true);
-                statusLabel.setText("Please mark your attendance for today");
-                statusLabel.setForeground(ModernTheme.TEXT_DARK);
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                "Error loading attendance data: " + e.getMessage(),
-                "Database Error",
-                JOptionPane.ERROR_MESSAGE);
+    private void showAttendancePanel() {
+        cardLayout.show(contentPanel, "attendance");
+        updateActiveButton(attendanceButton);
+        // Refresh the attendance panel
+        if (attendancePanel != null) {
+            attendancePanel.refreshPanel();
         }
     }
 
-    private void markAttendance(boolean isPresent) {
-        try {
-            User currentUser = authService.getCurrentUser();
+    private void updateActiveButton(JButton activeButton) {
+        // Reset all button colors
+        attendanceButton.setBackground(ModernTheme.PRIMARY_BLUE);
 
-            if (currentUser.getAssignedClubId() == null) {
-                JOptionPane.showMessageDialog(this,
-                    "You are not assigned to a club. Please contact the administrator.",
-                    "No Club Assignment",
-                    JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+        // Highlight the active button
+        activeButton.setBackground(ModernTheme.ACCENT_BLUE);
+    }
 
-            LocalDate today = LocalDate.now();
-
-            // Check if already marked
-            if (attendanceDAO.hasAttendanceForDate(currentUser.getId(), today)) {
-                JOptionPane.showMessageDialog(this,
-                    "You have already marked attendance for today.",
-                    "Already Marked",
-                    JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            // Create attendance record
-            Attendance attendance = new Attendance();
-            attendance.setStudentId(currentUser.getId());
-            attendance.setClubId(currentUser.getAssignedClubId());
-            attendance.setSessionDate(today);
-            attendance.setStatus(isPresent ? "PRESENT" : "ABSENT");
-            attendance.setMarkedById(currentUser.getId()); // Self-marked
-            attendance.setCreatedAt(LocalDateTime.now());
-
-            // Save to database
-            if (attendanceDAO.insertAttendance(attendance)) {
-                String statusText = isPresent ? "Present ✅" : "Absent ❌";
-
-                JOptionPane.showMessageDialog(this,
-                    "Attendance marked as: " + statusText + "\n\nThank you!",
-                    "Attendance Recorded",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-                // Refresh the UI
-                loadData();
-            } else {
-                JOptionPane.showMessageDialog(this,
-                    "Failed to record attendance. Please try again.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                "Database error: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+    /**
+     * Refresh all panels to ensure they have the latest data
+     */
+    public void refreshAllPanels() {
+        if (attendancePanel != null) {
+            attendancePanel.refreshPanel();
         }
     }
 
-    private void logout() {
-        int response = JOptionPane.showConfirmDialog(this,
-            "Are you sure you want to logout?",
-            "Confirm Logout",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE);
+    /**
+     * Set callback for logout action
+     */
+    public void setLogoutCallback(Runnable callback) {
+        this.logoutCallback = callback;
+    }
 
-        if (response == JOptionPane.YES_OPTION) {
-            authService.logout();
-
-            // Close current window and open login frame
-            Window window = SwingUtilities.getWindowAncestor(this);
-            if (window instanceof JFrame) {
-                window.dispose();
-            }
-
-            SwingUtilities.invokeLater(() -> {
-                new LoginFrame().setVisible(true);
-            });
+    /**
+     * Handle logout action (confirmation is handled by the callback)
+     */
+    private void handleLogout() {
+        if (logoutCallback != null) {
+            logoutCallback.run();
+        } else {
+            // Fallback: show message if no callback is set
+            JOptionPane.showMessageDialog(this,
+                "Logout functionality not properly configured.",
+                "Logout Error",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 }
