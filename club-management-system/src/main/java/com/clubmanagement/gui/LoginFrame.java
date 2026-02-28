@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 
 public class LoginFrame extends JFrame {
     private JTextField usernameField;
@@ -273,21 +272,11 @@ public class LoginFrame extends JFrame {
                         // Close login window first
                         LoginFrame.this.dispose();
 
-                        // Open appropriate window based on user status
+                        // Open main dashboard directly for all roles
                         SwingUtilities.invokeLater(() -> {
                             try {
-                                // Check if 9th grader needs to complete first login
-                                if (authService.needsFirstLoginCompletion()) {
-                                    // Grade 9 students need club selection
-                                    new ClubSelectionFrame(authService).setVisible(true);
-                                } else if (authService.needsClubSelection()) {
-                                    // Grade 11 students need club selection (multiple clubs)
-                                    new Grade11ClubSelectionFrame(authService).setVisible(true);
-                                } else {
-                                    // All roles (Manager, Grade 11, Grade 9) go through MainDashboard
-                                    MainDashboard dashboard = new MainDashboard(authService);
-                                    dashboard.setVisible(true);
-                                }
+                                MainDashboard dashboard = new MainDashboard(authService);
+                                dashboard.setVisible(true);
                             } catch (Exception e) {
                                 System.err.println("Error opening post-login window: " + e.getMessage());
                                 e.printStackTrace();
