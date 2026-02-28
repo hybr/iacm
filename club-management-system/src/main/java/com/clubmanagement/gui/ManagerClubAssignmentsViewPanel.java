@@ -2,11 +2,10 @@ package com.clubmanagement.gui;
 
 import com.clubmanagement.dao.UserDAO;
 import com.clubmanagement.dao.ClubDAO;
-import com.clubmanagement.dao.ClubAllocationDAO;
+import com.clubmanagement.dao.Grade11ClubAssignmentDAO;
 import com.clubmanagement.gui.theme.ModernTheme;
 import com.clubmanagement.models.User;
 import com.clubmanagement.models.Club;
-import com.clubmanagement.models.ClubAllocation;
 import com.clubmanagement.models.User.UserRole;
 import com.clubmanagement.services.AuthenticationService;
 
@@ -32,7 +31,7 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
     private AuthenticationService authService;
     private UserDAO userDAO;
     private ClubDAO clubDAO;
-    private ClubAllocationDAO clubAllocationDAO;
+    private Grade11ClubAssignmentDAO grade11DAO;
     private Runnable backToDashboardCallback;
 
     // UI Components
@@ -56,7 +55,7 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
         this.authService = authService;
         this.userDAO = new UserDAO();
         this.clubDAO = new ClubDAO();
-        this.clubAllocationDAO = new ClubAllocationDAO();
+        this.grade11DAO = new Grade11ClubAssignmentDAO();
         this.clubNamesMap = new HashMap<>();
         this.studentClubMap = new HashMap<>();
 
@@ -270,7 +269,6 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
         refreshButton.setEnabled(false);
         exportButton.setEnabled(false);
 
-        // Load data in a simpler way to avoid UI blocking
         new Thread(() -> {
             try {
                 // Load all students (Grade 9 and Grade 11)
@@ -287,11 +285,23 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
                     tempClubNamesMap.put(club.getId(), club.getName());
                 }
 
-                // Load club allocations
+                // Build student-club map from the correct sources:
+                // Grade 9: users.assigned_club_id
+                // Grade 11: grade11_student_clubs table
                 Map<Integer, Integer> tempStudentClubMap = new HashMap<>();
-                List<ClubAllocation> allocations = clubAllocationDAO.getAllAllocations();
-                for (ClubAllocation allocation : allocations) {
-                    tempStudentClubMap.put(allocation.getStudentId(), allocation.getClubId());
+
+                for (User student : grade9Students) {
+                    if (student.getAssignedClubId() != null && student.getAssignedClubId() > 0) {
+                        tempStudentClubMap.put(student.getId(), student.getAssignedClubId());
+                    }
+                }
+
+                List<Grade11ClubAssignmentDAO.StudentClubAssignment> grade11Assignments =
+                        grade11DAO.getAllGrade11Assignments();
+                for (Grade11ClubAssignmentDAO.StudentClubAssignment assignment : grade11Assignments) {
+                    if (assignment.getClubId() > 0) {
+                        tempStudentClubMap.put(assignment.getStudentId(), assignment.getClubId());
+                    }
                 }
 
                 // Update UI on EDT

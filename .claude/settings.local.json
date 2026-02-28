@@ -20,7 +20,8 @@
       "Bash(.compile.bat)",
       "Bash(compile.bat)",
       "Bash(bash:*)",
-      "Bash(sqlite3:*)"
+      "Bash(sqlite3:*)",
+      "Bash(mvn compile -q)"
     ],
     "deny": [],
     "ask": []
