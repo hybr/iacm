@@ -235,7 +235,7 @@ public class Grade11ClubSelectionFrame extends JFrame {
                     .orElse("");
 
                 JOptionPane.showMessageDialog(this,
-                    "✅ Club selection saved successfully!\n\n" +
+                    "Club selection saved successfully!\n\n" +
                     "Selected clubs: " + clubNames + "\n\n" +
                     "You will now be taken to your dashboard.",
                     "Selection Saved", JOptionPane.INFORMATION_MESSAGE);

@@ -345,7 +345,7 @@ public class SignUpFrame extends JFrame {
                 }
 
                 JOptionPane.showMessageDialog(this,
-                    "✅ Account created successfully!\n\n" +
+                    "Account created successfully!\n\n" +
                     "Username: " + username + clubInfo + "\n\n" +
                     "You can now log in with your credentials.",
                     "Account Created", JOptionPane.INFORMATION_MESSAGE);

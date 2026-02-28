@@ -174,11 +174,11 @@ public class AttendanceDashboardPanel extends JPanel {
 
         // Attendance Marking Tab
         JPanel markingPanel = createAttendanceMarkingPanel();
-        tabbedPane.addTab("📝 Mark Attendance", markingPanel);
+        tabbedPane.addTab("Mark Attendance", markingPanel);
 
         // Attendance History Tab
         JPanel historyPanel = createAttendanceHistoryPanel();
-        tabbedPane.addTab("📊 Attendance History", historyPanel);
+        tabbedPane.addTab("Attendance History", historyPanel);
 
         add(createHeaderPanel(), BorderLayout.NORTH);
         add(tabbedPane, BorderLayout.CENTER);
@@ -278,7 +278,7 @@ public class AttendanceDashboardPanel extends JPanel {
             // Load club info
             Club club = clubDAO.getClubById(clubId);
             if (club != null) {
-                clubNameLabel.setText("📋 " + club.getName() + " - Attendance Dashboard");
+                clubNameLabel.setText(club.getName() + " - Attendance Dashboard");
             }
 
             // Load club members
@@ -377,9 +377,9 @@ public class AttendanceDashboardPanel extends JPanel {
     private void updateStatistics() {
         try {
             String summaryText = attendanceService.getAttendanceSummaryText(clubId);
-            statsLabel.setText("📈 " + summaryText);
+            statsLabel.setText(summaryText);
         } catch (SQLException e) {
-            statsLabel.setText("📈 Unable to load statistics");
+            statsLabel.setText("Unable to load statistics");
         }
     }
 
@@ -412,14 +412,14 @@ public class AttendanceDashboardPanel extends JPanel {
             }
 
             JOptionPane.showMessageDialog(this,
-                "✅ Attendance saved successfully!",
+                "Attendance saved successfully!",
                 "Success", JOptionPane.INFORMATION_MESSAGE);
 
             refreshData();
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                "❌ Error saving attendance: " + e.getMessage(),
+                "Error saving attendance: " + e.getMessage(),
                 "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -440,14 +440,14 @@ public class AttendanceDashboardPanel extends JPanel {
                 try (java.io.FileWriter writer = new java.io.FileWriter(file)) {
                     writer.write(csvData);
                     JOptionPane.showMessageDialog(this,
-                        "📁 Attendance exported successfully to: " + file.getName(),
+                        "Attendance exported successfully to: " + file.getName(),
                         "Export Complete", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                "❌ Error exporting attendance: " + e.getMessage(),
+                "Error exporting attendance: " + e.getMessage(),
                 "Export Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -499,11 +499,11 @@ public class AttendanceDashboardPanel extends JPanel {
             setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
             setBackground(Color.WHITE);
 
-            presentBtn = new JButton("✅");
-            absentBtn = new JButton("❌");
+            presentBtn = new JButton("P");
+            absentBtn = new JButton("A");
 
-            presentBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
-            absentBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+            presentBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            absentBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
 
             presentBtn.setPreferredSize(new Dimension(40, 30));
             absentBtn.setPreferredSize(new Dimension(40, 30));

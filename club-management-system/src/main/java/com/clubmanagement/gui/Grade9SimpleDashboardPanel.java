@@ -62,8 +62,8 @@ public class Grade9SimpleDashboardPanel extends JPanel {
         contentPanel.add(attendancePanel, "attendance");
 
         // Initialize navigation buttons
-        attendanceButton = createNavigationButton("📝 Mark Attendance", "Mark your daily attendance");
-        logoutButton = createLogoutButton("🚪 Logout", "Sign out of the application");
+        attendanceButton = createNavigationButton("Mark Attendance", "Mark your daily attendance");
+        logoutButton = createLogoutButton("Logout", "Sign out of the application");
     }
 
     private JButton createNavigationButton(String text, String tooltip) {

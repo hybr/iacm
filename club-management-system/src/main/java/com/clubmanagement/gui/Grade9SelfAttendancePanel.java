@@ -40,11 +40,11 @@ public class Grade9SelfAttendancePanel extends JPanel {
 
     private void initializeComponents() {
         // Main action buttons - large and prominent
-        markPresentButton = ModernTheme.createPrimaryButton("✅ Mark Present");
+        markPresentButton = ModernTheme.createPrimaryButton("Mark Present");
         markPresentButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
         markPresentButton.setPreferredSize(new Dimension(250, 80));
 
-        markAbsentButton = ModernTheme.createSecondaryButton("❌ Mark Absent");
+        markAbsentButton = ModernTheme.createSecondaryButton("Mark Absent");
         markAbsentButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
         markAbsentButton.setPreferredSize(new Dimension(250, 80));
 
@@ -125,7 +125,7 @@ public class Grade9SelfAttendancePanel extends JPanel {
             if (hasAttendanceToday) {
                 markPresentButton.setEnabled(false);
                 markAbsentButton.setEnabled(false);
-                statusLabel.setText("✅ Attendance already marked for today");
+                statusLabel.setText("Attendance already marked for today");
                 statusLabel.setForeground(ModernTheme.PRIMARY_BLUE);
             } else {
                 markPresentButton.setEnabled(true);
@@ -176,7 +176,7 @@ public class Grade9SelfAttendancePanel extends JPanel {
 
             // Save to database
             if (attendanceDAO.insertAttendance(attendance)) {
-                String statusText = isPresent ? "Present ✅" : "Absent ❌";
+                String statusText = isPresent ? "Present" : "Absent";
                 JOptionPane.showMessageDialog(this,
                     "Attendance marked as: " + statusText,
                     "Attendance Recorded",

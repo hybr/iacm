@@ -41,29 +41,20 @@ public class MainDashboard extends JFrame {
 
     private void setupLayout() {
         setLayout(new BorderLayout());
-
-        // Set modern look and feel
         getContentPane().setBackground(ModernTheme.LIGHT_GRAY);
 
-        // Header with title
-        JPanel titlePanel = createTitlePanel();
-        add(titlePanel, BorderLayout.NORTH);
+        // North: title bar only — toolbar is not used in the current UI
+        add(createTitlePanel(), BorderLayout.NORTH);
 
-        // Navigation toolbar for all users
-        add(toolbar, BorderLayout.CENTER);
-
-        // Main content area
+        // Center: content fills all remaining space
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(ModernTheme.LIGHT_GRAY);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
         mainPanel.add(contentPanel, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
 
-        // Status bar
-        JPanel statusPanel = createStatusPanel();
-        mainPanel.add(statusPanel, BorderLayout.SOUTH);
-
-        add(mainPanel, BorderLayout.SOUTH);
+        // South: status bar
+        add(createStatusPanel(), BorderLayout.SOUTH);
 
         loadInitialContent();
     }
@@ -93,9 +84,9 @@ public class MainDashboard extends JFrame {
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         rightPanel.setBackground(ModernTheme.PRIMARY_BLUE);
 
-        JButton minimizeBtn = createWindowButton("−");
-        JButton maximizeBtn = createWindowButton("□");
-        JButton closeBtn = createWindowButton("×");
+        JButton minimizeBtn = createWindowButton("-");
+        JButton maximizeBtn = createWindowButton("+");
+        JButton closeBtn = createWindowButton("X");
 
         minimizeBtn.addActionListener(e -> setState(JFrame.ICONIFIED));
         maximizeBtn.addActionListener(e -> {
@@ -143,7 +134,7 @@ public class MainDashboard extends JFrame {
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         rightPanel.setBackground(ModernTheme.PRIMARY_BLUE);
 
-        JButton closeBtn = createWindowButton("×");
+        JButton closeBtn = createWindowButton("X");
         closeBtn.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to exit?", "Confirm Exit",
@@ -172,7 +163,7 @@ public class MainDashboard extends JFrame {
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                if (text.equals("×")) {
+                if (text.equals("X")) {
                     button.setBackground(ModernTheme.ERROR_RED);
                 } else {
                     button.setBackground(ModernTheme.SECONDARY_BLUE);
@@ -203,21 +194,200 @@ public class MainDashboard extends JFrame {
     }
 
 
+    private void setToolbarVisible(boolean visible) {
+        toolbar.setVisible(visible);
+        revalidate();
+        repaint();
+    }
+
+    private void showManagerDashboard() {
+        setToolbarVisible(false);
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+
+        ManagerDashboardPanel dashboardPanel = new ManagerDashboardPanel(authService);
+        dashboardPanel.setOnLogout(this::logout);
+        dashboardPanel.setOnProposals(() -> {
+            showProposalManagement();
+            statusLabel.setText("Proposal Management loaded");
+        });
+        dashboardPanel.setOnAttendanceReports(() -> {
+            showManagerAttendanceReports();
+            statusLabel.setText("Attendance Reports loaded");
+        });
+        dashboardPanel.setOnClubAssignments(() -> {
+            showManagerClubAssignments();
+            statusLabel.setText("Club Assignments loaded");
+        });
+
+        cardPanel.add(dashboardPanel, BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "managerDashboard");
+        cardLayout.show(contentPanel, "managerDashboard");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        statusLabel.setText("Dashboard loaded");
+    }
+
     private void loadInitialContent() {
         if (authService.isClubManager()) {
-            showProposalManagement();
+            showManagerDashboard();
         } else if (authService.isGrade11()) {
-            showGrade11SelfAttendance(); // Show self-attendance marking for Grade 11
+            showGrade11Dashboard();
         } else if (authService.isGrade9()) {
-            showAttendanceMarking(); // Grade 9 sees their own attendance history
+            showGrade9Dashboard();
         }
+    }
+
+    // ── Grade 11 dashboard and feature pages ─────────────────────────────────
+
+    private void showGrade11Dashboard() {
+        setToolbarVisible(false);
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+
+        Grade11LandingDashboard dashboard = new Grade11LandingDashboard(authService);
+        dashboard.setOnLogout(this::logout);
+        dashboard.setOnAttendance(() -> {
+            showGrade11AttendanceFeature();
+            statusLabel.setText("Attendance loaded");
+        });
+        dashboard.setOnUploadProposal(() -> {
+            showGrade11UploadProposalFeature();
+            statusLabel.setText("Upload Proposal loaded");
+        });
+        dashboard.setOnProposalStatus(() -> {
+            showGrade11ProposalStatusFeature();
+            statusLabel.setText("Proposal Status loaded");
+        });
+        dashboard.setOnViewGrade9(() -> {
+            showGrade11ViewGrade9Feature();
+            statusLabel.setText("Grade 9 Students loaded");
+        });
+
+        cardPanel.add(dashboard, BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade11Dashboard");
+        cardLayout.show(contentPanel, "grade11Dashboard");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        statusLabel.setText("Dashboard loaded");
+    }
+
+    private void showGrade11AttendanceFeature() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(createBackBar("Dashboard", this::showGrade11Dashboard), BorderLayout.NORTH);
+        cardPanel.add(new Grade11SelfAttendancePanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade11Attendance");
+        cardLayout.show(contentPanel, "grade11Attendance");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private void showGrade11UploadProposalFeature() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(createBackBar("Dashboard", this::showGrade11Dashboard), BorderLayout.NORTH);
+        cardPanel.add(new ProposalSubmissionPanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade11UploadProposal");
+        cardLayout.show(contentPanel, "grade11UploadProposal");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private void showGrade11ProposalStatusFeature() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(createBackBar("Dashboard", this::showGrade11Dashboard), BorderLayout.NORTH);
+        cardPanel.add(new ProposalStatusPanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade11ProposalStatus");
+        cardLayout.show(contentPanel, "grade11ProposalStatus");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private void showGrade11ViewGrade9Feature() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(createBackBar("Dashboard", this::showGrade11Dashboard), BorderLayout.NORTH);
+        cardPanel.add(new Grade9StudentsViewPanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade11ViewGrade9");
+        cardLayout.show(contentPanel, "grade11ViewGrade9");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    // ── Grade 9 dashboard and feature pages ──────────────────────────────────
+
+    private void showGrade9Dashboard() {
+        setToolbarVisible(false);
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+
+        Grade9LandingDashboard dashboard = new Grade9LandingDashboard(authService);
+        dashboard.setOnLogout(this::logout);
+        dashboard.setOnAttendance(() -> {
+            showGrade9AttendanceFeature();
+            statusLabel.setText("Attendance loaded");
+        });
+
+        cardPanel.add(dashboard, BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade9Dashboard");
+        cardLayout.show(contentPanel, "grade9Dashboard");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        statusLabel.setText("Dashboard loaded");
+    }
+
+    private void showGrade9AttendanceFeature() {
+        contentPanel.removeAll();
+        JPanel cardPanel = ModernTheme.createCardPanel();
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.add(createBackBar("Dashboard", this::showGrade9Dashboard), BorderLayout.NORTH);
+        cardPanel.add(new Grade9SelfAttendancePanel(authService), BorderLayout.CENTER);
+        contentPanel.add(cardPanel, "grade9Attendance");
+        cardLayout.show(contentPanel, "grade9Attendance");
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    // ── Shared back-navigation bar ────────────────────────────────────────────
+
+    private JPanel createBackBar(String dest, Runnable action) {
+        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        bar.setBackground(ModernTheme.WHITE);
+        bar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ModernTheme.MEDIUM_GRAY));
+        JButton btn = new JButton("Back to " + dest);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btn.setBackground(new Color(70, 130, 180));
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createEmptyBorder(6, 15, 6, 15));
+        btn.addActionListener(e -> action.run());
+        bar.add(btn);
+        return bar;
     }
 
     private void showProposalManagement() {
         contentPanel.removeAll();
         JPanel cardPanel = ModernTheme.createCardPanel();
         cardPanel.setLayout(new BorderLayout());
-        cardPanel.add(new ProposalManagementPanel(authService), BorderLayout.CENTER);
+
+        ProposalManagementPanel proposalPanel = new ProposalManagementPanel(authService);
+        proposalPanel.setBackToDashboardCallback(() -> {
+            showManagerDashboard();
+            statusLabel.setText("Returned to Dashboard");
+        });
+
+        cardPanel.add(proposalPanel, BorderLayout.CENTER);
         contentPanel.add(cardPanel, "proposalManagement");
         cardLayout.show(contentPanel, "proposalManagement");
         contentPanel.revalidate();
@@ -297,7 +467,7 @@ public class MainDashboard extends JFrame {
 
         ManagerAttendanceReportPanel attendancePanel = new ManagerAttendanceReportPanel(authService);
         attendancePanel.setBackToDashboardCallback(() -> {
-            showProposalManagement(); // Return to default manager view
+            showManagerDashboard(); // Return to manager dashboard
         });
 
         cardPanel.add(attendancePanel, BorderLayout.CENTER);
@@ -315,7 +485,7 @@ public class MainDashboard extends JFrame {
         ManagerClubAssignmentsViewPanel assignmentsPanel = new ManagerClubAssignmentsViewPanel(authService);
         // Set callback to return to dashboard
         assignmentsPanel.setBackToDashboardCallback(() -> {
-            loadInitialContent(); // This will show the proposal management (manager's default dashboard)
+            showManagerDashboard();
             statusLabel.setText("Returned to Dashboard");
         });
 
@@ -488,28 +658,28 @@ public class MainDashboard extends JFrame {
                     break;
                 case "selfattendance":
                     if (authService.isGrade11()) {
-                        showGrade11SelfAttendance();
-                        statusLabel.setText("Self-Attendance Marking loaded");
-                    } else {
-                        showAttendanceMarking();
+                        showGrade11AttendanceFeature();
+                        statusLabel.setText("Attendance loaded");
+                    } else if (authService.isGrade9()) {
+                        showGrade9AttendanceFeature();
                         statusLabel.setText("Attendance loaded");
                     }
                     break;
                 case "uploadproposal":
                     if (authService.isGrade11()) {
-                        showProposalSubmission();
+                        showGrade11UploadProposalFeature();
                         statusLabel.setText("Upload Proposal loaded");
                     }
                     break;
                 case "proposalstatus":
                     if (authService.isGrade11()) {
-                        showProposalStatus();
+                        showGrade11ProposalStatusFeature();
                         statusLabel.setText("Proposal Status loaded");
                     }
                     break;
                 case "viewgrade9":
                     if (authService.isGrade11()) {
-                        showGrade9StudentsView();
+                        showGrade11ViewGrade9Feature();
                         statusLabel.setText("Grade 9 Students View loaded");
                     }
                     break;

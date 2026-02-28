@@ -52,79 +52,20 @@ public class NavigationToolbar extends JPanel {
     }
 
     private void createClubManagerButtons() {
-        // Proposals button
-        JButton proposalsBtn = createToolbarButton("📋 Proposals", "Review and manage club proposals");
-        proposalsBtn.addActionListener(e -> notifyAction("proposals"));
-        add(proposalsBtn);
-
-        // Attendance Reports button (read-only)
-        JButton attendanceBtn = createToolbarButton("📊 Attendance Reports", "View and export attendance data");
-        attendanceBtn.addActionListener(e -> notifyAction("attendanceReports"));
-        add(attendanceBtn);
-
-        // Club Assignments View button (read-only)
-        JButton assignmentsBtn = createToolbarButton("👥 Club Assignments", "View student club assignments");
-        assignmentsBtn.addActionListener(e -> notifyAction("clubAssignments"));
-        add(assignmentsBtn);
-
-        // Separator
-        add(createSeparator());
+        // Navigation is handled by the dashboard cards — no buttons needed here
     }
 
     private void createGrade11Buttons() {
-        // Dashboard button
-        JButton dashboardBtn = createToolbarButton("🏠 Home", "View your dashboard");
-        dashboardBtn.addActionListener(e -> notifyAction("dashboard"));
-        add(dashboardBtn);
-
-        // Club Allocation button
-        JButton allocationBtn = createToolbarButton("🎯 Allocation", "View club allocations");
-        allocationBtn.addActionListener(e -> notifyAction("allocation"));
-        add(allocationBtn);
-
-        // Self Attendance button
-        JButton attendanceBtn = createToolbarButton("✔️ Mark Attendance", "Mark your attendance");
-        attendanceBtn.addActionListener(e -> notifyAction("selfAttendance"));
-        add(attendanceBtn);
-
-        // Upload Proposal button
-        JButton uploadProposalBtn = createToolbarButton("📤 Upload Proposal", "Submit a new proposal");
-        uploadProposalBtn.addActionListener(e -> notifyAction("uploadProposal"));
-        add(uploadProposalBtn);
-
-        // Check Proposal Status button
-        JButton proposalStatusBtn = createToolbarButton("📊 Proposal Status", "Check proposal status");
-        proposalStatusBtn.addActionListener(e -> notifyAction("proposalStatus"));
-        add(proposalStatusBtn);
-
-        // View Grade 9 Students button
-        JButton viewGrade9Btn = createToolbarButton("👥 View Grade 9", "View Grade 9 students and their clubs");
-        viewGrade9Btn.addActionListener(e -> notifyAction("viewGrade9"));
-        add(viewGrade9Btn);
-
-        // Attendance History button
-        JButton historyBtn = createToolbarButton("📈 History", "View attendance history");
-        historyBtn.addActionListener(e -> notifyAction("attendanceHistory"));
-        add(historyBtn);
-
-        // Separator
+        JButton homeBtn = createToolbarButton("Home", "Return to dashboard");
+        homeBtn.addActionListener(e -> notifyAction("dashboard"));
+        add(homeBtn);
         add(createSeparator());
     }
 
     private void createGrade9Buttons() {
-        // Dashboard button
-        JButton dashboardBtn = createToolbarButton("🏠 Home", "View your dashboard");
-        dashboardBtn.addActionListener(e -> notifyAction("dashboard"));
-        add(dashboardBtn);
-
-        // Club Assignment button removed per user request
-
-        // Self Attendance button
-        JButton attendanceBtn = createToolbarButton("✔️ Attendance", "Mark attendance");
-        attendanceBtn.addActionListener(e -> notifyAction("selfAttendance"));
-        add(attendanceBtn);
-
-        // Separator
+        JButton homeBtn = createToolbarButton("Home", "Return to dashboard");
+        homeBtn.addActionListener(e -> notifyAction("dashboard"));
+        add(homeBtn);
         add(createSeparator());
     }
 
@@ -132,23 +73,23 @@ public class NavigationToolbar extends JPanel {
         // Only show Profile, Password, and Help buttons for non-manager users
         if (!authService.isClubManager()) {
             // Profile button
-            JButton profileBtn = createToolbarButton("👤 Profile", "View profile");
+            JButton profileBtn = createToolbarButton("Profile", "View profile");
             profileBtn.addActionListener(e -> notifyAction("profile"));
             add(profileBtn);
 
             // Change Password button
-            JButton passwordBtn = createToolbarButton("🔑 Password", "Change password");
+            JButton passwordBtn = createToolbarButton("Password", "Change password");
             passwordBtn.addActionListener(e -> notifyAction("changepassword"));
             add(passwordBtn);
 
             // Help button
-            JButton helpBtn = createToolbarButton("ℹ️ Help", "Get help");
+            JButton helpBtn = createToolbarButton("Help", "Get help");
             helpBtn.addActionListener(e -> notifyAction("userguide"));
             add(helpBtn);
         }
 
         // Logout button for all users
-        JButton logoutBtn = createToolbarButton("🚪 Logout", "Sign out");
+        JButton logoutBtn = createToolbarButton("Logout", "Sign out");
         logoutBtn.addActionListener(e -> notifyAction("logout"));
         logoutBtn.setBackground(new Color(180, 50, 50)); // Darker red for logout
         logoutBtn.setForeground(Color.WHITE);

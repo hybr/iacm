@@ -6,30 +6,24 @@ import java.time.LocalTime;
 
 public class Attendance {
     public enum AttendanceStatus {
-        PRESENT("Present", "✅"),
-        ABSENT("Absent", "❌"),
-        LATE("Late", "⏱️"),
-        EXCUSED("Excused", "📝");
+        PRESENT("Present"),
+        ABSENT("Absent"),
+        LATE("Late"),
+        EXCUSED("Excused");
 
         private final String displayName;
-        private final String emoji;
 
-        AttendanceStatus(String displayName, String emoji) {
+        AttendanceStatus(String displayName) {
             this.displayName = displayName;
-            this.emoji = emoji;
         }
 
         public String getDisplayName() {
             return displayName;
         }
 
-        public String getEmoji() {
-            return emoji;
-        }
-
         @Override
         public String toString() {
-            return emoji + " " + displayName;
+            return displayName;
         }
     }
 

@@ -95,8 +95,8 @@ public class MyProfileFrame extends JFrame {
         gbc.gridwidth = 2;
 
         // Profile picture placeholder
-        JLabel avatarLabel = new JLabel("👤", SwingConstants.CENTER);
-        avatarLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
+        JLabel avatarLabel = new JLabel("[ Profile ]", SwingConstants.CENTER);
+        avatarLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         avatarLabel.setForeground(ModernTheme.PRIMARY_BLUE);
         avatarLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         gbc.gridx = 0; gbc.gridy = 0;

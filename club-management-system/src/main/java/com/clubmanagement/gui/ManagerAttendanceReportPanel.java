@@ -107,19 +107,19 @@ public class ManagerAttendanceReportPanel extends JPanel {
         statusFilterCombo.addItem("Excused");
 
         // Create buttons
-        refreshButton = new JButton("🔄 Refresh");
+        refreshButton = new JButton("Refresh");
         refreshButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         refreshButton.setBackground(ModernTheme.PRIMARY_BLUE);
         refreshButton.setForeground(Color.WHITE);
         refreshButton.setFocusPainted(false);
 
-        exportExcelButton = new JButton("📊 Export to Excel");
+        exportExcelButton = new JButton("Export to Excel");
         exportExcelButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         exportExcelButton.setBackground(new Color(34, 139, 34)); // Green
         exportExcelButton.setForeground(Color.WHITE);
         exportExcelButton.setFocusPainted(false);
 
-        backToDashboardButton = new JButton("🏠 Back to Dashboard");
+        backToDashboardButton = new JButton("Back to Dashboard");
         backToDashboardButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         backToDashboardButton.setBackground(new Color(70, 130, 180)); // Steel Blue
         backToDashboardButton.setForeground(Color.WHITE);
@@ -405,19 +405,19 @@ public class ManagerAttendanceReportPanel extends JPanel {
                 switch (status) {
                     case "PRESENT":
                         setForeground(new Color(34, 139, 34)); // Green
-                        setText("✅ Present");
+                        setText("Present");
                         break;
                     case "ABSENT":
                         setForeground(new Color(220, 20, 60)); // Red
-                        setText("❌ Absent");
+                        setText("Absent");
                         break;
                     case "LATE":
                         setForeground(new Color(255, 165, 0)); // Orange
-                        setText("⏰ Late");
+                        setText("Late");
                         break;
                     case "EXCUSED":
                         setForeground(new Color(70, 130, 180)); // Blue
-                        setText("📝 Excused");
+                        setText("Excused");
                         break;
                     default:
                         setForeground(Color.BLACK);

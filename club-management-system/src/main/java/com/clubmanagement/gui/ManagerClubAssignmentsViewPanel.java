@@ -108,19 +108,19 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
         // Create buttons
-        refreshButton = new JButton("🔄 Refresh");
+        refreshButton = new JButton("Refresh");
         refreshButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         refreshButton.setBackground(ModernTheme.PRIMARY_BLUE);
         refreshButton.setForeground(Color.WHITE);
         refreshButton.setFocusPainted(false);
 
-        exportButton = new JButton("📊 Export to Excel");
+        exportButton = new JButton("Export to Excel");
         exportButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         exportButton.setBackground(new Color(34, 139, 34)); // Green
         exportButton.setForeground(Color.WHITE);
         exportButton.setFocusPainted(false);
 
-        backToDashboardButton = new JButton("🏠 Back to Dashboard");
+        backToDashboardButton = new JButton("Back to Dashboard");
         backToDashboardButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         backToDashboardButton.setBackground(new Color(70, 130, 180)); // Steel Blue
         backToDashboardButton.setForeground(Color.WHITE);
@@ -171,7 +171,7 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
         // Info panel
         JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         infoPanel.setBackground(ModernTheme.WHITE);
-        JLabel infoLabel = ModernTheme.createBodyLabel("📋 Students self-select their clubs. This is a read-only view for monitoring assignments.");
+        JLabel infoLabel = ModernTheme.createBodyLabel("Students self-select their clubs. This is a read-only view for monitoring assignments.");
         infoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         infoLabel.setForeground(new Color(100, 100, 100));
         infoPanel.add(infoLabel);
@@ -344,12 +344,12 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
 
         for (User student : allStudents) {
             String clubName = "Not Assigned";
-            String status = "❌ Unassigned";
+            String status = "Unassigned";
 
             Integer clubId = studentClubMap.get(student.getId());
             if (clubId != null && clubNamesMap.containsKey(clubId)) {
                 clubName = clubNamesMap.get(clubId);
-                status = "✅ Assigned";
+                status = "Assigned";
                 assignedStudents++;
                 clubCounts.put(clubName, clubCounts.getOrDefault(clubName, 0) + 1);
             }

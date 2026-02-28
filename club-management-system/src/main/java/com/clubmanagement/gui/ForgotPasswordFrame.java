@@ -393,7 +393,7 @@ public class ForgotPasswordFrame extends JFrame {
 
             if (success) {
                 JOptionPane.showMessageDialog(this,
-                    "✅ Password reset successfully!\n\n" +
+                    "Password reset successfully!\n\n" +
                     "You can now log in with your new password.",
                     "Password Reset Complete", JOptionPane.INFORMATION_MESSAGE);
 

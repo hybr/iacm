@@ -79,7 +79,7 @@ public class Grade9StudentsViewPanel extends JPanel {
         studentsTable.setRowSorter(sorter);
 
         // Create other components
-        refreshButton = new JButton("🔄 Refresh Data");
+        refreshButton = new JButton("Refresh Data");
         refreshButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         refreshButton.setBackground(ModernTheme.PRIMARY_BLUE);
         refreshButton.setForeground(Color.WHITE);
@@ -249,12 +249,12 @@ public class Grade9StudentsViewPanel extends JPanel {
         // Add data to table
         for (User student : grade9Students) {
             String clubName = "Not Assigned";
-            String status = "❌ Unassigned";
+            String status = "Unassigned";
 
             Integer clubId = studentClubMap.get(student.getId());
             if (clubId != null && clubNamesMap.containsKey(clubId)) {
                 clubName = clubNamesMap.get(clubId);
-                status = "✅ Assigned";
+                status = "Assigned";
             }
 
             Object[] rowData = {

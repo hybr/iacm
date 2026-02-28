@@ -72,7 +72,7 @@ public class Grade11SelfAttendancePanel extends JPanel {
         clubInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         // Present button with check mark
-        presentButton = new JButton("✅ Present");
+        presentButton = new JButton("Present");
         presentButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
         presentButton.setPreferredSize(new Dimension(200, 80));
         presentButton.setBackground(new Color(34, 139, 34)); // Forest Green
@@ -82,7 +82,7 @@ public class Grade11SelfAttendancePanel extends JPanel {
         presentButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         // Absent button with X mark
-        absentButton = new JButton("❌ Absent");
+        absentButton = new JButton("Absent");
         absentButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
         absentButton.setPreferredSize(new Dimension(200, 80));
         absentButton.setBackground(new Color(220, 20, 60)); // Crimson

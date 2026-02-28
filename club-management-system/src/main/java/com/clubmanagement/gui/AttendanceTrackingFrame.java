@@ -385,15 +385,15 @@ public class AttendanceTrackingFrame extends JFrame {
             setLayout(new FlowLayout(FlowLayout.CENTER, 2, 2));
             setBackground(ModernTheme.WHITE);
 
-            presentBtn = new JButton("✅");
-            lateBtn = new JButton("⏱️");
-            absentBtn = new JButton("❌");
-            excusedBtn = new JButton("📝");
+            presentBtn = new JButton("P");
+            lateBtn = new JButton("L");
+            absentBtn = new JButton("A");
+            excusedBtn = new JButton("E");
 
-            presentBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
-            lateBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
-            absentBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
-            excusedBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
+            presentBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lateBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            absentBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            excusedBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
 
             presentBtn.setPreferredSize(new Dimension(30, 25));
             lateBtn.setPreferredSize(new Dimension(30, 25));

@@ -62,11 +62,11 @@ public class Grade11EnhancedDashboard extends JPanel {
         contentPanel.add(grade9StudentsViewPanel, "viewGrade9");
 
         // Initialize navigation buttons
-        attendanceButton = createNavigationButton("📝 Mark Attendance", "Mark your daily attendance");
-        uploadProposalButton = createNavigationButton("📤 Upload Proposal", "Submit a new proposal document");
-        checkProposalStatusButton = createNavigationButton("📊 Check Proposal Status", "View status of your submitted proposals");
-        viewGrade9StudentsButton = createNavigationButton("👥 View Grade 9", "View Grade 9 students and their clubs");
-        logoutButton = createLogoutButton("🚪 Logout", "Sign out of the application");
+        attendanceButton = createNavigationButton("Mark Attendance", "Mark your daily attendance");
+        uploadProposalButton = createNavigationButton("Upload Proposal", "Submit a new proposal document");
+        checkProposalStatusButton = createNavigationButton("Check Proposal Status", "View status of your submitted proposals");
+        viewGrade9StudentsButton = createNavigationButton("View Grade 9", "View Grade 9 students and their clubs");
+        logoutButton = createLogoutButton("Logout", "Sign out of the application");
     }
 
     private JButton createNavigationButton(String text, String tooltip) {

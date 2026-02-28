@@ -31,13 +31,22 @@ public class ModernTheme {
     public static final Color TAB_ACTIVE = WHITE;
     public static final Color TAB_INACTIVE = new Color(243, 244, 246);
 
+    // Cross-platform font: Segoe UI on Windows, system sans-serif on Mac/Linux
+    private static final String UI_FONT = resolveFont();
+    private static String resolveFont() {
+        String os = System.getProperty("os.name", "").toLowerCase();
+        if (os.contains("mac")) return "Helvetica Neue";
+        if (os.contains("win")) return "Segoe UI";
+        return "SansSerif";
+    }
+
     // Fonts
-    public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 24);
-    public static final Font HEADING_FONT = new Font("Segoe UI", Font.BOLD, 16);
-    public static final Font SUBHEADING_FONT = new Font("Segoe UI", Font.BOLD, 14);
-    public static final Font BODY_FONT = new Font("Segoe UI", Font.PLAIN, 12);
-    public static final Font SMALL_FONT = new Font("Segoe UI", Font.PLAIN, 10);
-    public static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 12);
+    public static final Font TITLE_FONT       = new Font(UI_FONT, Font.BOLD, 24);
+    public static final Font HEADING_FONT     = new Font(UI_FONT, Font.BOLD, 16);
+    public static final Font SUBHEADING_FONT  = new Font(UI_FONT, Font.BOLD, 14);
+    public static final Font BODY_FONT        = new Font(UI_FONT, Font.PLAIN, 12);
+    public static final Font SMALL_FONT       = new Font(UI_FONT, Font.PLAIN, 10);
+    public static final Font BUTTON_FONT      = new Font(UI_FONT, Font.BOLD, 12);
 
     // Component Styling Methods
     public static JButton createPrimaryButton(String text) {
