@@ -21,7 +21,8 @@
       "Bash(compile.bat)",
       "Bash(bash:*)",
       "Bash(sqlite3:*)",
-      "Bash(mvn compile -q)"
+      "Bash(mvn compile -q)",
+      "Bash(CP=\"lib/sqlite-jdbc-3.47.2.0.jar;lib/bcrypt-0.9.0.jar\")"
     ],
     "deny": [],
     "ask": []

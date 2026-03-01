@@ -451,12 +451,12 @@ public class AttendanceDAO {
 
         String createdAtStr = rs.getString("created_at");
         if (createdAtStr != null) {
-            attendance.setCreatedAt(LocalDateTime.parse(createdAtStr));
+            attendance.setCreatedAt(LocalDateTime.parse(createdAtStr.replace(" ", "T")));
         }
 
         String updatedAtStr = rs.getString("updated_at");
         if (updatedAtStr != null) {
-            attendance.setUpdatedAt(LocalDateTime.parse(updatedAtStr));
+            attendance.setUpdatedAt(LocalDateTime.parse(updatedAtStr.replace(" ", "T")));
         }
 
         // Set display names if available
@@ -479,7 +479,7 @@ public class AttendanceDAO {
 
         String createdAtStr = rs.getString("created_at");
         if (createdAtStr != null) {
-            session.setCreatedAt(LocalDateTime.parse(createdAtStr));
+            session.setCreatedAt(LocalDateTime.parse(createdAtStr.replace(" ", "T")));
         }
 
         session.setActive(rs.getBoolean("is_active"));
@@ -592,12 +592,12 @@ public class AttendanceDAO {
 
         String createdAtStr = rs.getString("created_at");
         if (createdAtStr != null) {
-            attendance.setCreatedAt(LocalDateTime.parse(createdAtStr));
+            attendance.setCreatedAt(LocalDateTime.parse(createdAtStr.replace(" ", "T")));
         }
 
         String updatedAtStr = rs.getString("updated_at");
         if (updatedAtStr != null) {
-            attendance.setUpdatedAt(LocalDateTime.parse(updatedAtStr));
+            attendance.setUpdatedAt(LocalDateTime.parse(updatedAtStr.replace(" ", "T")));
         }
 
         // Set display names if available

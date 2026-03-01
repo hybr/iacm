@@ -133,7 +133,7 @@ public class Grade11ClubAssignmentDAO {
 
                 String assignedAtStr = rs.getString("assigned_at");
                 if (assignedAtStr != null) {
-                    assignment.setAssignedAt(java.time.LocalDateTime.parse(assignedAtStr));
+                    assignment.setAssignedAt(java.time.LocalDateTime.parse(assignedAtStr.replace(" ", "T")));
                 }
 
                 assignments.add(assignment);

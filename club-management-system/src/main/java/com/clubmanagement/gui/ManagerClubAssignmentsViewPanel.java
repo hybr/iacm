@@ -320,7 +320,7 @@ public class ManagerClubAssignmentsViewPanel extends JPanel {
                     statusLabel.setForeground(ModernTheme.DARK_GRAY);
                 });
 
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 SwingUtilities.invokeLater(() -> {
                     statusLabel.setText("Error loading data: " + e.getMessage());
                     statusLabel.setForeground(Color.RED);

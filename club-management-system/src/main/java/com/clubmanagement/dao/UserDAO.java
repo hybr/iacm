@@ -110,11 +110,17 @@ public class UserDAO {
                         rs.getInt("id"),
                         rs.getString("username"),
                         rs.getString("password"),
+                        rs.getString("password_salt"),
                         rs.getString("email"),
                         rs.getString("full_name"),
                         rs.getString("security_question"),
                         rs.getString("security_answer"),
-                        UserRole.valueOf(rs.getString("role"))
+                        UserRole.valueOf(rs.getString("role")),
+                        getIntegerOrNull(rs, "assigned_club_id"),
+                        getBooleanOrDefault(rs, "first_login_completed", false),
+                        rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null,
+                        rs.getTimestamp("last_login") != null ? rs.getTimestamp("last_login").toLocalDateTime() : null,
+                        getBooleanOrDefault(rs, "is_active", true)
                     ));
                 }
             }

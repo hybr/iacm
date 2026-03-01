@@ -2,11 +2,9 @@ package com.clubmanagement.gui;
 
 import com.clubmanagement.dao.UserDAO;
 import com.clubmanagement.dao.ClubDAO;
-import com.clubmanagement.dao.ClubAllocationDAO;
 import com.clubmanagement.gui.theme.ModernTheme;
 import com.clubmanagement.models.User;
 import com.clubmanagement.models.Club;
-import com.clubmanagement.models.ClubAllocation;
 import com.clubmanagement.models.User.UserRole;
 import com.clubmanagement.services.AuthenticationService;
 
@@ -28,7 +26,6 @@ public class Grade9StudentsViewPanel extends JPanel {
     private AuthenticationService authService;
     private UserDAO userDAO;
     private ClubDAO clubDAO;
-    private ClubAllocationDAO clubAllocationDAO;
 
     // UI Components
     private JTable studentsTable;
@@ -47,7 +44,6 @@ public class Grade9StudentsViewPanel extends JPanel {
         this.authService = authService;
         this.userDAO = new UserDAO();
         this.clubDAO = new ClubDAO();
-        this.clubAllocationDAO = new ClubAllocationDAO();
         this.clubNamesMap = new HashMap<>();
         this.studentClubMap = new HashMap<>();
 
@@ -59,7 +55,7 @@ public class Grade9StudentsViewPanel extends JPanel {
 
     private void initializeComponents() {
         // Create table model with columns
-        String[] columnNames = {"Student ID", "Username", "Full Name", "Email", "Assigned Club", "Status"};
+        String[] columnNames = {"Student ID", "Username", "Full Name", "Email", "Assigned Club"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -204,12 +200,11 @@ public class Grade9StudentsViewPanel extends JPanel {
                         clubNamesMap.put(club.getId(), club.getName());
                     }
 
-                    // Load club allocations for Grade 9 students
+                    // Load club assignments from users.assigned_club_id
                     studentClubMap.clear();
                     for (User student : grade9Students) {
-                        ClubAllocation allocation = clubAllocationDAO.getAllocationByStudentId(student.getId());
-                        if (allocation != null) {
-                            studentClubMap.put(student.getId(), allocation.getClubId());
+                        if (student.getAssignedClubId() != null && student.getAssignedClubId() > 0) {
+                            studentClubMap.put(student.getId(), student.getAssignedClubId());
                         }
                     }
 
@@ -249,12 +244,10 @@ public class Grade9StudentsViewPanel extends JPanel {
         // Add data to table
         for (User student : grade9Students) {
             String clubName = "Not Assigned";
-            String status = "Unassigned";
 
             Integer clubId = studentClubMap.get(student.getId());
             if (clubId != null && clubNamesMap.containsKey(clubId)) {
                 clubName = clubNamesMap.get(clubId);
-                status = "Assigned";
             }
 
             Object[] rowData = {
@@ -262,8 +255,7 @@ public class Grade9StudentsViewPanel extends JPanel {
                 student.getUsername(),
                 student.getFullName() != null ? student.getFullName() : "N/A",
                 student.getEmail() != null ? student.getEmail() : "N/A",
-                clubName,
-                status
+                clubName
             };
 
             tableModel.addRow(rowData);

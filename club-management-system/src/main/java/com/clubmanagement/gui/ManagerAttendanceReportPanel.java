@@ -288,7 +288,7 @@ public class ManagerAttendanceReportPanel extends JPanel {
                     statusLabel.setForeground(ModernTheme.DARK_GRAY);
                 });
 
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 SwingUtilities.invokeLater(() -> {
                     statusLabel.setText("Error loading data: " + e.getMessage());
                     statusLabel.setForeground(Color.RED);
@@ -335,7 +335,7 @@ public class ManagerAttendanceReportPanel extends JPanel {
 
             tableModel.addRow(rowData);
             totalRecords++;
-            if (attendance.getStatus().toString().equals("PRESENT")) {
+            if (attendance.getStatus().toString().equals("Present")) {
                 presentCount++;
             }
         }
@@ -403,25 +403,20 @@ public class ManagerAttendanceReportPanel extends JPanel {
             if (value != null) {
                 String status = value.toString();
                 switch (status) {
-                    case "PRESENT":
+                    case "Present":
                         setForeground(new Color(34, 139, 34)); // Green
-                        setText("Present");
                         break;
-                    case "ABSENT":
+                    case "Absent":
                         setForeground(new Color(220, 20, 60)); // Red
-                        setText("Absent");
                         break;
-                    case "LATE":
+                    case "Late":
                         setForeground(new Color(255, 165, 0)); // Orange
-                        setText("Late");
                         break;
-                    case "EXCUSED":
+                    case "Excused":
                         setForeground(new Color(70, 130, 180)); // Blue
-                        setText("Excused");
                         break;
                     default:
                         setForeground(Color.BLACK);
-                        setText(status);
                 }
             }
 
