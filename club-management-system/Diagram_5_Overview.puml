@@ -1,0 +1,100 @@
+@startuml System_Overview
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 11
+skinparam linetype ortho
+
+skinparam actor {
+    BackgroundColor #D6E8FF
+    BorderColor #2E5FA3
+}
+skinparam rectangle {
+    BackgroundColor #EEF4FF
+    BorderColor #2E5FA3
+    RoundCorner 8
+}
+skinparam database {
+    BackgroundColor #FFF8E1
+    BorderColor #E6A817
+}
+skinparam component {
+    BackgroundColor #E8F5E9
+    BorderColor #388E3C
+    RoundCorner 6
+}
+
+title Club Management System — Overview
+
+' Actors
+actor "Grade 9\nStudent" as G9
+actor "Grade 11\nStudent" as G11
+actor "Club\nManager" as MGR
+
+' System boundary
+rectangle "Club Management System" {
+
+    ' GUI Layer
+    rectangle "GUI" {
+        component "Login /\nRegister" as UI_AUTH
+        component "G9 Dashboard\n(self-attendance)" as UI_G9
+        component "G11 Dashboard\n(mark G9 / proposal)" as UI_G11
+        component "Manager Dashboard\n(reports / proposals)" as UI_MGR
+    }
+
+    ' Service Layer
+    rectangle "Services" {
+        component "AuthenticationService" as SVC_AUTH
+        component "AttendanceService" as SVC_ATT
+    }
+
+    ' DAO Layer
+    rectangle "DAO" {
+        component "UserDAO" as DAO_USER
+        component "ClubDAO" as DAO_CLUB
+        component "AttendanceDAO" as DAO_ATT
+        component "ProposalDAO" as DAO_PROP
+        component "Grade11ClubAssignmentDAO" as DAO_G11
+    }
+}
+
+' Data Stores
+database "users" as DB_U
+database "clubs" as DB_C
+database "attendance" as DB_A
+database "grade11_student_clubs" as DB_G11
+database "proposals" as DB_P
+
+' Actor → UI
+G9  --> UI_AUTH
+G9  --> UI_G9
+G11 --> UI_AUTH
+G11 --> UI_G11
+MGR --> UI_AUTH
+MGR --> UI_MGR
+
+' GUI → Services
+UI_AUTH --> SVC_AUTH
+UI_G9   --> SVC_ATT
+UI_G11  --> SVC_ATT
+
+' Services → DAO
+SVC_AUTH --> DAO_USER
+SVC_ATT  --> DAO_ATT
+
+' GUI → DAO (direct reads)
+UI_MGR  --> DAO_ATT
+UI_MGR  --> DAO_USER
+UI_MGR  --> DAO_CLUB
+UI_MGR  --> DAO_PROP
+UI_G11  --> DAO_USER
+UI_G11  --> DAO_PROP
+UI_G11  --> DAO_G11
+
+' DAO → DB
+DAO_USER --> DB_U
+DAO_CLUB --> DB_C
+DAO_ATT  --> DB_A
+DAO_G11  --> DB_G11
+DAO_PROP --> DB_P
+
+@enduml

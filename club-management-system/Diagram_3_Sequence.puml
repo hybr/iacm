@@ -1,0 +1,143 @@
+@startuml Sequence_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam sequence {
+    ArrowColor #2E5FA3
+    ActorBorderColor #2E5FA3
+    ActorBackgroundColor #D6E8FF
+    ParticipantBorderColor #2E5FA3
+    ParticipantBackgroundColor #EEF4FF
+    ParticipantFontColor #1A1A2E
+    LifeLineBorderColor #6B93D6
+    BoxBackgroundColor #F5F8FF
+    BoxBorderColor #6B93D6
+}
+skinparam noteBorderColor #6B93D6
+skinparam noteBackgroundColor #FFFDE7
+
+title Club Management System — Sequence Diagram
+
+' ══════════════════════════════════════════
+== Flow 1: User Login ==
+' ══════════════════════════════════════════
+
+actor "User" as U
+participant "LoginFrame" as LF
+participant "AuthenticationService" as AS
+participant "UserDAO" as UD
+database "SQLite DB" as DB
+participant "MainDashboard" as MD
+
+U -> LF : Enter username & password\nclick Login
+activate LF
+
+LF -> LF : Validate fields not empty
+LF -> AS : login(username, password)
+activate AS
+
+AS -> UD : getUserByUsername(username)
+activate UD
+UD -> DB : SELECT * FROM users\nWHERE username = ?
+DB --> UD : ResultSet (user row)
+UD --> AS : User object\n(with role, assignedClubId)
+deactivate UD
+
+AS -> AS : PasswordHasher.verifyPassword\n(input, storedHash, salt)
+
+alt Login successful
+    AS --> LF : true
+    deactivate AS
+    LF -> LF : dispose()
+    LF -> MD : new MainDashboard(authService)
+    activate MD
+    MD -> MD : detect role\n(GRADE_9 / GRADE_11 / CLUB_MANAGER)
+    MD -> MD : show correct dashboard panel
+    MD --> U : Dashboard displayed
+    deactivate MD
+else Invalid credentials
+    AS --> LF : false
+    deactivate AS
+    LF --> U : Show error dialog\n"Invalid username or password"
+    LF -> LF : Clear password field
+end
+deactivate LF
+
+' ══════════════════════════════════════════
+== Flow 2: Grade 9 Student Marks Attendance ==
+' ══════════════════════════════════════════
+
+actor "Grade 9 Student" as S9
+participant "Grade9SelfAttendancePanel" as G9P
+participant "AttendanceService" as ATS
+participant "AttendanceDAO" as ADAO
+
+S9 -> G9P : Click "Mark Present"\nor "Mark Absent"
+activate G9P
+
+G9P -> ATS : hasMarkedToday(studentId, clubId)
+activate ATS
+ATS -> ADAO : getStudentAttendanceForDate\n(studentId, clubId, today)
+activate ADAO
+ADAO -> DB : SELECT * FROM attendance\nWHERE student_id=? AND club_id=?\nAND session_date=?
+DB --> ADAO : ResultSet
+ADAO --> ATS : Attendance record (or null)
+deactivate ADAO
+
+alt Already marked today
+    ATS --> G9P : true
+    deactivate ATS
+    G9P --> S9 : Show "Attendance already\nmarked for today"
+else Not yet marked
+    ATS --> G9P : false
+    G9P -> ADAO : insertAttendance(attendance)
+    activate ADAO
+    ADAO -> DB : INSERT INTO attendance\n(student_id, club_id, status, date, ...)
+    DB --> ADAO : success
+    ADAO --> G9P : true
+    deactivate ADAO
+    G9P --> S9 : Show "Attendance marked\nsuccessfully"
+    G9P -> G9P : Refresh status label\n& attendance history
+end
+deactivate G9P
+
+' ══════════════════════════════════════════
+== Flow 3: Manager Views Club Assignments ==
+' ══════════════════════════════════════════
+
+actor "Manager" as MGR
+participant "ManagerClubAssignmentsViewPanel" as MCV
+participant "UserDAO" as UD2
+participant "Grade11ClubAssignmentDAO" as G11DAO
+
+MGR -> MCV : Open Club Assignments page
+activate MCV
+
+MCV -> MCV : loadData() on background thread
+
+MCV -> UD2 : getUsersByRole(GRADE_9)
+activate UD2
+UD2 -> DB : SELECT * FROM users WHERE role='GRADE_9'
+DB --> UD2 : 12 students with assigned_club_id
+UD2 --> MCV : List<User> grade9Students
+deactivate UD2
+
+MCV -> UD2 : getUsersByRole(GRADE_11)
+activate UD2
+UD2 -> DB : SELECT * FROM users WHERE role='GRADE_11'
+DB --> UD2 : 5 students
+UD2 --> MCV : List<User> grade11Students
+deactivate UD2
+
+MCV -> G11DAO : getAllGrade11Assignments()
+activate G11DAO
+G11DAO -> DB : SELECT u.*, c.* FROM users u\nJOIN grade11_student_clubs gsc\nJOIN clubs c ...
+DB --> G11DAO : Assignments with club names
+G11DAO --> MCV : List<StudentClubAssignment>
+deactivate G11DAO
+
+MCV -> MCV : Build studentClubMap\n(Grade9: from assigned_club_id\nGrade11: from grade11_student_clubs)
+MCV -> MCV : SwingUtilities.invokeLater\n→ updateTable()
+
+MCV --> MGR : Table shows 17 students\nwith assigned clubs
+deactivate MCV
+
+@enduml

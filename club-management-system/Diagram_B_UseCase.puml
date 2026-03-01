@@ -1,0 +1,50 @@
+@startuml Use_Case_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+skinparam usecase {
+    BackgroundColor #EEF4FF
+    BorderColor #2E5FA3
+    ArrowColor #2E5FA3
+}
+skinparam actor {
+    BackgroundColor #D6E8FF
+    BorderColor #2E5FA3
+}
+
+title Use Case Diagram
+
+actor "Grade 9\nStudent" as G9
+actor "Grade 11\nStudent" as G11
+actor "Club Manager" as MGR
+
+rectangle "Club Management System" {
+    usecase "Sign Up / Log In" as UC1
+    usecase "Mark Own Attendance" as UC2
+    usecase "View Attendance History" as UC3
+    usecase "Mark G9 Attendance" as UC4
+    usecase "Submit Club Proposal" as UC5
+    usecase "View G9 Student List" as UC6
+    usecase "View All Club Assignments" as UC7
+    usecase "View Attendance Reports" as UC8
+    usecase "Review Club Proposals" as UC9
+    usecase "Export to CSV" as UC10
+}
+
+G9  --> UC1
+G9  --> UC2
+G9  --> UC3
+
+G11 --> UC1
+G11 --> UC4
+G11 --> UC5
+G11 --> UC6
+
+MGR --> UC1
+MGR --> UC7
+MGR --> UC8
+MGR --> UC9
+
+UC8 .> UC10 : <<include>>
+UC7 .> UC10 : <<include>>
+
+@enduml

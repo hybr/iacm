@@ -1,0 +1,66 @@
+@startuml Sequence_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+skinparam sequence {
+    ArrowColor #2E5FA3
+    ParticipantBackgroundColor #EEF4FF
+    ParticipantBorderColor #2E5FA3
+    LifeLineBorderColor #6B93D6
+}
+
+title Sequence Diagram
+
+== Login ==
+actor User as U
+participant LoginFrame as LF
+participant AuthService as AS
+database SQLite as DB
+
+U -> LF : enter username + password
+LF -> AS : login(username, password)
+AS -> DB : SELECT user WHERE username=?
+DB --> AS : user row
+AS -> AS : verify password hash
+alt success
+    AS --> LF : true
+    LF -> U : open Dashboard
+else fail
+    AS --> LF : false
+    LF -> U : show error dialog
+end
+
+== Grade 9 Marks Own Attendance ==
+actor "Grade 9" as G9
+participant AttendancePanel as AP
+participant AttendanceDAO as DAO
+
+G9 -> AP : click Mark Present/Absent
+AP -> DAO : getAttendanceForDate(studentId, today)
+DAO -> DB : SELECT attendance WHERE student=? AND date=?
+DB --> DAO : result
+alt already marked
+    DAO --> AP : record found
+    AP -> G9 : "Already marked today"
+else not yet marked
+    DAO --> AP : null
+    AP -> DAO : insertAttendance(record)
+    DAO -> DB : INSERT INTO attendance
+    DB --> DAO : success
+    AP -> G9 : "Attendance marked"
+end
+
+== Manager Views Assignments ==
+actor Manager as MGR
+participant AssignmentsPanel as MVP
+participant UserDAO as UD
+
+MGR -> MVP : open Club Assignments page
+MVP -> UD : getUsersByRole(GRADE_9)
+UD -> DB : SELECT * FROM users WHERE role='GRADE_9'
+DB --> UD : 12 students
+UD --> MVP : List<User>
+MVP -> DB : SELECT grade11_student_clubs
+DB --> MVP : G11 assignments
+MVP -> MGR : table of 17 students + clubs
+
+@enduml

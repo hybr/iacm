@@ -1,0 +1,61 @@
+@startuml Class_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor #EEF4FF
+    BorderColor #2E5FA3
+    ArrowColor #2E5FA3
+}
+
+title Class Diagram
+
+enum UserRole {
+    GRADE_9
+    GRADE_11
+    CLUB_MANAGER
+}
+
+class User {
+    - id : int
+    - username : String
+    - passwordHash : String
+    - email : String
+    - role : UserRole
+    - assignedClubId : Integer
+}
+
+class Club {
+    - id : int
+    - name : String
+    - description : String
+}
+
+class Attendance {
+    - studentId : int
+    - clubId : int
+    - sessionDate : LocalDate
+    - status : AttendanceStatus
+}
+
+enum AttendanceStatus {
+    PRESENT
+    ABSENT
+    LATE
+    EXCUSED
+}
+
+class Proposal {
+    - submittedById : int
+    - clubId : int
+    - title : String
+    - status : String
+}
+
+User "1" -- "1" UserRole
+User "0..1" -- "1" Club : assigned to >
+Attendance "1" -- "1" AttendanceStatus
+Proposal "many" -- "1" User : submitted by >
+Proposal "many" -- "1" Club : for >
+
+@enduml

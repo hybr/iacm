@@ -1,0 +1,119 @@
+@startuml Data_Flow_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 11
+
+skinparam rectangle {
+    BackgroundColor #D6E8FF
+    BorderColor #1A3A6B
+    FontColor #1A1A2E
+    BorderThickness 2
+    RoundCorner 0
+}
+skinparam storage {
+    BackgroundColor #FFFDE7
+    BorderColor #B8860B
+    FontColor #1A1A2E
+    BorderThickness 2
+}
+skinparam circle {
+    BackgroundColor #E8F5E9
+    BorderColor #2E7D32
+    FontColor #1A1A2E
+    BorderThickness 2
+}
+skinparam arrow {
+    Color #444444
+    FontColor #333333
+    FontSize 9
+}
+
+title Club Management System — Data Flow Diagram (Level 1)
+
+' ─── External Entities (rectangles) ──────────────────
+rectangle "Grade 9\nStudent" as G9
+rectangle "Grade 11\nStudent" as G11
+rectangle "Club\nManager" as MGR
+
+' ─── Processes (circles) ─────────────────────────────
+circle "1\nRegister\nAccount" as P1
+circle "2\nLogin /\nLogout" as P2
+circle "3\nMark Own\nAttendance" as P3
+circle "4\nMark G9\nAttendance" as P4
+circle "5\nView Club\nAssignments" as P5
+circle "6\nView Attendance\nReports" as P6
+circle "7\nSubmit Club\nProposal" as P7
+circle "8\nReview\nProposals" as P8
+circle "9\nReset\nPassword" as P9
+
+' ─── Data Stores (open rectangles) ──────────────────
+storage "DS1  users" as DS1
+storage "DS2  clubs" as DS2
+storage "DS3  attendance" as DS3
+storage "DS4  grade11_student_clubs" as DS4
+storage "DS5  proposals" as DS5
+storage "DS6  password_reset_tokens" as DS6
+
+' ─── Registration ────────────────────────────────────
+G9  --> P1 : personal details\n+ club choice
+G11 --> P1 : personal details\n+ club choice
+P1 --> DS1 : store user record\n(hashed pw, role)
+P1 --> DS4 : store G11\nclub assignment
+DS2 --> P1 : available clubs
+
+' ─── Login ───────────────────────────────────────────
+G9  --> P2 : username & password
+G11 --> P2 : username & password
+MGR --> P2 : username & password
+DS1 --> P2 : user record
+P2 --> G9  : session (GRADE_9)
+P2 --> G11 : session (GRADE_11)
+P2 --> MGR : session (CLUB_MANAGER)
+
+' ─── Grade 9 Self-Attendance ─────────────────────────
+G9  --> P3 : mark present / absent
+DS3 --> P3 : today's record
+P3 --> DS3 : write attendance row
+P3 --> G9  : confirmation /\nalready marked
+
+' ─── Grade 11 marks G9 ───────────────────────────────
+G11 --> P4 : student list + status
+DS1 --> P4 : G9 student list
+P4 --> DS3 : bulk attendance rows
+P4 --> G11 : confirmation
+
+' ─── Manager: Club Assignments ───────────────────────
+MGR --> P5 : request view
+DS1 --> P5 : students + assigned_club_id
+DS4 --> P5 : G11 club assignments
+DS2 --> P5 : club names
+P5 --> MGR : assignment table
+
+' ─── Manager: Attendance Reports ─────────────────────
+MGR --> P6 : request report
+DS3 --> P6 : all attendance records
+DS1 --> P6 : student & marker names
+DS2 --> P6 : club names
+P6 --> MGR : report + CSV export
+
+' ─── Proposals ───────────────────────────────────────
+G11 --> P7 : title & description
+DS2 --> P7 : club list
+P7 --> DS5 : store proposal (PENDING)
+P7 --> G11 : confirmation
+
+MGR --> P8 : approve / reject
+DS5 --> P8 : pending proposals
+P8 --> DS5 : update status
+P8 --> MGR : updated list
+
+' ─── Password Reset ──────────────────────────────────
+G9  --> P9 : username +\nsecurity answer
+G11 --> P9 : username +\nsecurity answer
+DS1 --> P9 : verify security answer
+P9 --> DS1 : update hashed password
+P9 --> DS6 : consume reset token
+P9 --> G9  : new password set
+P9 --> G11 : new password set
+
+@enduml

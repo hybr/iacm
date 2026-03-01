@@ -1,0 +1,88 @@
+@startuml Use_Case_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam usecase {
+    BackgroundColor #EEF4FF
+    BorderColor #2E5FA3
+    FontColor #1A1A2E
+    ArrowColor #2E5FA3
+}
+skinparam actor {
+    BackgroundColor #D6E8FF
+    BorderColor #2E5FA3
+    FontColor #1A1A2E
+}
+skinparam packageBackgroundColor #F5F8FF
+skinparam packageBorderColor #6B93D6
+
+title Club Management System — Use Case Diagram
+
+' ─── Actors ───
+actor "Grade 9 Student" as G9
+actor "Grade 11 Student" as G11
+actor "Club Manager" as MGR
+
+' ─────────────────────────────────────────
+rectangle "Authentication" {
+    usecase "Sign Up\n(choose club)" as UC_SIGNUP
+    usecase "Log In" as UC_LOGIN
+    usecase "Forgot Password\n(security question)" as UC_FORGOT
+    usecase "Change Password" as UC_CHANGEPW
+}
+
+rectangle "Grade 9 — Self Service" {
+    usecase "View Own Dashboard" as UC_G9_DASH
+    usecase "Mark Own Attendance\n(Present / Absent)" as UC_G9_ATT
+    usecase "View Attendance History" as UC_G9_HIST
+    usecase "View My Profile" as UC_G9_PROF
+}
+
+rectangle "Grade 11 — Club Leader" {
+    usecase "View Own Dashboard" as UC_G11_DASH
+    usecase "Mark Attendance\nfor Grade 9 Students" as UC_G11_ATT
+    usecase "View Grade 9\nStudent List & Clubs" as UC_G11_VIEW
+    usecase "Submit Club Proposal" as UC_G11_PROP
+    usecase "View My Profile" as UC_G11_PROF
+}
+
+rectangle "Manager — Administration" {
+    usecase "View Manager Dashboard" as UC_MGR_DASH
+    usecase "View All Club Assignments\n(Grade 9 & 11)" as UC_MGR_CLUBS
+    usecase "View Attendance Reports\n(All Students)" as UC_MGR_ATT
+    usecase "Export Reports to CSV" as UC_MGR_EXP
+    usecase "Review Club Proposals" as UC_MGR_PROP
+}
+
+' ─────────────────────────────────────────
+' Shared connections
+G9  --> UC_SIGNUP
+G9  --> UC_LOGIN
+G9  --> UC_FORGOT
+G9  --> UC_CHANGEPW
+G9  --> UC_G9_DASH
+G9  --> UC_G9_ATT
+G9  --> UC_G9_HIST
+G9  --> UC_G9_PROF
+
+G11 --> UC_SIGNUP
+G11 --> UC_LOGIN
+G11 --> UC_FORGOT
+G11 --> UC_CHANGEPW
+G11 --> UC_G11_DASH
+G11 --> UC_G11_ATT
+G11 --> UC_G11_VIEW
+G11 --> UC_G11_PROP
+G11 --> UC_G11_PROF
+
+MGR --> UC_LOGIN
+MGR --> UC_CHANGEPW
+MGR --> UC_MGR_DASH
+MGR --> UC_MGR_CLUBS
+MGR --> UC_MGR_ATT
+MGR --> UC_MGR_EXP
+MGR --> UC_MGR_PROP
+
+' Include relationships
+UC_MGR_ATT .> UC_MGR_EXP : <<include>>
+UC_MGR_CLUBS .> UC_MGR_EXP : <<include>>
+
+@enduml

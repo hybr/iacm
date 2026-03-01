@@ -1,0 +1,173 @@
+@startuml Class_Diagram
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+skinparam packageFontSize 13
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #EEF4FF
+    BorderColor #2E5FA3
+    ArrowColor #2E5FA3
+    FontColor #1A1A2E
+}
+skinparam package {
+    BackgroundColor #F5F8FF
+    BorderColor #6B93D6
+}
+
+title Club Management System — Class Diagram
+
+' ─────────────────────────────────────────
+package "Models" {
+
+    enum UserRole {
+        GRADE_9
+        GRADE_11
+        CLUB_MANAGER
+    }
+
+    class User {
+        - id : int
+        - username : String
+        - passwordHash : String
+        - passwordSalt : String
+        - email : String
+        - fullName : String
+        - securityQuestion : String
+        - securityAnswer : String
+        - role : UserRole
+        - assignedClubId : Integer
+        - firstLoginCompleted : boolean
+        - isActive : boolean
+        + getAssignedClubId() : Integer
+        + getRole() : UserRole
+    }
+
+    class Club {
+        - id : int
+        - name : String
+        - description : String
+        + getId() : int
+        + getName() : String
+    }
+
+    class Attendance {
+        - id : int
+        - studentId : int
+        - clubId : int
+        - markedById : int
+        - sessionDate : LocalDate
+        - sessionTime : LocalTime
+        - status : AttendanceStatus
+        - notes : String
+        + isPresent() : boolean
+    }
+
+    enum AttendanceStatus {
+        PRESENT
+        ABSENT
+        LATE
+        EXCUSED
+        + toString() : String
+    }
+
+    class Proposal {
+        - id : int
+        - submittedById : int
+        - clubId : int
+        - title : String
+        - description : String
+        - status : String
+        - submittedAt : LocalDateTime
+    }
+
+    class ClubAllocation {
+        - id : int
+        - studentId : int
+        - clubId : int
+    }
+}
+
+' ─────────────────────────────────────────
+package "DAO Layer" {
+
+    class UserDAO {
+        + getUsersByRole(role) : List<User>
+        + getUserByUsername(u) : User
+        + getUserById(id) : User
+        + getAllUsers() : List<User>
+        + insertUser(user) : boolean
+        + updateUserClubAssignment(id, clubId) : boolean
+        + updatePasswordWithSalt(id, hash, salt) : boolean
+        + getGrade9StudentsWithClubAssignments() : List<User>
+    }
+
+    class ClubDAO {
+        + getAllClubs() : List<Club>
+        + getClubById(id) : Club
+    }
+
+    class AttendanceDAO {
+        + getAllAttendance() : List<Attendance>
+        + insertAttendance(a) : boolean
+        + getAttendanceByStudent(id) : List<Attendance>
+        + getStudentAttendanceForDate(sid, cid, date) : Attendance
+        + markAttendance(a) : boolean
+    }
+
+    class Grade11ClubAssignmentDAO {
+        + getAllGrade11Assignments() : List<StudentClubAssignment>
+        + assignClubsToStudent(id, clubs) : boolean
+        + getStudentClubs(id) : List<Club>
+        + hasClubAssignments(id) : boolean
+    }
+
+    class ProposalDAO {
+        + insertProposal(p) : boolean
+        + getProposalsByUser(id) : List<Proposal>
+        + getAllProposals() : List<Proposal>
+        + updateProposalStatus(id, status) : boolean
+    }
+}
+
+' ─────────────────────────────────────────
+package "Services" {
+
+    class AuthenticationService {
+        - currentUser : User
+        + login(username, password) : boolean
+        + logout() : void
+        + getCurrentUser() : User
+        + isLoggedIn() : boolean
+    }
+
+    class AttendanceService {
+        + markSelfAttendance(student, clubId) : boolean
+        + getStudentAttendance(studentId) : List<Attendance>
+        + hasMarkedToday(studentId, clubId) : boolean
+    }
+
+    class ClubAllocationService {
+        + allocateStudentToClub(studentId, clubId) : boolean
+        + getStudentClub(studentId) : Club
+    }
+}
+
+' ─────────────────────────────────────────
+' Relationships
+User "1" -- "1" UserRole : has >
+Attendance "1" -- "1" AttendanceStatus : has >
+User "1" -- "0..1" Club : assigned to >
+Proposal "many" -- "1" User : submitted by >
+Proposal "many" -- "1" Club : for >
+
+UserDAO ..> User : creates
+ClubDAO ..> Club : creates
+AttendanceDAO ..> Attendance : creates
+Grade11ClubAssignmentDAO ..> Club : creates
+ProposalDAO ..> Proposal : creates
+
+AuthenticationService ..> UserDAO : uses
+AttendanceService ..> AttendanceDAO : uses
+ClubAllocationService ..> Grade11ClubAssignmentDAO : uses
+
+@enduml
